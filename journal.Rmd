@@ -150,7 +150,9 @@ sales_by_location_tbl %>%
   )
 
 ```
+
 ### 6.2 Sales by Year and Location ----
+
 ```{r}
 # Step 1 - Manipulate
 sales_by_loc_year_tbl <- bike_orderlines_wrangled_tbl %>%
