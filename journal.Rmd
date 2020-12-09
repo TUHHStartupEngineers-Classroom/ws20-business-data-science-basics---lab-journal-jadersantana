@@ -16,7 +16,7 @@ output:
 knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE)
 ```
 
-# My first post edited
+# My first post edited 2
 
 Last compiled: `r Sys.Date()`
 ```{r}
@@ -57,7 +57,6 @@ bikeshops_tbl  <- read_excel("00_data/01_bike_sales/01_raw_data/bikeshops.xlsx")
 bikeshops_tbl
 glimpse(bikeshops_tbl)
 # 4.0 Joining Data ----
-left_join(orderlines_tbl, bikes_tbl)
 left_join(orderlines_tbl, bikes_tbl, by = c("product.id" = "bike.id"))
 bike_orderlines_joined_tbl <- orderlines_tbl %>%
   left_join(bikes_tbl, by = c("product.id" = "bike.id")) %>%

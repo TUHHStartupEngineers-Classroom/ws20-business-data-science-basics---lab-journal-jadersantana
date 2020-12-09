@@ -410,117 +410,305 @@ div.tocify {
 </div>
 
 
-<div id="my-first-post" class="section level1">
-<h1><span class="header-section-number">1</span> My first post</h1>
+<div id="my-first-post-edited-2" class="section level1">
+<h1><span class="header-section-number">1</span> My first post edited 2</h1>
 <p>Last compiled: 2020-12-08</p>
-</div>
-<div id="data-science-at-tuhh" class="section level1">
-<h1><span class="header-section-number">2</span> Data Science at TUHH ——————————————————</h1>
-</div>
-<div id="sales-analysis--" class="section level1">
-<h1><span class="header-section-number">3</span> SALES ANALYSIS —-</h1>
-</div>
-<div id="load-libraries--" class="section level1">
-<h1><span class="header-section-number">4</span> 1.0 Load libraries —-</h1>
-<p>library(tidyverse) # library(tibble) –&gt; is a modern re-imagining of the data frame # library(readr) –&gt; provides a fast and friendly way to read rectangular data like csv # library(dplyr) –&gt; provides a grammar of data manipulation # library(magrittr) –&gt; offers a set of operators which make your code more readable (pipe operator) # library(tidyr) –&gt; provides a set of functions that help you get to tidy data # library(stringr) –&gt; provides a cohesive set of functions designed to make working with strings as easy as possible # library(ggplot2) –&gt; graphics</p>
-<div id="attaching-packages-tidyverse-1.3.0" class="section level2">
-<h2><span class="header-section-number">4.1</span> ── Attaching packages ──────────────────────────────── tidyverse 1.3.0 ──</h2>
-</div>
-<div id="ggplot2-3.3.0-purrr-0.3.4" class="section level2">
-<h2><span class="header-section-number">4.2</span> ✓ ggplot2 3.3.0 ✓ purrr 0.3.4</h2>
-</div>
-<div id="tibble-3.0.1-dplyr-0.8.5" class="section level2">
-<h2><span class="header-section-number">4.3</span> ✓ tibble 3.0.1 ✓ dplyr 0.8.5</h2>
-</div>
-<div id="tidyr-1.0.2-stringr-1.4.0" class="section level2">
-<h2><span class="header-section-number">4.4</span> ✓ tidyr 1.0.2 ✓ stringr 1.4.0</h2>
-</div>
-<div id="readr-1.3.1-forcats-0.5.0" class="section level2">
-<h2><span class="header-section-number">4.5</span> ✓ readr 1.3.1 ✓ forcats 0.5.0</h2>
-</div>
-<div id="conflicts-tidyverse_conflicts" class="section level2">
-<h2><span class="header-section-number">4.6</span> ── Conflicts ───────────────────────────────────────── tidyverse_conflicts() ──</h2>
-</div>
-<div id="x-dplyrfilter-masks-statsfilter" class="section level2">
-<h2><span class="header-section-number">4.7</span> x dplyr::filter() masks stats::filter()</h2>
-</div>
-<div id="x-dplyrlag-masks-statslag" class="section level2">
-<h2><span class="header-section-number">4.8</span> x dplyr::lag() masks stats::lag()</h2>
-</div>
-</div>
-<div id="excel-files" class="section level1">
-<h1><span class="header-section-number">5</span> Excel Files</h1>
-<p>library(readxl) # 2.0 Importing Files —- # A good convention is to use the file name and suffix it with tbl for the data structure tibble bikes_tbl &lt;- read_excel(path = “00_data/01_bike_sales/01_raw_data/bikes.xlsx”) orderlines_tbl &lt;- read_excel(“00_data/01_bike_sales/01_raw_data/orderlines.xlsx”)</p>
-</div>
-<div id="not-necessary-for-this-analysis-but-for-the-sake-of-completeness" class="section level1">
-<h1><span class="header-section-number">6</span> Not necessary for this analysis, but for the sake of completeness</h1>
-<p>bikeshops_tbl &lt;- read_excel(“00_data/01_bike_sales/01_raw_data/bikeshops.xlsx”)</p>
-</div>
-<div id="examining-data--" class="section level1">
-<h1><span class="header-section-number">7</span> 3.0 Examining Data —-</h1>
-<p>bikeshops_tbl glimpse(bikeshops_tbl) # 4.0 Joining Data —- left_join(orderlines_tbl, bikes_tbl) left_join(orderlines_tbl, bikes_tbl, by = c(“product.id” = “bike.id”)) bike_orderlines_joined_tbl &lt;- orderlines_tbl %&gt;% left_join(bikes_tbl, by = c(“product.id” = “bike.id”)) %&gt;% left_join(bikeshops_tbl, by = c(“customer.id” = “bikeshop.id”)) bike_orderlines_joined_tbl %&gt;% glimpse() # 5.0 Wrangling Data —- # All actions are chained with the pipe already. You can perform each step separately and use glimpse() or View() to validate your code. Store the result in a variable at the end of the steps. bike_orderlines_wrangled_tbl &lt;- bike_orderlines_joined_tbl %&gt;% # 5.1 Separate category name separate(col = location, into = c(“city”, “state”), sep = “,”) %&gt;%</p>
-<p># 5.2 Add the total price (price * quantity) # Add a column to a tibble that uses a formula-style calculation of other columns mutate(total.price = price * quantity) %&gt;%</p>
-<p># 5.3 Optional: Reorganize. Using select to grab or remove unnecessary columns # 5.3.1 by exact column name select(-…1, -gender) %&gt;%</p>
-<p># 5.3.2 by a pattern # You can use the select_helpers to define patterns. # Type ?ends_with and click on Select helpers in the documentation select(-ends_with(“.id”)) %&gt;%</p>
-<p># 5.3.3 Actually we need the column “order.id”. Let’s bind it back to the data bind_cols(bike_orderlines_joined_tbl %&gt;% select(order.id)) %&gt;%</p>
-<p># 5.3.4 You can reorder the data by selecting the columns in your desired order. # You can use select_helpers like contains() or everything() select(order.id, contains(“order”), contains(“model”), contains(“category”), price, quantity, total.price, everything()) %&gt;%</p>
-<p># 5.4 Rename columns because we actually wanted underscores instead of the dots # (one at the time vs. multiple at once) rename(bikeshop = name) %&gt;% set_names(names(.) %&gt;% str_replace_all(“\.”, "_"))</p>
-</div>
-<div id="business-insights--" class="section level1">
-<h1><span class="header-section-number">8</span> 6.0 Business Insights —-</h1>
-</div>
-<div id="sales-by-location--" class="section level1">
-<h1><span class="header-section-number">9</span> 6.1 Sales by Location —-</h1>
-<p>library(lubridate) # Step 1 - Manipulate sales_by_location_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;%</p>
-<p># Select columns select(state, total_price) %&gt;%</p>
-<p># Add year column #no need mutate(year = year(order_date)) %&gt;%</p>
-<p># Grouping by state and summarizing sales group_by(state) %&gt;% summarize(sales = sum(total_price)) %&gt;%</p>
-<p># Optional: Add a column that turns the numbers into a currency format # (makes it in the plot optically more appealing) # mutate(sales_text = scales::dollar(sales)) &lt;- Works for dollar values mutate(sales_text = scales::dollar(sales, big.mark = “.”, decimal.mark = “,”, prefix = "“, suffix =” €"))</p>
-<p>sales_by_location_tbl</p>
-</div>
-<div id="step-2---visualize" class="section level1">
-<h1><span class="header-section-number">10</span> Step 2 - Visualize</h1>
-<p>sales_by_location_tbl %&gt;%</p>
-<p># Setup canvas with the columns location (x-axis) and sales (y-axis) ggplot(aes(x = state, y = sales)) +</p>
-<p># Geometries geom_col(fill = “#2DC6D6”) + # Use geom_col for a bar plot geom_label(aes(label = sales_text)) + # Adding labels to the bars geom_smooth(method = “lm”, se = FALSE) + # Adding a trendline</p>
-<p># Formatting # scale_y_continuous(labels = scales::dollar) + # Change the y-axis. # Again, we have to adjust it for euro values scale_y_continuous(labels = scales::dollar_format(big.mark = “.”, decimal.mark = “,”, prefix = "“, suffix =” €“)) + labs( title =”Revenue by Location(state)“, subtitle =”Not an upward Trend“, x =”“, # Override defaults for x and y y =”Revenue" ) theme(axis.text.x = element_text(angle = 45, hjust = 1))</p>
-</div>
-<div id="sales-by-year-and-location--" class="section level1">
-<h1><span class="header-section-number">11</span> 6.2 Sales by Year and Location —-</h1>
-</div>
-<div id="step-1---manipulate" class="section level1">
-<h1><span class="header-section-number">12</span> Step 1 - Manipulate</h1>
-<p>sales_by_loc_year_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;%</p>
-<p># Select columns and add a year select(order_date, total_price, state) %&gt;% mutate(year = year(order_date)) %&gt;%</p>
-<p># Group by and summarize year and main catgegory group_by(year, state) %&gt;% summarise(sales = sum(total_price)) %&gt;% ungroup() %&gt;%</p>
-<p># Format $ Text mutate(sales_text = scales::dollar(sales, big.mark = “.”, decimal.mark = “,”, prefix = "“, suffix =” €"))</p>
-<p>sales_by_loc_year_tbl<br />
-# Step 2 - Visualize sales_by_loc_year_tbl %&gt;%</p>
-<p># Set up x, y, fill ggplot(aes(x = year, y = sales, fill = state)) +</p>
-<p># Geometries geom_col() + # Run up to here to get a stacked bar plot</p>
-<p># Facet facet_wrap(~ state) +</p>
-<p># Formatting scale_y_continuous(labels = scales::dollar_format(big.mark = “.”, decimal.mark = “,”, prefix = "“, suffix =” €“)) + labs( title =”Revenue by year and location“, subtitle =”Each location has an upward trend“, fill =”Main Location" # Changes the legend name )</p>
+<pre class="r"><code># Data Science at TUHH ------------------------------------------------------
+# SALES ANALYSIS ----
+
+# 1.0 Load libraries ----
+
+library(tidyverse)
+#  library(tibble)    --&gt; is a modern re-imagining of the data frame
+#  library(readr)     --&gt; provides a fast and friendly way to read rectangular data like csv
+#  library(dplyr)     --&gt; provides a grammar of data manipulation
+#  library(magrittr)  --&gt; offers a set of operators which make your code more readable (pipe operator)
+#  library(tidyr)     --&gt; provides a set of functions that help you get to tidy data
+#  library(stringr)   --&gt; provides a cohesive set of functions designed to make working with strings as easy as possible
+#  library(ggplot2)   --&gt; graphics
+
+## ── Attaching packages ──────────────────────────────── tidyverse 1.3.0 ──
+## ✓ ggplot2 3.3.0     ✓ purrr   0.3.4
+## ✓ tibble  3.0.1     ✓ dplyr   0.8.5
+## ✓ tidyr   1.0.2     ✓ stringr 1.4.0
+## ✓ readr   1.3.1     ✓ forcats 0.5.0
+## ── Conflicts ───────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+
+# Excel Files
+library(readxl)
+# 2.0 Importing Files ----
+# A good convention is to use the file name and suffix it with tbl for the data structure tibble
+bikes_tbl      &lt;- read_excel(path = &quot;00_data/01_bike_sales/01_raw_data/bikes.xlsx&quot;)
+orderlines_tbl &lt;- read_excel(&quot;00_data/01_bike_sales/01_raw_data/orderlines.xlsx&quot;)
+
+# Not necessary for this analysis, but for the sake of completeness
+bikeshops_tbl  &lt;- read_excel(&quot;00_data/01_bike_sales/01_raw_data/bikeshops.xlsx&quot;)
+
+# 3.0 Examining Data ----
+bikeshops_tbl</code></pre>
+<pre><code>## # A tibble: 30 x 5
+##    bikeshop.id name                  location                          lat   lng
+##          &lt;dbl&gt; &lt;chr&gt;                 &lt;chr&gt;                           &lt;dbl&gt; &lt;dbl&gt;
+##  1           1 Zum Goldenen Lenker   Berlin, Berlin                   52.5 13.4 
+##  2           2 AlexandeRad           Hamburg, Hamburg                 53.6 10.0 
+##  3           3 Fahrradladen 16       Munich, Bavaria                  48.2 11.6 
+##  4           4 Bikestation Köln      Cologne, North Rhine-Westphalia  50.9  6.95
+##  5           5 Montimare             Frankfurt, Hesse                 50.1  8.68
+##  6           6 fahrschneller         Stuttgart, Baden-Württemberg     48.8  9.18
+##  7           7 Rad Ab                Düsseldorf, North Rhine-Westph~  51.2  6.79
+##  8           8 Lucky Bike            Dortmund, North Rhine-Westphal~  51.5  7.47
+##  9           9 Zweirad-Center Stadl~ Essen, North Rhine-Westphalia    51.5  7.01
+## 10          10 WITT-RAD              Bremen, Bremen                   53.1  8.83
+## # ... with 20 more rows</code></pre>
+<pre class="r"><code>glimpse(bikeshops_tbl)</code></pre>
+<pre><code>## Rows: 30
+## Columns: 5
+## $ bikeshop.id &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, ...
+## $ name        &lt;chr&gt; &quot;Zum Goldenen Lenker&quot;, &quot;AlexandeRad&quot;, &quot;Fahrradladen 16&quot;...
+## $ location    &lt;chr&gt; &quot;Berlin, Berlin&quot;, &quot;Hamburg, Hamburg&quot;, &quot;Munich, Bavaria&quot;...
+## $ lat         &lt;dbl&gt; 52.51667, 53.57532, 48.15000, 50.93333, 50.11552, 48.78...
+## $ lng         &lt;dbl&gt; 13.400000, 10.015340, 11.583333, 6.950000, 8.684167, 9....</code></pre>
+<pre class="r"><code># 4.0 Joining Data ----
+left_join(orderlines_tbl, bikes_tbl, by = c(&quot;product.id&quot; = &quot;bike.id&quot;))</code></pre>
+<pre><code>## # A tibble: 15,644 x 15
+##    ...1  order.id order.line order.date          customer.id product.id quantity
+##    &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt; &lt;dttm&gt;                    &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;
+##  1 1            1          1 2015-01-07 00:00:00           2       2681        1
+##  2 2            1          2 2015-01-07 00:00:00           2       2411        1
+##  3 3            2          1 2015-01-10 00:00:00          10       2629        1
+##  4 4            2          2 2015-01-10 00:00:00          10       2137        1
+##  5 5            3          1 2015-01-10 00:00:00           6       2367        1
+##  6 6            3          2 2015-01-10 00:00:00           6       1973        1
+##  7 7            3          3 2015-01-10 00:00:00           6       2422        1
+##  8 8            3          4 2015-01-10 00:00:00           6       2655        1
+##  9 9            3          5 2015-01-10 00:00:00           6       2247        1
+## 10 10           4          1 2015-01-11 00:00:00          22       2408        1
+## # ... with 15,634 more rows, and 8 more variables: model &lt;chr&gt;,
+## #   model.year &lt;dbl&gt;, frame.material &lt;chr&gt;, weight &lt;dbl&gt;, price &lt;dbl&gt;,
+## #   category &lt;chr&gt;, gender &lt;chr&gt;, url &lt;chr&gt;</code></pre>
+<pre class="r"><code>bike_orderlines_joined_tbl &lt;- orderlines_tbl %&gt;%
+  left_join(bikes_tbl, by = c(&quot;product.id&quot; = &quot;bike.id&quot;)) %&gt;%
+  left_join(bikeshops_tbl, by = c(&quot;customer.id&quot; = &quot;bikeshop.id&quot;))
+bike_orderlines_joined_tbl %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 15,644
+## Columns: 19
+## $ ...1           &lt;chr&gt; &quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot;, &quot;6&quot;, &quot;7&quot;, &quot;8&quot;, &quot;9&quot;, &quot;10&quot;, &quot;...
+## $ order.id       &lt;dbl&gt; 1, 1, 2, 2, 3, 3, 3, 3, 3, 4, 5, 5, 5, 5, 6, 6, 6, 6...
+## $ order.line     &lt;dbl&gt; 1, 2, 1, 2, 1, 2, 3, 4, 5, 1, 1, 2, 3, 4, 1, 2, 3, 4...
+## $ order.date     &lt;dttm&gt; 2015-01-07, 2015-01-07, 2015-01-10, 2015-01-10, 201...
+## $ customer.id    &lt;dbl&gt; 2, 2, 10, 10, 6, 6, 6, 6, 6, 22, 8, 8, 8, 8, 16, 16,...
+## $ product.id     &lt;dbl&gt; 2681, 2411, 2629, 2137, 2367, 1973, 2422, 2655, 2247...
+## $ quantity       &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1...
+## $ model          &lt;chr&gt; &quot;Spectral CF 7 WMN&quot;, &quot;Ultimate CF SLX Disc 8.0 ETAP&quot;...
+## $ model.year     &lt;dbl&gt; 2021, 2020, 2021, 2019, 2020, 2020, 2020, 2021, 2020...
+## $ frame.material &lt;chr&gt; &quot;carbon&quot;, &quot;carbon&quot;, &quot;carbon&quot;, &quot;carbon&quot;, &quot;aluminium&quot;,...
+## $ weight         &lt;dbl&gt; 13.80, 7.44, 14.06, 8.80, 11.50, 8.80, 8.20, 8.85, 1...
+## $ price          &lt;dbl&gt; 3119, 5359, 2729, 1749, 1219, 1359, 2529, 1559, 3899...
+## $ category       &lt;chr&gt; &quot;Mountain - Trail - Spectral&quot;, &quot;Road - Race - Ultima...
+## $ gender         &lt;chr&gt; &quot;female&quot;, &quot;unisex&quot;, &quot;unisex&quot;, &quot;unisex&quot;, &quot;unisex&quot;, &quot;u...
+## $ url            &lt;chr&gt; &quot;https://www.canyon.com/en-de/mountain-bikes/trail-b...
+## $ name           &lt;chr&gt; &quot;AlexandeRad&quot;, &quot;AlexandeRad&quot;, &quot;WITT-RAD&quot;, &quot;WITT-RAD&quot;...
+## $ location       &lt;chr&gt; &quot;Hamburg, Hamburg&quot;, &quot;Hamburg, Hamburg&quot;, &quot;Bremen, Bre...
+## $ lat            &lt;dbl&gt; 53.57532, 53.57532, 53.07379, 53.07379, 48.78234, 48...
+## $ lng            &lt;dbl&gt; 10.015340, 10.015340, 8.826754, 8.826754, 9.180819, ...</code></pre>
+<pre class="r"><code># 5.0 Wrangling Data ----
+# All actions are chained with the pipe already. You can perform each step separately and use glimpse() or View() to validate your code. Store the result in a variable at the end of the steps.
+bike_orderlines_wrangled_tbl &lt;- bike_orderlines_joined_tbl %&gt;%
+  # 5.1 Separate category name
+  separate(col    = location,
+           into   = c(&quot;city&quot;, &quot;state&quot;),
+           sep    = &quot;, &quot;) %&gt;%
+  
+  # 5.2 Add the total price (price * quantity) 
+  # Add a column to a tibble that uses a formula-style calculation of other columns
+  mutate(total.price = price * quantity) %&gt;%
+  
+  # 5.3 Optional: Reorganize. Using select to grab or remove unnecessary columns
+  # 5.3.1 by exact column name
+  select(-...1, -gender) %&gt;%
+  
+  # 5.3.2 by a pattern
+  # You can use the select_helpers to define patterns. 
+  # Type ?ends_with and click on Select helpers in the documentation
+  select(-ends_with(&quot;.id&quot;)) %&gt;%
+  
+  # 5.3.3 Actually we need the column &quot;order.id&quot;. Let&#39;s bind it back to the data
+  bind_cols(bike_orderlines_joined_tbl %&gt;% select(order.id)) %&gt;% 
+  
+  # 5.3.4 You can reorder the data by selecting the columns in your desired order.
+  # You can use select_helpers like contains() or everything()
+  select(order.id, contains(&quot;order&quot;), contains(&quot;model&quot;), contains(&quot;category&quot;),
+         price, quantity, total.price,
+         everything()) %&gt;%
+  
+  # 5.4 Rename columns because we actually wanted underscores instead of the dots
+  # (one at the time vs. multiple at once)
+  rename(bikeshop = name) %&gt;%
+  set_names(names(.) %&gt;% str_replace_all(&quot;\\.&quot;, &quot;_&quot;))
+
+# 6.0 Business Insights ----
+# 6.1 Sales by Location ----
+library(lubridate)
+# Step 1 - Manipulate
+sales_by_location_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;%
+  
+  # Select columns
+  select(state, total_price) %&gt;%
+  
+  # Add year column
+  #no need mutate(year = year(order_date)) %&gt;%
+  
+  # Grouping by state and summarizing sales
+  group_by(state) %&gt;% 
+  summarize(sales = sum(total_price)) %&gt;%
+  
+  # Optional: Add a column that turns the numbers into a currency format 
+  # (makes it in the plot optically more appealing)
+  # mutate(sales_text = scales::dollar(sales)) &lt;- Works for dollar values
+  mutate(sales_text = scales::dollar(sales, big.mark = &quot;.&quot;, 
+                                     decimal.mark = &quot;,&quot;, 
+                                     prefix = &quot;&quot;, 
+                                     suffix = &quot; €&quot;))
+
+sales_by_location_tbl</code></pre>
+<pre><code>## # A tibble: 12 x 3
+##    state                            sales sales_text  
+##    &lt;chr&gt;                            &lt;dbl&gt; &lt;chr&gt;       
+##  1 Baden-Württemberg              6521090 6.521.090 € 
+##  2 Bavaria                        6742819 6.742.819 € 
+##  3 Berlin                         1128433 1.128.433 € 
+##  4 Bremen                        10653499 10.653.499 €
+##  5 Hamburg                        3874756 3.874.756 € 
+##  6 Hesse                          1558901 1.558.901 € 
+##  7 Lower Saxony                   4107115 4.107.115 € 
+##  8 Mecklenburg-Western Pomerania   618974 618.974 €   
+##  9 North Rhine-Westphalia        21200613 21.200.613 €
+## 10 Saxony                         2230245 2.230.245 € 
+## 11 Saxony-Anhalt                   569614 569.614 €   
+## 12 Schleswig-Holstein             3224749 3.224.749 €</code></pre>
+<pre class="r"><code># Step 2 - Visualize
+sales_by_location_tbl %&gt;%
+  
+  # Setup canvas with the columns location (x-axis) and sales (y-axis)
+  ggplot(aes(x = state, y = sales)) +
+  
+  # Geometries
+  geom_col(fill = &quot;#2DC6D6&quot;) + # Use geom_col for a bar plot
+  geom_label(aes(label = sales_text)) + # Adding labels to the bars
+  geom_smooth(method = &quot;lm&quot;, se = FALSE) + # Adding a trendline
+  
+  # Formatting
+  # scale_y_continuous(labels = scales::dollar) + # Change the y-axis. 
+  # Again, we have to adjust it for euro values
+  scale_y_continuous(labels = scales::dollar_format(big.mark = &quot;.&quot;, 
+                                                    decimal.mark = &quot;,&quot;, 
+                                                    prefix = &quot;&quot;, 
+                                                    suffix = &quot; €&quot;)) +
+  labs(
+    title    = &quot;Revenue by Location(state)&quot;,
+    subtitle = &quot;Not an upward Trend&quot;,
+    x = &quot;&quot;, # Override defaults for x and y
+    y = &quot;Revenue&quot;
+  )</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<pre><code>## List of 1
+##  $ axis.text.x:List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : num 1
+##   ..$ vjust        : NULL
+##   ..$ angle        : num 45
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  - attr(*, &quot;class&quot;)= chr [1:2] &quot;theme&quot; &quot;gg&quot;
+##  - attr(*, &quot;complete&quot;)= logi FALSE
+##  - attr(*, &quot;validate&quot;)= logi TRUE</code></pre>
+<pre class="r"><code># 6.2 Sales by Year and Location ----
+# Step 1 - Manipulate
+sales_by_loc_year_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;%
+  
+  # Select columns and add a year
+  select(order_date, total_price, state) %&gt;%
+  mutate(year = year(order_date)) %&gt;%
+  
+  # Group by and summarize year and main catgegory
+  group_by(year, state) %&gt;%
+  summarise(sales = sum(total_price)) %&gt;%
+  ungroup() %&gt;%
+  
+  # Format $ Text
+  mutate(sales_text = scales::dollar(sales, big.mark = &quot;.&quot;, 
+                                     decimal.mark = &quot;,&quot;, 
+                                     prefix = &quot;&quot;, 
+                                     suffix = &quot; €&quot;))
+
+sales_by_loc_year_tbl  </code></pre>
+<pre><code>## # A tibble: 60 x 4
+##     year state                           sales sales_text 
+##    &lt;dbl&gt; &lt;chr&gt;                           &lt;dbl&gt; &lt;chr&gt;      
+##  1  2015 Baden-Württemberg             1031924 1.031.924 €
+##  2  2015 Bavaria                       1301461 1.301.461 €
+##  3  2015 Berlin                          95853 95.853 €   
+##  4  2015 Bremen                        1395912 1.395.912 €
+##  5  2015 Hamburg                        423090 423.090 €  
+##  6  2015 Hesse                          308609 308.609 €  
+##  7  2015 Lower Saxony                   584386 584.386 €  
+##  8  2015 Mecklenburg-Western Pomerania  222003 222.003 €  
+##  9  2015 North Rhine-Westphalia        3735092 3.735.092 €
+## 10  2015 Saxony                         238371 238.371 €  
+## # ... with 50 more rows</code></pre>
+<pre class="r"><code># Step 2 - Visualize
+sales_by_loc_year_tbl %&gt;%
+  
+  # Set up x, y, fill
+  ggplot(aes(x = year, y = sales, fill = state)) +
+  
+  # Geometries
+  geom_col() + # Run up to here to get a stacked bar plot
+  
+  # Facet
+  facet_wrap(~ state) +
+  
+  # Formatting
+  scale_y_continuous(labels = scales::dollar_format(big.mark = &quot;.&quot;, 
+                                                    decimal.mark = &quot;,&quot;, 
+                                                    prefix = &quot;&quot;, 
+                                                    suffix = &quot; €&quot;)) +
+  labs(
+    title = &quot;Revenue by year and location&quot;,
+    subtitle = &quot;Each location has an upward trend&quot;,
+    fill = &quot;Main Location&quot; # Changes the legend name
+  )</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
 <div id="second-level-header" class="section level2">
-<h2><span class="header-section-number">12.1</span> Second level header</h2>
+<h2><span class="header-section-number">1.1</span> Second level header</h2>
 <p>You can add more headers by adding more hashtags. These won’t be put into the table of contents</p>
 <div id="third-level-header" class="section level3">
-<h3><span class="header-section-number">12.1.1</span> third level header</h3>
+<h3><span class="header-section-number">1.1.1</span> third level header</h3>
 <p>Here’s an even lower level header</p>
 </div>
 </div>
 </div>
 <div id="my-second-post-note-the-order" class="section level1">
-<h1><span class="header-section-number">13</span> My second post (note the order)</h1>
+<h1><span class="header-section-number">2</span> My second post (note the order)</h1>
 <p>Last compiled: 2020-12-08</p>
 <p>I’m writing this tutorial going from the top down. And, this is how it will be printed. So, notice the second post is second in the list. If you want your most recent post to be at the top, then make a new post starting at the top. If you want the oldest first, do, then keep adding to the bottom</p>
 </div>
 <div id="adding-r-stuff" class="section level1">
-<h1><span class="header-section-number">14</span> Adding R stuff</h1>
+<h1><span class="header-section-number">3</span> Adding R stuff</h1>
 <p>So far this is just a blog where you can write in plain text and serve your writing to a webpage. One of the main purposes of this lab journal is to record your progress learning R. The reason I am asking you to use this process is because you can both make a website, and a lab journal, and learn R all in R-studio. This makes everything really convenient and in the same place.</p>
 <p>So, let’s say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this:</p>
 <pre class="r"><code>samples &lt;- rnorm(100, mean=0, sd=1)
 hist(samples)</code></pre>
-<p><img src="journal_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p><img src="journal_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <p>When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You’ll learn that all of these things and more can be customized in each R code block.</p>
 </div>
 
