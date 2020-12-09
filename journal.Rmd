@@ -19,7 +19,7 @@ knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE)
 # My first post
 
 Last compiled: `r Sys.Date()`
-
+```{r}
 # Data Science at TUHH ------------------------------------------------------
 # SALES ANALYSIS ----
 
@@ -192,7 +192,7 @@ sales_by_loc_year_tbl %>%
     subtitle = "Each location has an upward trend",
     fill = "Main Location" # Changes the legend name
   )
-
+```
 
 ## Second level header
 
