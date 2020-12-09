@@ -46,17 +46,22 @@ orderlines_tbl <- read_excel("00_data/01_bike_sales/01_raw_data/orderlines.xlsx"
 
 # Not necessary for this analysis, but for the sake of completeness
 bikeshops_tbl  <- read_excel("00_data/01_bike_sales/01_raw_data/bikeshops.xlsx")
-
-# 3.0 Examining Data ----
+```
+## 3.0 Examining Data ----
+```{r}
 bikeshops_tbl
 glimpse(bikeshops_tbl)
-# 4.0 Joining Data ----
+```
+## 4.0 Joining Data ----
+```{r}
 left_join(orderlines_tbl, bikes_tbl, by = c("product.id" = "bike.id"))
 bike_orderlines_joined_tbl <- orderlines_tbl %>%
   left_join(bikes_tbl, by = c("product.id" = "bike.id")) %>%
   left_join(bikeshops_tbl, by = c("customer.id" = "bikeshop.id"))
 bike_orderlines_joined_tbl %>% glimpse()
-# 5.0 Wrangling Data ----
+```
+## 5.0 Wrangling Data ----
+```{r}
 # All actions are chained with the pipe already. You can perform each step separately and use glimpse() or View() to validate your code. Store the result in a variable at the end of the steps.
 bike_orderlines_wrangled_tbl <- bike_orderlines_joined_tbl %>%
   # 5.1 Separate category name
@@ -90,9 +95,11 @@ bike_orderlines_wrangled_tbl <- bike_orderlines_joined_tbl %>%
   # (one at the time vs. multiple at once)
   rename(bikeshop = name) %>%
   set_names(names(.) %>% str_replace_all("\\.", "_"))
+```
+## 6.0 Business Insights ----
 
-# 6.0 Business Insights ----
-# 6.1 Sales by Location ----
+### 6.1 Sales by Location ----
+```{r}
 library(lubridate)
 # Step 1 - Manipulate
 sales_by_location_tbl <- bike_orderlines_wrangled_tbl %>%
@@ -142,8 +149,9 @@ sales_by_location_tbl %>%
     y = "Revenue"
   )
 
-
-# 6.2 Sales by Year and Location ----
+```
+### 6.2 Sales by Year and Location ----
+```{r}
 # Step 1 - Manipulate
 sales_by_loc_year_tbl <- bike_orderlines_wrangled_tbl %>%
   

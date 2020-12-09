@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2020-12-09 00:19:01</p>
+<p>Last compiled: 2020-12-09 00:29:41</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -439,10 +439,11 @@ bikes_tbl      &lt;- read_excel(path = &quot;00_data/01_bike_sales/01_raw_data/b
 orderlines_tbl &lt;- read_excel(&quot;00_data/01_bike_sales/01_raw_data/orderlines.xlsx&quot;)
 
 # Not necessary for this analysis, but for the sake of completeness
-bikeshops_tbl  &lt;- read_excel(&quot;00_data/01_bike_sales/01_raw_data/bikeshops.xlsx&quot;)
-
-# 3.0 Examining Data ----
-bikeshops_tbl</code></pre>
+bikeshops_tbl  &lt;- read_excel(&quot;00_data/01_bike_sales/01_raw_data/bikeshops.xlsx&quot;)</code></pre>
+</div>
+<div id="examining-data--" class="section level2">
+<h2><span class="header-section-number">2.3</span> 3.0 Examining Data —-</h2>
+<pre class="r"><code>bikeshops_tbl</code></pre>
 <pre><code>## # A tibble: 30 x 5
 ##    bikeshop.id name                  location                          lat   lng
 ##          &lt;dbl&gt; &lt;chr&gt;                 &lt;chr&gt;                           &lt;dbl&gt; &lt;dbl&gt;
@@ -465,8 +466,10 @@ bikeshops_tbl</code></pre>
 ## $ location    &lt;chr&gt; &quot;Berlin, Berlin&quot;, &quot;Hamburg, Hamburg&quot;, &quot;Munich, Bavaria&quot;...
 ## $ lat         &lt;dbl&gt; 52.51667, 53.57532, 48.15000, 50.93333, 50.11552, 48.78...
 ## $ lng         &lt;dbl&gt; 13.400000, 10.015340, 11.583333, 6.950000, 8.684167, 9....</code></pre>
-<pre class="r"><code># 4.0 Joining Data ----
-left_join(orderlines_tbl, bikes_tbl, by = c(&quot;product.id&quot; = &quot;bike.id&quot;))</code></pre>
+</div>
+<div id="joining-data--" class="section level2">
+<h2><span class="header-section-number">2.4</span> 4.0 Joining Data —-</h2>
+<pre class="r"><code>left_join(orderlines_tbl, bikes_tbl, by = c(&quot;product.id&quot; = &quot;bike.id&quot;))</code></pre>
 <pre><code>## # A tibble: 15,644 x 15
 ##    ...1  order.id order.line order.date          customer.id product.id quantity
 ##    &lt;chr&gt;    &lt;dbl&gt;      &lt;dbl&gt; &lt;dttm&gt;                    &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;
@@ -508,8 +511,10 @@ bike_orderlines_joined_tbl %&gt;% glimpse()</code></pre>
 ## $ location       &lt;chr&gt; &quot;Hamburg, Hamburg&quot;, &quot;Hamburg, Hamburg&quot;, &quot;Bremen, Bre...
 ## $ lat            &lt;dbl&gt; 53.57532, 53.57532, 53.07379, 53.07379, 48.78234, 48...
 ## $ lng            &lt;dbl&gt; 10.015340, 10.015340, 8.826754, 8.826754, 9.180819, ...</code></pre>
-<pre class="r"><code># 5.0 Wrangling Data ----
-# All actions are chained with the pipe already. You can perform each step separately and use glimpse() or View() to validate your code. Store the result in a variable at the end of the steps.
+</div>
+<div id="wrangling-data--" class="section level2">
+<h2><span class="header-section-number">2.5</span> 5.0 Wrangling Data —-</h2>
+<pre class="r"><code># All actions are chained with the pipe already. You can perform each step separately and use glimpse() or View() to validate your code. Store the result in a variable at the end of the steps.
 bike_orderlines_wrangled_tbl &lt;- bike_orderlines_joined_tbl %&gt;%
   # 5.1 Separate category name
   separate(col    = location,
@@ -541,11 +546,13 @@ bike_orderlines_wrangled_tbl &lt;- bike_orderlines_joined_tbl %&gt;%
   # 5.4 Rename columns because we actually wanted underscores instead of the dots
   # (one at the time vs. multiple at once)
   rename(bikeshop = name) %&gt;%
-  set_names(names(.) %&gt;% str_replace_all(&quot;\\.&quot;, &quot;_&quot;))
-
-# 6.0 Business Insights ----
-# 6.1 Sales by Location ----
-library(lubridate)
+  set_names(names(.) %&gt;% str_replace_all(&quot;\\.&quot;, &quot;_&quot;))</code></pre>
+</div>
+<div id="business-insights--" class="section level2">
+<h2><span class="header-section-number">2.6</span> 6.0 Business Insights —-</h2>
+<div id="sales-by-location--" class="section level3">
+<h3><span class="header-section-number">2.6.1</span> 6.1 Sales by Location —-</h3>
+<pre class="r"><code>library(lubridate)
 # Step 1 - Manipulate
 sales_by_location_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;%
   
@@ -607,9 +614,8 @@ sales_by_location_tbl %&gt;%
     x = &quot;&quot;, # Override defaults for x and y
     y = &quot;Revenue&quot;
   )</code></pre>
-<p><img src="journal_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-<pre class="r"><code># 6.2 Sales by Year and Location ----
-# Step 1 - Manipulate
+<p><img src="journal_files/figure-html/unnamed-chunk-6-1.png" width="672" /> ### 6.2 Sales by Year and Location —-</p>
+<pre class="r"><code># Step 1 - Manipulate
 sales_by_loc_year_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;%
   
   # Select columns and add a year
@@ -665,6 +671,7 @@ sales_by_loc_year_tbl %&gt;%
     fill = &quot;Main Location&quot; # Changes the legend name
   )</code></pre>
 <p><img src="journal_files/figure-html/plot-1.png" width="1248" /></p>
+</div>
 </div>
 </div>
 
