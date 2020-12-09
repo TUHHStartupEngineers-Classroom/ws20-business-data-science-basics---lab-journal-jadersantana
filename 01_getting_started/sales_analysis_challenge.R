@@ -107,7 +107,7 @@ sales_by_location_tbl %>%
   
   # Setup canvas with the columns location (x-axis) and sales (y-axis)
   ggplot(aes(x = state, y = sales)) +
-  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   # Geometries
   geom_col(fill = "#2DC6D6") + # Use geom_col for a bar plot
   geom_label(aes(label = sales_text)) + # Adding labels to the bars
@@ -126,7 +126,7 @@ sales_by_location_tbl %>%
     x = "", # Override defaults for x and y
     y = "Revenue"
   )
-theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 # 6.2 Sales by Year and Location ----
 # Step 1 - Manipulate

@@ -410,15 +410,16 @@ div.tocify {
 </div>
 
 
-<div id="my-first-post-edited-2" class="section level1">
-<h1><span class="header-section-number">1</span> My first post edited 2</h1>
-<p>Last compiled: 2020-12-08</p>
-<pre class="r"><code># Data Science at TUHH ------------------------------------------------------
-# SALES ANALYSIS ----
-
-# 1.0 Load libraries ----
-
-library(tidyverse)
+<div id="challenge-01_intro_r-introduction-to-r-rstudio-ide-github" class="section level1">
+<h1><span class="header-section-number">1</span> Challenge 01_intro_r Introduction to R, RStudio IDE &amp; Github</h1>
+<p>no specific challenge for this unit</p>
+</div>
+<div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
+<h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
+<p>Last compiled: 2020-12-09 00:19:01</p>
+<div id="load-libraries--" class="section level2">
+<h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
+<pre class="r"><code>library(tidyverse)
 #  library(tibble)    --&gt; is a modern re-imagining of the data frame
 #  library(readr)     --&gt; provides a fast and friendly way to read rectangular data like csv
 #  library(dplyr)     --&gt; provides a grammar of data manipulation
@@ -427,19 +428,13 @@ library(tidyverse)
 #  library(stringr)   --&gt; provides a cohesive set of functions designed to make working with strings as easy as possible
 #  library(ggplot2)   --&gt; graphics
 
-## ── Attaching packages ──────────────────────────────── tidyverse 1.3.0 ──
-## ✓ ggplot2 3.3.0     ✓ purrr   0.3.4
-## ✓ tibble  3.0.1     ✓ dplyr   0.8.5
-## ✓ tidyr   1.0.2     ✓ stringr 1.4.0
-## ✓ readr   1.3.1     ✓ forcats 0.5.0
-## ── Conflicts ───────────────────────────────────────── tidyverse_conflicts() ──
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()
 
 # Excel Files
-library(readxl)
-# 2.0 Importing Files ----
-# A good convention is to use the file name and suffix it with tbl for the data structure tibble
+library(readxl)</code></pre>
+</div>
+<div id="importing-files--" class="section level2">
+<h2><span class="header-section-number">2.2</span> 2.0 Importing Files —-</h2>
+<pre class="r"><code># A good convention is to use the file name and suffix it with tbl for the data structure tibble
 bikes_tbl      &lt;- read_excel(path = &quot;00_data/01_bike_sales/01_raw_data/bikes.xlsx&quot;)
 orderlines_tbl &lt;- read_excel(&quot;00_data/01_bike_sales/01_raw_data/orderlines.xlsx&quot;)
 
@@ -593,7 +588,7 @@ sales_by_location_tbl %&gt;%
   
   # Setup canvas with the columns location (x-axis) and sales (y-axis)
   ggplot(aes(x = state, y = sales)) +
-  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   # Geometries
   geom_col(fill = &quot;#2DC6D6&quot;) + # Use geom_col for a bar plot
   geom_label(aes(label = sales_text)) + # Adding labels to the bars
@@ -612,25 +607,7 @@ sales_by_location_tbl %&gt;%
     x = &quot;&quot;, # Override defaults for x and y
     y = &quot;Revenue&quot;
   )</code></pre>
-<p><img src="journal_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
-<pre class="r"><code>theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<pre><code>## List of 1
-##  $ axis.text.x:List of 11
-##   ..$ family       : NULL
-##   ..$ face         : NULL
-##   ..$ colour       : NULL
-##   ..$ size         : NULL
-##   ..$ hjust        : num 1
-##   ..$ vjust        : NULL
-##   ..$ angle        : num 45
-##   ..$ lineheight   : NULL
-##   ..$ margin       : NULL
-##   ..$ debug        : NULL
-##   ..$ inherit.blank: logi FALSE
-##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
-##  - attr(*, &quot;class&quot;)= chr [1:2] &quot;theme&quot; &quot;gg&quot;
-##  - attr(*, &quot;complete&quot;)= logi FALSE
-##  - attr(*, &quot;validate&quot;)= logi TRUE</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <pre class="r"><code># 6.2 Sales by Year and Location ----
 # Step 1 - Manipulate
 sales_by_loc_year_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;%
@@ -650,7 +627,7 @@ sales_by_loc_year_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;%
                                      prefix = &quot;&quot;, 
                                      suffix = &quot; €&quot;))
 
-sales_by_loc_year_tbl  </code></pre>
+sales_by_loc_year_tbl</code></pre>
 <pre><code>## # A tibble: 60 x 4
 ##     year state                           sales sales_text 
 ##    &lt;dbl&gt; &lt;chr&gt;                           &lt;dbl&gt; &lt;chr&gt;      
@@ -670,7 +647,7 @@ sales_by_loc_year_tbl %&gt;%
   
   # Set up x, y, fill
   ggplot(aes(x = year, y = sales, fill = state)) +
-  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   # Geometries
   geom_col() + # Run up to here to get a stacked bar plot
   
@@ -687,29 +664,8 @@ sales_by_loc_year_tbl %&gt;%
     subtitle = &quot;Each location has an upward trend&quot;,
     fill = &quot;Main Location&quot; # Changes the legend name
   )</code></pre>
-<p><img src="journal_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
-<div id="second-level-header" class="section level2">
-<h2><span class="header-section-number">1.1</span> Second level header</h2>
-<p>You can add more headers by adding more hashtags. These won’t be put into the table of contents</p>
-<div id="third-level-header" class="section level3">
-<h3><span class="header-section-number">1.1.1</span> third level header</h3>
-<p>Here’s an even lower level header</p>
+<p><img src="journal_files/figure-html/plot-1.png" width="1248" /></p>
 </div>
-</div>
-</div>
-<div id="my-second-post-note-the-order" class="section level1">
-<h1><span class="header-section-number">2</span> My second post (note the order)</h1>
-<p>Last compiled: 2020-12-08</p>
-<p>I’m writing this tutorial going from the top down. And, this is how it will be printed. So, notice the second post is second in the list. If you want your most recent post to be at the top, then make a new post starting at the top. If you want the oldest first, do, then keep adding to the bottom</p>
-</div>
-<div id="adding-r-stuff" class="section level1">
-<h1><span class="header-section-number">3</span> Adding R stuff</h1>
-<p>So far this is just a blog where you can write in plain text and serve your writing to a webpage. One of the main purposes of this lab journal is to record your progress learning R. The reason I am asking you to use this process is because you can both make a website, and a lab journal, and learn R all in R-studio. This makes everything really convenient and in the same place.</p>
-<p>So, let’s say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this:</p>
-<pre class="r"><code>samples &lt;- rnorm(100, mean=0, sd=1)
-hist(samples)</code></pre>
-<p><img src="journal_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-<p>When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You’ll learn that all of these things and more can be customized in each R code block.</p>
 </div>
 
 
