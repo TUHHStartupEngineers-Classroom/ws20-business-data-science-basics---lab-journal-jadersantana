@@ -16,7 +16,7 @@ output:
 knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE)
 ```
 
-# My first post
+# My first post edited
 
 Last compiled: `r Sys.Date()`
 ```{r}
