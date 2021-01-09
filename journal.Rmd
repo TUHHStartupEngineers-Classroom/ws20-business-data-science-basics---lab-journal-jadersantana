@@ -198,3 +198,10 @@ sales_by_loc_year_tbl %>%
     fill = "Main Location" # Changes the legend name
   )
 ```
+
+# Challenge 03_Data Aquisition
+
+Last compiled: `r Sys.time()`
+
+## 1.0 Load libraries ----
+test
