@@ -242,19 +242,19 @@ assignee_tbl <- vroom(
             na         = c("", "NA", "NULL")
         )
 
-#col_types_patent_tbl <- list(
- # id = col_character(),
-  #type = col_character(),
-#  number = col_character(),
-  #country = col_character(),
- # date = col_date("%Y-%m-%d"),
-#  abstract = col_character(),
- # title = col_character(),
-  #kind = col_character(),
- # num_claims = col_double(),
-#  filename = col_character(),
-  #withdrawn = col_double()
-#)
+col_types_patent_tbl <- list(
+  id = col_character(),
+  type = col_character(),
+  number = col_character(),
+  country = col_character(),
+  date = col_date("%Y-%m-%d"),
+  abstract = col_character(),
+  title = col_character(),
+  kind = col_character(),
+  num_claims = col_double(),
+  filename = col_character(),
+  withdrawn = col_double()
+)
 
 #patent_tbl <- vroom(
 #            file       = "00_data/04_challenge/patent.tsv", 
@@ -263,18 +263,18 @@ assignee_tbl <- vroom(
 #            na         = c("", "NA", "NULL")
 #        )
 
-#col_types_patent_assignee_tbl <- list(
-#  patent_id = col_character(),
-#  assignee_id = col_character(),
-#  location_id = col_character()
-#)
+col_types_patent_assignee_tbl <- list(
+  patent_id = col_character(),
+  assignee_id = col_character(),
+  location_id = col_character()
+)
 
-#patent_assignee_tbl <- vroom(
-#            file       = "00_data/04_challenge/patent_assignee.tsv", 
-#            delim      = "\t", 
-#            col_types  = col_types_patent_assignee_tbl,
-#            na         = c("", "NA", "NULL")
-#        )
+patent_assignee_tbl <- vroom(
+            file       = "00_data/04_challenge/patent_assignee.tsv", 
+            delim      = "\t", 
+            col_types  = col_types_patent_assignee_tbl,
+            na         = c("", "NA", "NULL")
+        )
 
 #col_types_uspc_tbl <- list(
 #  uuid = col_character(),
