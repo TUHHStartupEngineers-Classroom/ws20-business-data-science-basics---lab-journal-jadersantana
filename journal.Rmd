@@ -235,12 +235,12 @@ col_types_assignee_tbl <- list(
   organization = col_character()
 )
 
-#assignee_tbl <- vroom(
- #           file       = "00_data/04_challenge/assignee.tsv", 
-  #          delim      = "\t", 
-   #         col_types  = col_types_assignee_tbl,
-    #        na         = c("", "NA", "NULL")
-     #   )
+assignee_tbl <- vroom(
+            file       = "00_data/04_challenge/assignee.tsv", 
+            delim      = "\t", 
+            col_types  = col_types_assignee_tbl,
+            na         = c("", "NA", "NULL")
+        )
 
 #col_types_patent_tbl <- list(
  # id = col_character(),
@@ -291,7 +291,7 @@ col_types_assignee_tbl <- list(
 #            na         = c("", "NA", "NULL")
 #        )
 
-#assignee_tbl %>% glimpse()
+assignee_tbl %>% glimpse()
 #patent_tbl %>% glimpse()
 #patent_assignee_tbl %>% glimpse()
 #uspc_tbl %>% glimpse()
