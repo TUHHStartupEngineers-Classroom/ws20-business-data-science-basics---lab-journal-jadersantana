@@ -211,7 +211,7 @@ Answer the following questions with that data:
 
 ## 1.0 Patent Dominance ----
 1. Patent Dominance: What US company / corporation has the most patents? List the 10 US companies with the most assigned/granted patents.
-```{r}
+```{r 1.0 Patent Dominance}
 #install.packages("vroom")
 #install.packages("tictoc")
 
@@ -319,27 +319,35 @@ patent_assignee_tbl %>% glimpse()
 # 4.0 DATA WRANGLING ----
 # 4.1 Joining / Merging Data ----
 
-#tic()
-#combined_assignee_patent_assignee_tbl <- merge(x = assignee_tbl, y = patent_assignee_tbl, 
- #                      by.x = "id", by.y = "assignee_id",
-  #                     all.x = TRUE, 
-   #                    all.y = TRUE)
-#toc()
+tic()
+combined_assignee_patent_assignee_tbl <- merge(x = assignee_tbl, y = patent_assignee_tbl, 
+                       by.x = "id", by.y = "assignee_id",
+                       all.x = TRUE, 
+                       all.y = TRUE)%>%
+mutate(patents_unit=1)%>%
+ group_by(organization) %>%
+  summarize(number_of_patents = sum(patents_unit)) %>%
+  ungroup()%>%
+  arrange(number_of_patents)
+toc()
 
-#combined_assignee_patent_assignee_tbl %>% glimpse()
-
-#setkey(combined_assignee_patent_assignee_tbl, "id")
-#key(combined_assignee_patent_assignee_tbl)
-
-#?setorder()
-#setorderv(combined_assignee_patent_assignee_tbl, c("id"))
-
+combined_assignee_patent_assignee_tbl %>%
+    select(organization, number_of_patents) %>%
+    arrange(desc(number_of_patents)) %>%
+    slice(1:11) %>%
+    filter(organization!="")
 
 ```
 
 
 ## 2.0 Recent Patent Acitivity ----
-2. Recent patent acitivity: What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019.
+2. Recent patent activity: What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019.
+
+```{r}
+
+```
+
+
 ## 3.0 Innovation in Tech ----
 3. Innovation in Tech: What is the most innovative tech sector? For the top 10 companies (worldwide) with the most patents, what are the top 5 USPTO tech main classes?
 

@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-01-13 14:07:13</p>
+<p>Last compiled: 2021-01-13 16:57:51</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -679,7 +679,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-01-13 14:07:13</p>
+<p>Last compiled: 2021-01-13 16:57:51</p>
 <div id="load-libraries---1" class="section level2">
 <h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -828,25 +828,46 @@ patent_assignee_tbl %&gt;% glimpse()</code></pre>
 # 4.0 DATA WRANGLING ----
 # 4.1 Joining / Merging Data ----
 
-#tic()
-#combined_assignee_patent_assignee_tbl &lt;- merge(x = assignee_tbl, y = patent_assignee_tbl, 
- #                      by.x = &quot;id&quot;, by.y = &quot;assignee_id&quot;,
-  #                     all.x = TRUE, 
-   #                    all.y = TRUE)
-#toc()
-
-#combined_assignee_patent_assignee_tbl %&gt;% glimpse()
-
-#setkey(combined_assignee_patent_assignee_tbl, &quot;id&quot;)
-#key(combined_assignee_patent_assignee_tbl)
-
-#?setorder()
-#setorderv(combined_assignee_patent_assignee_tbl, c(&quot;id&quot;))</code></pre>
+tic()
+combined_assignee_patent_assignee_tbl &lt;- merge(x = assignee_tbl, y = patent_assignee_tbl, 
+                       by.x = &quot;id&quot;, by.y = &quot;assignee_id&quot;,
+                       all.x = TRUE, 
+                       all.y = TRUE)%&gt;%
+mutate(patents_unit=1)%&gt;%
+ group_by(organization) %&gt;%
+  summarize(number_of_patents = sum(patents_unit)) %&gt;%
+  ungroup()%&gt;%
+  arrange(number_of_patents)
+toc()</code></pre>
+<pre><code>## 55.7 sec elapsed</code></pre>
+<pre class="r"><code>combined_assignee_patent_assignee_tbl %&gt;%
+    select(organization, number_of_patents) %&gt;%
+    arrange(desc(number_of_patents)) %&gt;%
+    slice(1:11) %&gt;%
+    filter(organization!=&quot;&quot;)</code></pre>
+<pre><code>## # A tibble: 10 x 2
+##    organization                                number_of_patents
+##    &lt;chr&gt;                                                   &lt;dbl&gt;
+##  1 International Business Machines Corporation            141100
+##  2 Samsung Electronics Co., Ltd.                           95246
+##  3 Canon Kabushiki Kaisha                                  76700
+##  4 Sony Corporation                                        54889
+##  5 Kabushiki Kaisha Toshiba                                49715
+##  6 General Electric Company                                47545
+##  7 Hitachi, Ltd.                                           45521
+##  8 Intel Corporation                                       42962
+##  9 Fujitsu Limited                                         37461
+## 10 Hewlett-Packard Development Company, L.P.               36002</code></pre>
 </div>
 <div id="recent-patent-acitivity--" class="section level2">
 <h2><span class="header-section-number">4.2</span> 2.0 Recent Patent Acitivity —-</h2>
 <ol start="2" style="list-style-type: decimal">
-<li>Recent patent acitivity: What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019. ## 3.0 Innovation in Tech —-</li>
+<li>Recent patent activity: What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019.</li>
+</ol>
+</div>
+<div id="innovation-in-tech--" class="section level2">
+<h2><span class="header-section-number">4.3</span> 3.0 Innovation in Tech —-</h2>
+<ol start="3" style="list-style-type: decimal">
 <li>Innovation in Tech: What is the most innovative tech sector? For the top 10 companies (worldwide) with the most patents, what are the top 5 USPTO tech main classes?</li>
 </ol>
 <pre class="r"><code>library(tidyverse)</code></pre>
