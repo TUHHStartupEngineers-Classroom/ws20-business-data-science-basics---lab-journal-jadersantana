@@ -205,3 +205,143 @@ Last compiled: `r Sys.time()`
 
 ## 1.0 Load libraries ----
 test 2
+
+# Challenge 04_Data Wrangling
+Answer the following questions with that data:
+## 1.0 Patent Dominance ----
+1. Patent Dominance: What US company / corporation has the most patents? List the 10 US companies with the most assigned/granted patents.
+```{r}
+#install.packages("vroom")
+#install.packages("tictoc")
+
+# Tidyverse
+#library(tidyverse)
+#library(vroom)
+
+# Data Table
+#library(data.table)
+
+# Counter
+#library(tictoc)
+
+
+
+#col_types_assignee_tbl <- list(
+ # id = col_character(),
+  #type = col_double(),
+  #name_first = col_character(),
+  #name_last = col_character(),
+  #organization = col_character()
+#)
+
+#assignee_tbl <- vroom(
+ #           file       = "00_data/04_challenge/assignee.tsv", 
+  #          delim      = "\t", 
+   #         col_types  = col_types_assignee_tbl,
+    #        na         = c("", "NA", "NULL")
+     #   )
+
+#col_types_patent_tbl <- list(
+ # id = col_character(),
+  #type = col_character(),
+#  number = col_character(),
+  #country = col_character(),
+ # date = col_date("%Y-%m-%d"),
+#  abstract = col_character(),
+ # title = col_character(),
+  #kind = col_character(),
+ # num_claims = col_double(),
+#  filename = col_character(),
+  #withdrawn = col_double()
+#)
+
+#patent_tbl <- vroom(
+#            file       = "00_data/04_challenge/patent.tsv", 
+#            delim      = "\t", 
+#            col_types  = col_types_patent_tbl,
+#            na         = c("", "NA", "NULL")
+#        )
+
+#col_types_patent_assignee_tbl <- list(
+#  patent_id = col_character(),
+#  assignee_id = col_character(),
+#  location_id = col_character()
+#)
+
+#patent_assignee_tbl <- vroom(
+#            file       = "00_data/04_challenge/patent_assignee.tsv", 
+#            delim      = "\t", 
+#            col_types  = col_types_patent_assignee_tbl,
+#            na         = c("", "NA", "NULL")
+#        )
+
+#col_types_uspc_tbl <- list(
+#  uuid = col_character(),
+#  patent_id = col_character(),
+#  mainclass_id = col_character(),
+#  subclass_id = col_character(),
+#  sequence = col_double()
+#)
+
+#uspc_tbl <- vroom(
+#            file       = "00_data/04_challenge/uspc.tsv", 
+#            delim      = "\t", 
+#            col_types  = col_types_uspc_tbl,
+#            na         = c("", "NA", "NULL")
+#        )
+
+#assignee_tbl %>% glimpse()
+#patent_tbl %>% glimpse()
+#patent_assignee_tbl %>% glimpse()
+#uspc_tbl %>% glimpse()
+
+#class(assignee_tbl)
+#class(patent_tbl)
+#class(patent_assignee_tbl)
+#class(uspc_tbl)
+
+#setDT(assignee_tbl)
+#setDT(patent_tbl)
+#setDT(patent_assignee_tbl)
+#setDT(uspc_tbl)
+
+#class(assignee_tbl)
+#class(patent_tbl)
+#class(patent_assignee_tbl)
+#class(uspc_tbl)
+
+#assignee_tbl %>% glimpse()
+#patent_tbl %>% glimpse()
+#patent_assignee_tbl %>% glimpse()
+#uspc_tbl %>% glimpse()
+
+# 4.0 DATA WRANGLING ----
+# 4.1 Joining / Merging Data ----
+
+#tic()
+#combined_assignee_patent_assignee_tbl <- merge(x = assignee_tbl, y = patent_assignee_tbl, 
+ #                      by.x = "id", by.y = "assignee_id",
+  #                     all.x = TRUE, 
+   #                    all.y = TRUE)
+#toc()
+
+#combined_assignee_patent_assignee_tbl %>% glimpse()
+
+#setkey(combined_assignee_patent_assignee_tbl, "id")
+#key(combined_assignee_patent_assignee_tbl)
+
+#?setorder()
+#setorderv(combined_assignee_patent_assignee_tbl, c("id"))
+
+
+```
+
+
+## 2.0 Recent Patent Acitivity ----
+2. Recent patent acitivity: What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019.
+## 3.0 Innovation in Tech ----
+3. Innovation in Tech: What is the most innovative tech sector? For the top 10 companies (worldwide) with the most patents, what are the top 5 USPTO tech main classes?
+
+```{r}
+library(tidyverse)
+```
