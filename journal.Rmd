@@ -293,27 +293,27 @@ patent_assignee_tbl <- vroom(
 
 assignee_tbl %>% glimpse()
 #patent_tbl %>% glimpse()
-#patent_assignee_tbl %>% glimpse()
+patent_assignee_tbl %>% glimpse()
 #uspc_tbl %>% glimpse()
 
-#class(assignee_tbl)
+class(assignee_tbl)
 #class(patent_tbl)
-#class(patent_assignee_tbl)
+class(patent_assignee_tbl)
 #class(uspc_tbl)
 
-#setDT(assignee_tbl)
+setDT(assignee_tbl)
 #setDT(patent_tbl)
-#setDT(patent_assignee_tbl)
+setDT(patent_assignee_tbl)
 #setDT(uspc_tbl)
 
-#class(assignee_tbl)
+class(assignee_tbl)
 #class(patent_tbl)
-#class(patent_assignee_tbl)
+class(patent_assignee_tbl)
 #class(uspc_tbl)
 
-#assignee_tbl %>% glimpse()
+assignee_tbl %>% glimpse()
 #patent_tbl %>% glimpse()
-#patent_assignee_tbl %>% glimpse()
+patent_assignee_tbl %>% glimpse()
 #uspc_tbl %>% glimpse()
 
 # 4.0 DATA WRANGLING ----

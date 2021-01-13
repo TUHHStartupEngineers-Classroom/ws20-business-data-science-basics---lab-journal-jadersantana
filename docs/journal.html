@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-01-13 09:21:09</p>
+<p>Last compiled: 2021-01-13 09:24:53</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -679,7 +679,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-01-13 09:21:09</p>
+<p>Last compiled: 2021-01-13 09:24:53</p>
 <div id="load-libraries---1" class="section level2">
 <h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -781,28 +781,49 @@ assignee_tbl %&gt;% glimpse()</code></pre>
 ## $ name_last    &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA...
 ## $ organization &lt;chr&gt; &quot;Oborain, LLC&quot;, &quot;QUIET THERAPEUTICS LTD.&quot;, &quot;Kinergetic...</code></pre>
 <pre class="r"><code>#patent_tbl %&gt;% glimpse()
-#patent_assignee_tbl %&gt;% glimpse()
-#uspc_tbl %&gt;% glimpse()
+patent_assignee_tbl %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 6,884,971
+## Columns: 3
+## $ patent_id   &lt;chr&gt; &quot;4488683&quot;, &quot;5856666&quot;, &quot;5204210&quot;, &quot;5302149&quot;, &quot;D397841&quot;, ...
+## $ assignee_id &lt;chr&gt; &quot;org_dJc33162m5Ry3wK7wNeY&quot;, &quot;org_UiBjCdlCCCWxBIxSzRLe&quot;,...
+## $ location_id &lt;chr&gt; &quot;208e32d3-0ee9-4393-ad2a-803a31f8b723&quot;, &quot;4f5e4429-aac1-...</code></pre>
+<pre class="r"><code>#uspc_tbl %&gt;% glimpse()
 
-#class(assignee_tbl)
-#class(patent_tbl)
-#class(patent_assignee_tbl)
-#class(uspc_tbl)
+class(assignee_tbl)</code></pre>
+<pre><code>## [1] &quot;tbl_df&quot;     &quot;tbl&quot;        &quot;data.frame&quot;</code></pre>
+<pre class="r"><code>#class(patent_tbl)
+class(patent_assignee_tbl)</code></pre>
+<pre><code>## [1] &quot;tbl_df&quot;     &quot;tbl&quot;        &quot;data.frame&quot;</code></pre>
+<pre class="r"><code>#class(uspc_tbl)
 
-#setDT(assignee_tbl)
+setDT(assignee_tbl)
 #setDT(patent_tbl)
-#setDT(patent_assignee_tbl)
+setDT(patent_assignee_tbl)
 #setDT(uspc_tbl)
 
-#class(assignee_tbl)
-#class(patent_tbl)
-#class(patent_assignee_tbl)
-#class(uspc_tbl)
+class(assignee_tbl)</code></pre>
+<pre><code>## [1] &quot;data.table&quot; &quot;data.frame&quot;</code></pre>
+<pre class="r"><code>#class(patent_tbl)
+class(patent_assignee_tbl)</code></pre>
+<pre><code>## [1] &quot;data.table&quot; &quot;data.frame&quot;</code></pre>
+<pre class="r"><code>#class(uspc_tbl)
 
-#assignee_tbl %&gt;% glimpse()
-#patent_tbl %&gt;% glimpse()
-#patent_assignee_tbl %&gt;% glimpse()
-#uspc_tbl %&gt;% glimpse()
+assignee_tbl %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 512,152
+## Columns: 5
+## $ id           &lt;chr&gt; &quot;org_000Te6ufduCywtAA6oMB&quot;, &quot;org_001LOvSUTQjgiMNXj5uy&quot;...
+## $ type         &lt;dbl&gt; 2, 3, 2, 3, 3, 3, 3, 2, 3, 2, 2, 2, 3, 3, 3, 3, 2, 3, ...
+## $ name_first   &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA...
+## $ name_last    &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA...
+## $ organization &lt;chr&gt; &quot;Oborain, LLC&quot;, &quot;QUIET THERAPEUTICS LTD.&quot;, &quot;Kinergetic...</code></pre>
+<pre class="r"><code>#patent_tbl %&gt;% glimpse()
+patent_assignee_tbl %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 6,884,971
+## Columns: 3
+## $ patent_id   &lt;chr&gt; &quot;4488683&quot;, &quot;5856666&quot;, &quot;5204210&quot;, &quot;5302149&quot;, &quot;D397841&quot;, ...
+## $ assignee_id &lt;chr&gt; &quot;org_dJc33162m5Ry3wK7wNeY&quot;, &quot;org_UiBjCdlCCCWxBIxSzRLe&quot;,...
+## $ location_id &lt;chr&gt; &quot;208e32d3-0ee9-4393-ad2a-803a31f8b723&quot;, &quot;4f5e4429-aac1-...</code></pre>
+<pre class="r"><code>#uspc_tbl %&gt;% glimpse()
 
 # 4.0 DATA WRANGLING ----
 # 4.1 Joining / Merging Data ----
