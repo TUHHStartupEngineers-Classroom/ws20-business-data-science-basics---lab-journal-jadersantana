@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-01-13 09:24:53</p>
+<p>Last compiled: 2021-01-13 13:31:54</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -679,7 +679,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-01-13 09:24:53</p>
+<p>Last compiled: 2021-01-13 13:31:54</p>
 <div id="load-libraries---1" class="section level2">
 <h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -757,20 +757,20 @@ patent_assignee_tbl &lt;- vroom(
             na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
         )
 
-#col_types_uspc_tbl &lt;- list(
-#  uuid = col_character(),
-#  patent_id = col_character(),
-#  mainclass_id = col_character(),
-#  subclass_id = col_character(),
-#  sequence = col_double()
-#)
+col_types_uspc_tbl &lt;- list(
+  uuid = col_character(),
+  patent_id = col_character(),
+  mainclass_id = col_character(),
+  subclass_id = col_character(),
+  sequence = col_double()
+)
 
-#uspc_tbl &lt;- vroom(
-#            file       = &quot;00_data/04_challenge/uspc.tsv&quot;, 
-#            delim      = &quot;\t&quot;, 
-#            col_types  = col_types_uspc_tbl,
-#            na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
-#        )
+uspc_tbl &lt;- vroom(
+            file       = &quot;00_data/04_challenge/uspc.tsv&quot;, 
+            delim      = &quot;\t&quot;, 
+            col_types  = col_types_uspc_tbl,
+            na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+        )
 
 assignee_tbl %&gt;% glimpse()</code></pre>
 <pre><code>## Rows: 512,152

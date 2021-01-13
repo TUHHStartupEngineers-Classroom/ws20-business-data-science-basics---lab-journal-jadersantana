@@ -276,20 +276,20 @@ patent_assignee_tbl <- vroom(
             na         = c("", "NA", "NULL")
         )
 
-#col_types_uspc_tbl <- list(
-#  uuid = col_character(),
-#  patent_id = col_character(),
-#  mainclass_id = col_character(),
-#  subclass_id = col_character(),
-#  sequence = col_double()
-#)
+col_types_uspc_tbl <- list(
+  uuid = col_character(),
+  patent_id = col_character(),
+  mainclass_id = col_character(),
+  subclass_id = col_character(),
+  sequence = col_double()
+)
 
-#uspc_tbl <- vroom(
-#            file       = "00_data/04_challenge/uspc.tsv", 
-#            delim      = "\t", 
-#            col_types  = col_types_uspc_tbl,
-#            na         = c("", "NA", "NULL")
-#        )
+uspc_tbl <- vroom(
+            file       = "00_data/04_challenge/uspc.tsv", 
+            delim      = "\t", 
+            col_types  = col_types_uspc_tbl,
+            na         = c("", "NA", "NULL")
+        )
 
 assignee_tbl %>% glimpse()
 #patent_tbl %>% glimpse()
