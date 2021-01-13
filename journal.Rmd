@@ -208,6 +208,7 @@ test 2
 
 # Challenge 04_Data Wrangling
 Answer the following questions with that data:
+
 ## 1.0 Patent Dominance ----
 1. Patent Dominance: What US company / corporation has the most patents? List the 10 US companies with the most assigned/granted patents.
 ```{r}
@@ -215,24 +216,24 @@ Answer the following questions with that data:
 #install.packages("tictoc")
 
 # Tidyverse
-#library(tidyverse)
-#library(vroom)
+library(tidyverse)
+library(vroom)
 
 # Data Table
-#library(data.table)
+library(data.table)
 
 # Counter
-#library(tictoc)
+library(tictoc)
 
 
 
-#col_types_assignee_tbl <- list(
- # id = col_character(),
-  #type = col_double(),
-  #name_first = col_character(),
-  #name_last = col_character(),
-  #organization = col_character()
-#)
+col_types_assignee_tbl <- list(
+  id = col_character(),
+  type = col_double(),
+  name_first = col_character(),
+  name_last = col_character(),
+  organization = col_character()
+)
 
 #assignee_tbl <- vroom(
  #           file       = "00_data/04_challenge/assignee.tsv", 

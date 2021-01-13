@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-01-13 09:07:11</p>
+<p>Last compiled: 2021-01-13 09:10:42</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -679,7 +679,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-01-13 09:07:11</p>
+<p>Last compiled: 2021-01-13 09:10:42</p>
 <div id="load-libraries---1" class="section level2">
 <h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -687,29 +687,34 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-04_data-wrangling" class="section level1">
 <h1><span class="header-section-number">4</span> Challenge 04_Data Wrangling</h1>
-<p>Answer the following questions with that data: ## 1.0 Patent Dominance —- 1. Patent Dominance: What US company / corporation has the most patents? List the 10 US companies with the most assigned/granted patents.</p>
+<p>Answer the following questions with that data:</p>
+<div id="patent-dominance--" class="section level2">
+<h2><span class="header-section-number">4.1</span> 1.0 Patent Dominance —-</h2>
+<ol style="list-style-type: decimal">
+<li>Patent Dominance: What US company / corporation has the most patents? List the 10 US companies with the most assigned/granted patents.</li>
+</ol>
 <pre class="r"><code>#install.packages(&quot;vroom&quot;)
 #install.packages(&quot;tictoc&quot;)
 
 # Tidyverse
-#library(tidyverse)
-#library(vroom)
+library(tidyverse)
+library(vroom)
 
 # Data Table
-#library(data.table)
+library(data.table)
 
 # Counter
-#library(tictoc)
+library(tictoc)
 
 
 
-#col_types_assignee_tbl &lt;- list(
- # id = col_character(),
-  #type = col_double(),
-  #name_first = col_character(),
-  #name_last = col_character(),
-  #organization = col_character()
-#)
+col_types_assignee_tbl &lt;- list(
+  id = col_character(),
+  type = col_double(),
+  name_first = col_character(),
+  name_last = col_character(),
+  organization = col_character()
+)
 
 #assignee_tbl &lt;- vroom(
  #           file       = &quot;00_data/04_challenge/assignee.tsv&quot;, 
@@ -809,8 +814,9 @@ sales_by_loc_year_tbl %&gt;%
 
 #?setorder()
 #setorderv(combined_assignee_patent_assignee_tbl, c(&quot;id&quot;))</code></pre>
+</div>
 <div id="recent-patent-acitivity--" class="section level2">
-<h2><span class="header-section-number">4.1</span> 2.0 Recent Patent Acitivity —-</h2>
+<h2><span class="header-section-number">4.2</span> 2.0 Recent Patent Acitivity —-</h2>
 <ol start="2" style="list-style-type: decimal">
 <li>Recent patent acitivity: What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019. ## 3.0 Innovation in Tech —-</li>
 <li>Innovation in Tech: What is the most innovative tech sector? For the top 10 companies (worldwide) with the most patents, what are the top 5 USPTO tech main classes?</li>
