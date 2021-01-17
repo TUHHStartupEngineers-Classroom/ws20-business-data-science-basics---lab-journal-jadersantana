@@ -13,7 +13,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE)
+knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE, cache.lazy = FALSE)
 ```
 # Challenge 01_intro_r Introduction to R, RStudio IDE & Github
 no specific challenge for this unit
@@ -344,12 +344,198 @@ combined_assignee_patent_assignee_tbl %>%
 2. Recent patent activity: What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019.
 
 ```{r}
+#install.packages("vroom")
+#install.packages("tictoc")
+
+# Tidyverse
+library(tidyverse)
+library(vroom)
+
+# Data Table
+library(data.table)
+
+# Counter
+library(tictoc)
+
+col_types_assignee_tbl <- list(
+  id = col_character(),
+  type = col_double(),
+  name_first = col_character(),
+  name_last = col_character(),
+  organization = col_character()
+)
+
+#assignee_tbl <- vroom(
+            #file       = "00_data/04_challenge/assignee.tsv", 
+            #delim      = "\t", 
+            #col_types  = col_types_assignee_tbl,
+            #na         = c("", "NA", "NULL")
+        #)
+
+col_types_patent_tbl <- list(
+  id = col_character(),
+  type = col_character(),
+  number = col_character(),
+  country = col_character(),
+  date = col_date("%Y-%m-%d"),
+  abstract = col_character(),
+  title = col_character(),
+  kind = col_character(),
+  num_claims = col_double(),
+  filename = col_character(),
+  withdrawn = col_double()
+)
+
+#patent_tbl <- vroom(
+ #           file       = "00_data/04_challenge/patent.tsv", 
+  #          delim      = "\t", 
+   #         col_types  = col_types_patent_tbl,
+    #        na         = c("", "NA", "NULL")
+     #   )
+
+col_types_patent_assignee_tbl <- list(
+  patent_id = col_character(),
+  assignee_id = col_character(),
+  location_id = col_character()
+)
+
+#patent_assignee_tbl <- vroom(
+ #           file       = "00_data/04_challenge/patent_assignee.tsv", 
+  #          delim      = "\t", 
+   #         col_types  = col_types_patent_assignee_tbl,
+    #        na         = c("", "NA", "NULL")
+     #   )
+
+#col_types_uspc_tbl <- list(
+ # uuid = col_character(),
+  #patent_id = col_character(),
+  #mainclass_id = col_character(),
+  #subclass_id = col_character(),
+  #sequence = col_double()
+#)
+
+#uspc_tbl <- vroom(
+ #           file       = "00_data/04_challenge/uspc.tsv", 
+  #          delim      = "\t", 
+   #         col_types  = col_types_uspc_tbl,
+    #        na         = c("", "NA", "NULL")
+     #   )
+
+#assignee_tbl %>% glimpse()
+#patent_tbl %>% glimpse()
+#patent_assignee_tbl %>% glimpse()
+#uspc_tbl %>% glimpse()
+
+#class(assignee_tbl)
+#class(patent_tbl)
+#class(patent_assignee_tbl)
+#class(uspc_tbl)
+
+#setDT(assignee_tbl)
+#setDT(patent_tbl)
+#setDT(patent_assignee_tbl)
+#setDT(uspc_tbl)
+
+#class(assignee_tbl)
+#class(patent_tbl)
+#class(patent_assignee_tbl)
+#class(uspc_tbl)
+
+#assignee_tbl %>% glimpse()
+#patent_tbl %>% glimpse()
+#patent_assignee_tbl %>% glimpse()
+#uspc_tbl %>% glimpse()
+
+# 4.0 DATA WRANGLING ----
+# 4.1 Joining / Merging Data ----
+
+#tic()
+#combined_assignee_patent_assignee_tbl <- merge(x = assignee_tbl, y = patent_assignee_tbl, 
+                       #by.x = "id", by.y = "assignee_id",
+                       #all.x = TRUE, 
+                       #all.y = TRUE)%>%
+#mutate(patents_unit=1)%>%
+ #group_by(organization) %>%
+  #summarize(number_of_patents = sum(patents_unit)) %>%
+  #ungroup()%>%
+  #arrange(number_of_patents)
+#toc()
+
+#combined_assignee_patent_assignee_tbl %>%
+    #select(organization, number_of_patents) %>%
+    #arrange(desc(number_of_patents)) %>%
+    #slice(1:11) %>%
+    #filter(organization!="")
 
 ```
 
 
 ## 3.0 Innovation in Tech ----
 3. Innovation in Tech: What is the most innovative tech sector? For the top 10 companies (worldwide) with the most patents, what are the top 5 USPTO tech main classes?
+
+```{r}
+library(tidyverse)
+```
+
+# Challenge 05_Data Visualisation
+Answer the following questions with that data:
+
+## Challenge 05.1 ----
+
+Goal: Map the time course of the cumulative Covid-19 cases! Your plot should look like this:
+Adding the cases for Europe is optional. You can choose your own color theme, but don’t use the default one. Don’t forget to scale the axis properly. The labels can be added with geom_label() or with geom_label_repel() (from the package ggrepel).
+
+```{r}
+library(tidyverse)
+
+#covid_data_tbl <- read_csv("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
+    
+    col_types_covid_data_tbl <- list(
+    dateRep = col_date("%d/%m/%Y"),
+    year_week = col_character(),
+    cases_weekly = col_double(),
+    deaths_weekly = col_double(),
+    countriesAndTerritories = col_character(),
+    geoId = col_character(),
+    countryterritoryCode = col_character(),
+    popData2019 = col_double(),
+    continentExp = col_character(),
+    `notification_rate_per_100000_population_14-days` = col_double()
+    )
+   
+covid_data_tbl <- vroom(
+            file       = "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", 
+            delim      = ",", 
+            col_types  = col_types_covid_data_tbl,
+            na         = c("", "NA", "NULL")
+        )
+
+covid_data_cumulative_by_month_tbl <- covid_data_tbl %>%
+    
+    # Select relevant columns
+    select(dateRep, cases_weekly, countriesAndTerritories) %>%
+    mutate(month = month(dateRep)) %>%
+    mutate(year = year(dateRep)) %>%
+    filter(year=="2020")%>%
+    group_by(month, countriesAndTerritories) %>%  
+    summarize(cases_month = sum(cases_weekly)) %>%
+    arrange(countriesAndTerritories)%>%
+    mutate(cum_cases_month="0")
+covid_data_cumulative_by_month_tbl
+
+```
+
+## Challenge 05.2 ----
+
+Goal: Visualize the distribution of the mortality rate (deaths / population) with geom_map(). The necessary longitudinal and lateral data can be accessed with this function:
+
+world <- map_data("world")
+
+This data has also to be put in the map argument of geom_map():
+
+plot_data %>% ggplot( ... ) +
+  geom_map(aes(map_id = ..., ... ), map = world, ... ) +
+  ...
 
 ```{r}
 library(tidyverse)

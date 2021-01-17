@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-01-13 16:57:51</p>
+<p>Last compiled: 2021-01-17 17:40:48</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -639,7 +639,7 @@ sales_by_loc_year_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;%
 sales_by_loc_year_tbl</code></pre>
 <pre><code>## # A tibble: 60 x 4
 ##     year state                           sales sales_text 
-##    &lt;dbl&gt; &lt;chr&gt;                           &lt;dbl&gt; &lt;chr&gt;      
+##    &lt;int&gt; &lt;chr&gt;                           &lt;dbl&gt; &lt;chr&gt;      
 ##  1  2015 Baden-Württemberg             1031924 1.031.924 €
 ##  2  2015 Bavaria                       1301461 1.301.461 €
 ##  3  2015 Berlin                          95853 95.853 €   
@@ -679,7 +679,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-01-13 16:57:51</p>
+<p>Last compiled: 2021-01-17 17:40:49</p>
 <div id="load-libraries---1" class="section level2">
 <h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -839,7 +839,7 @@ mutate(patents_unit=1)%&gt;%
   ungroup()%&gt;%
   arrange(number_of_patents)
 toc()</code></pre>
-<pre><code>## 55.7 sec elapsed</code></pre>
+<pre><code>## 39.89 sec elapsed</code></pre>
 <pre class="r"><code>combined_assignee_patent_assignee_tbl %&gt;%
     select(organization, number_of_patents) %&gt;%
     arrange(desc(number_of_patents)) %&gt;%
@@ -864,12 +864,201 @@ toc()</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>Recent patent activity: What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019.</li>
 </ol>
+<pre class="r"><code>#install.packages(&quot;vroom&quot;)
+#install.packages(&quot;tictoc&quot;)
+
+# Tidyverse
+library(tidyverse)
+library(vroom)
+
+# Data Table
+library(data.table)
+
+# Counter
+library(tictoc)
+
+col_types_assignee_tbl &lt;- list(
+  id = col_character(),
+  type = col_double(),
+  name_first = col_character(),
+  name_last = col_character(),
+  organization = col_character()
+)
+
+#assignee_tbl &lt;- vroom(
+            #file       = &quot;00_data/04_challenge/assignee.tsv&quot;, 
+            #delim      = &quot;\t&quot;, 
+            #col_types  = col_types_assignee_tbl,
+            #na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+        #)
+
+col_types_patent_tbl &lt;- list(
+  id = col_character(),
+  type = col_character(),
+  number = col_character(),
+  country = col_character(),
+  date = col_date(&quot;%Y-%m-%d&quot;),
+  abstract = col_character(),
+  title = col_character(),
+  kind = col_character(),
+  num_claims = col_double(),
+  filename = col_character(),
+  withdrawn = col_double()
+)
+
+#patent_tbl &lt;- vroom(
+ #           file       = &quot;00_data/04_challenge/patent.tsv&quot;, 
+  #          delim      = &quot;\t&quot;, 
+   #         col_types  = col_types_patent_tbl,
+    #        na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+     #   )
+
+col_types_patent_assignee_tbl &lt;- list(
+  patent_id = col_character(),
+  assignee_id = col_character(),
+  location_id = col_character()
+)
+
+#patent_assignee_tbl &lt;- vroom(
+ #           file       = &quot;00_data/04_challenge/patent_assignee.tsv&quot;, 
+  #          delim      = &quot;\t&quot;, 
+   #         col_types  = col_types_patent_assignee_tbl,
+    #        na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+     #   )
+
+#col_types_uspc_tbl &lt;- list(
+ # uuid = col_character(),
+  #patent_id = col_character(),
+  #mainclass_id = col_character(),
+  #subclass_id = col_character(),
+  #sequence = col_double()
+#)
+
+#uspc_tbl &lt;- vroom(
+ #           file       = &quot;00_data/04_challenge/uspc.tsv&quot;, 
+  #          delim      = &quot;\t&quot;, 
+   #         col_types  = col_types_uspc_tbl,
+    #        na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+     #   )
+
+#assignee_tbl %&gt;% glimpse()
+#patent_tbl %&gt;% glimpse()
+#patent_assignee_tbl %&gt;% glimpse()
+#uspc_tbl %&gt;% glimpse()
+
+#class(assignee_tbl)
+#class(patent_tbl)
+#class(patent_assignee_tbl)
+#class(uspc_tbl)
+
+#setDT(assignee_tbl)
+#setDT(patent_tbl)
+#setDT(patent_assignee_tbl)
+#setDT(uspc_tbl)
+
+#class(assignee_tbl)
+#class(patent_tbl)
+#class(patent_assignee_tbl)
+#class(uspc_tbl)
+
+#assignee_tbl %&gt;% glimpse()
+#patent_tbl %&gt;% glimpse()
+#patent_assignee_tbl %&gt;% glimpse()
+#uspc_tbl %&gt;% glimpse()
+
+# 4.0 DATA WRANGLING ----
+# 4.1 Joining / Merging Data ----
+
+#tic()
+#combined_assignee_patent_assignee_tbl &lt;- merge(x = assignee_tbl, y = patent_assignee_tbl, 
+                       #by.x = &quot;id&quot;, by.y = &quot;assignee_id&quot;,
+                       #all.x = TRUE, 
+                       #all.y = TRUE)%&gt;%
+#mutate(patents_unit=1)%&gt;%
+ #group_by(organization) %&gt;%
+  #summarize(number_of_patents = sum(patents_unit)) %&gt;%
+  #ungroup()%&gt;%
+  #arrange(number_of_patents)
+#toc()
+
+#combined_assignee_patent_assignee_tbl %&gt;%
+    #select(organization, number_of_patents) %&gt;%
+    #arrange(desc(number_of_patents)) %&gt;%
+    #slice(1:11) %&gt;%
+    #filter(organization!=&quot;&quot;)</code></pre>
 </div>
 <div id="innovation-in-tech--" class="section level2">
 <h2><span class="header-section-number">4.3</span> 3.0 Innovation in Tech —-</h2>
 <ol start="3" style="list-style-type: decimal">
 <li>Innovation in Tech: What is the most innovative tech sector? For the top 10 companies (worldwide) with the most patents, what are the top 5 USPTO tech main classes?</li>
 </ol>
+<pre class="r"><code>library(tidyverse)</code></pre>
+</div>
+</div>
+<div id="challenge-05_data-visualisation" class="section level1">
+<h1><span class="header-section-number">5</span> Challenge 05_Data Visualisation</h1>
+<p>Answer the following questions with that data:</p>
+<div id="challenge-05.1--" class="section level2">
+<h2><span class="header-section-number">5.1</span> Challenge 05.1 —-</h2>
+<p>Goal: Map the time course of the cumulative Covid-19 cases! Your plot should look like this: Adding the cases for Europe is optional. You can choose your own color theme, but don’t use the default one. Don’t forget to scale the axis properly. The labels can be added with geom_label() or with geom_label_repel() (from the package ggrepel).</p>
+<pre class="r"><code>library(tidyverse)
+
+#covid_data_tbl &lt;- read_csv(&quot;https://opendata.ecdc.europa.eu/covid19/casedistribution/csv&quot;)
+    
+    col_types_covid_data_tbl &lt;- list(
+    dateRep = col_date(&quot;%d/%m/%Y&quot;),
+    year_week = col_character(),
+    cases_weekly = col_double(),
+    deaths_weekly = col_double(),
+    countriesAndTerritories = col_character(),
+    geoId = col_character(),
+    countryterritoryCode = col_character(),
+    popData2019 = col_double(),
+    continentExp = col_character(),
+    `notification_rate_per_100000_population_14-days` = col_double()
+    )
+   
+covid_data_tbl &lt;- vroom(
+            file       = &quot;https://opendata.ecdc.europa.eu/covid19/casedistribution/csv&quot;, 
+            delim      = &quot;,&quot;, 
+            col_types  = col_types_covid_data_tbl,
+            na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+        )
+
+covid_data_cumulative_by_month_tbl &lt;- covid_data_tbl %&gt;%
+    
+    # Select relevant columns
+    select(dateRep, cases_weekly, countriesAndTerritories) %&gt;%
+    mutate(month = month(dateRep)) %&gt;%
+    mutate(year = year(dateRep)) %&gt;%
+    filter(year==&quot;2020&quot;)%&gt;%
+    group_by(month, countriesAndTerritories) %&gt;%  
+    summarize(cases_month = sum(cases_weekly)) %&gt;%
+    arrange(countriesAndTerritories)%&gt;%
+    mutate(cum_cases_month=&quot;0&quot;)
+covid_data_cumulative_by_month_tbl</code></pre>
+<pre><code>## # A tibble: 2,218 x 4
+## # Groups:   month [12]
+##    month countriesAndTerritories cases_month cum_cases_month
+##    &lt;int&gt; &lt;chr&gt;                         &lt;dbl&gt; &lt;chr&gt;          
+##  1     1 Afghanistan                       0 0              
+##  2     2 Afghanistan                       0 0              
+##  3     3 Afghanistan                     114 0              
+##  4     4 Afghanistan                    1417 0              
+##  5     5 Afghanistan                    9051 0              
+##  6     6 Afghanistan                   20385 0              
+##  7     7 Afghanistan                    5296 0              
+##  8     8 Afghanistan                    1899 0              
+##  9     9 Afghanistan                    1065 0              
+## 10    10 Afghanistan                    1606 0              
+## # ... with 2,208 more rows</code></pre>
+</div>
+<div id="challenge-05.2--" class="section level2">
+<h2><span class="header-section-number">5.2</span> Challenge 05.2 —-</h2>
+<p>Goal: Visualize the distribution of the mortality rate (deaths / population) with geom_map(). The necessary longitudinal and lateral data can be accessed with this function:</p>
+<p>world &lt;- map_data(“world”)</p>
+<p>This data has also to be put in the map argument of geom_map():</p>
+<p>plot_data %&gt;% ggplot( … ) + geom_map(aes(map_id = …, … ), map = world, … ) + …</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
 </div>
 </div>
