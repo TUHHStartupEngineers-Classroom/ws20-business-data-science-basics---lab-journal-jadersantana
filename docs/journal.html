@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-01-17 17:40:48</p>
+<p>Last compiled: 2021-01-18 11:22:24</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -679,7 +679,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-01-17 17:40:49</p>
+<p>Last compiled: 2021-01-18 11:22:24</p>
 <div id="load-libraries---1" class="section level2">
 <h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -1001,7 +1001,10 @@ col_types_patent_assignee_tbl &lt;- list(
 <div id="challenge-05.1--" class="section level2">
 <h2><span class="header-section-number">5.1</span> Challenge 05.1 —-</h2>
 <p>Goal: Map the time course of the cumulative Covid-19 cases! Your plot should look like this: Adding the cases for Europe is optional. You can choose your own color theme, but don’t use the default one. Don’t forget to scale the axis properly. The labels can be added with geom_label() or with geom_label_repel() (from the package ggrepel).</p>
-<pre class="r"><code>library(tidyverse)
+<pre class="r"><code>library(vroom)
+library(tidyverse)
+library(data.table)
+library(dplyr)
 
 #covid_data_tbl &lt;- read_csv(&quot;https://opendata.ecdc.europa.eu/covid19/casedistribution/csv&quot;)
     
@@ -1035,22 +1038,25 @@ covid_data_cumulative_by_month_tbl &lt;- covid_data_tbl %&gt;%
     group_by(month, countriesAndTerritories) %&gt;%  
     summarize(cases_month = sum(cases_weekly)) %&gt;%
     arrange(countriesAndTerritories)%&gt;%
-    mutate(cum_cases_month=&quot;0&quot;)
+    group_by(countriesAndTerritories) %&gt;%
+    mutate( cases_month_aux = ifelse( is.na(cases_month), 0, cases_month ), #remove NA
+          cum_cases_month = cumsum(cases_month_aux) )%&gt;%
+    select(month, countriesAndTerritories, cases_month, cum_cases_month)
 covid_data_cumulative_by_month_tbl</code></pre>
 <pre><code>## # A tibble: 2,218 x 4
-## # Groups:   month [12]
+## # Groups:   countriesAndTerritories [214]
 ##    month countriesAndTerritories cases_month cum_cases_month
-##    &lt;int&gt; &lt;chr&gt;                         &lt;dbl&gt; &lt;chr&gt;          
-##  1     1 Afghanistan                       0 0              
-##  2     2 Afghanistan                       0 0              
-##  3     3 Afghanistan                     114 0              
-##  4     4 Afghanistan                    1417 0              
-##  5     5 Afghanistan                    9051 0              
-##  6     6 Afghanistan                   20385 0              
-##  7     7 Afghanistan                    5296 0              
-##  8     8 Afghanistan                    1899 0              
-##  9     9 Afghanistan                    1065 0              
-## 10    10 Afghanistan                    1606 0              
+##    &lt;int&gt; &lt;chr&gt;                         &lt;dbl&gt;           &lt;dbl&gt;
+##  1     1 Afghanistan                       0               0
+##  2     2 Afghanistan                       0               0
+##  3     3 Afghanistan                     114             114
+##  4     4 Afghanistan                    1417            1531
+##  5     5 Afghanistan                    9051           10582
+##  6     6 Afghanistan                   20385           30967
+##  7     7 Afghanistan                    5296           36263
+##  8     8 Afghanistan                    1899           38162
+##  9     9 Afghanistan                    1065           39227
+## 10    10 Afghanistan                    1606           40833
 ## # ... with 2,208 more rows</code></pre>
 </div>
 <div id="challenge-05.2--" class="section level2">

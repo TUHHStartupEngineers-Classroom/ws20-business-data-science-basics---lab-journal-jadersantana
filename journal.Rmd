@@ -486,7 +486,10 @@ Goal: Map the time course of the cumulative Covid-19 cases! Your plot should loo
 Adding the cases for Europe is optional. You can choose your own color theme, but don’t use the default one. Don’t forget to scale the axis properly. The labels can be added with geom_label() or with geom_label_repel() (from the package ggrepel).
 
 ```{r}
+library(vroom)
 library(tidyverse)
+library(data.table)
+library(dplyr)
 
 #covid_data_tbl <- read_csv("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
     
@@ -520,7 +523,10 @@ covid_data_cumulative_by_month_tbl <- covid_data_tbl %>%
     group_by(month, countriesAndTerritories) %>%  
     summarize(cases_month = sum(cases_weekly)) %>%
     arrange(countriesAndTerritories)%>%
-    mutate(cum_cases_month="0")
+    group_by(countriesAndTerritories) %>%
+    mutate( cases_month_aux = ifelse( is.na(cases_month), 0, cases_month ), #remove NA
+          cum_cases_month = cumsum(cases_month_aux) )%>%
+    select(month, countriesAndTerritories, cases_month, cum_cases_month)
 covid_data_cumulative_by_month_tbl
 
 ```
