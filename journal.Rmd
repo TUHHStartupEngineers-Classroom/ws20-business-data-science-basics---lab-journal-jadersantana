@@ -490,6 +490,8 @@ library(vroom)
 library(tidyverse)
 library(data.table)
 library(dplyr)
+library(base)
+
 
 #covid_data_tbl <- read_csv("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
     
@@ -518,17 +520,57 @@ covid_data_cumulative_by_month_tbl <- covid_data_tbl %>%
     # Select relevant columns
     select(dateRep, cases_weekly, countriesAndTerritories) %>%
     mutate(month = month(dateRep)) %>%
+    mutate(month_name = months(dateRep)) %>%
     mutate(year = year(dateRep)) %>%
     filter(year=="2020")%>%
-    group_by(month, countriesAndTerritories) %>%  
+    group_by(month, month_name, countriesAndTerritories) %>%  
     summarize(cases_month = sum(cases_weekly)) %>%
     arrange(countriesAndTerritories)%>%
     group_by(countriesAndTerritories) %>%
-    mutate( cases_month_aux = ifelse( is.na(cases_month), 0, cases_month ), #remove NA
+    mutate(cases_month_aux = ifelse( is.na(cases_month), 0, cases_month ), #remove NA
           cum_cases_month = cumsum(cases_month_aux) )%>%
-    select(month, countriesAndTerritories, cases_month, cum_cases_month)
-covid_data_cumulative_by_month_tbl
+    mutate(cum_cases_month_abbr = scales::dollar(cum_cases_month, 
+                                                      scale = 1e-6, 
+                                                      prefix       = "", 
+                                                      suffix       = " M")) %>%
+    mutate(cum_cases_month_in_millions = cum_cases_month/1e6) %>%
+    select(month,countriesAndTerritories, cases_month, cum_cases_month, month_name, cum_cases_month_abbr, cum_cases_month_in_millions )
+    
+covid_data_cumulative_by_month_tbl %>%
+filter(countriesAndTerritories %in% c("United_Kingdom","United_States_of_America", "Germany", "Spain", "France", "Brazil"))%>%
 
+  # Set up x, y, fill
+  ggplot(aes(x = factor(month_name, 
+                        level=c("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September","Oktober", "November", "Dezember")), 
+                        y = cum_cases_month_in_millions, group=countriesAndTerritories, color=countriesAndTerritories)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  # Geometries
+  geom_point() +
+  geom_line(aes(label=countriesAndTerritories)) +
+  #geom_smooth(method = "lm", se = FALSE)+
+  
+  #scale_x_continuous(breaks = seq(1, 12, by=1)) +
+  #scale_y_discrete() +
+  #xlim(1,12)+
+  ylim(0, 20)+
+  
+  #verify with Prof geom_label
+  #geom_label(label = covid_data_cumulative_by_month_tbl %>%
+   #                   filter(cum_cases_month_in_millions > 1000000),
+    #           vjust = -0.5, 
+     #          size  = 3,
+      #         fill  = "#1f78b4",
+       #        color = "white",
+        #       fontface = "italic",
+         #      data = covid_data_cumulative_by_month_tbl %>%
+          #            filter(cum_cases_month_in_millions > 1000000)) +
+    
+labs(
+      title = "COVID-19 Confirmed Cases Worldwide",
+      subtitle = "-",
+      x = "YEAR 2020",
+      y = "Cumulative Cases (in millions)"
+      )
 ```
 
 ## Challenge 05.2 ----

@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-01-18 11:22:24</p>
+<p>Last compiled: 2021-01-18 16:03:59</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -679,7 +679,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-01-18 11:22:24</p>
+<p>Last compiled: 2021-01-18 16:03:59</p>
 <div id="load-libraries---1" class="section level2">
 <h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -1005,6 +1005,8 @@ col_types_patent_assignee_tbl &lt;- list(
 library(tidyverse)
 library(data.table)
 library(dplyr)
+library(base)
+
 
 #covid_data_tbl &lt;- read_csv(&quot;https://opendata.ecdc.europa.eu/covid19/casedistribution/csv&quot;)
     
@@ -1033,31 +1035,58 @@ covid_data_cumulative_by_month_tbl &lt;- covid_data_tbl %&gt;%
     # Select relevant columns
     select(dateRep, cases_weekly, countriesAndTerritories) %&gt;%
     mutate(month = month(dateRep)) %&gt;%
+    mutate(month_name = months(dateRep)) %&gt;%
     mutate(year = year(dateRep)) %&gt;%
     filter(year==&quot;2020&quot;)%&gt;%
-    group_by(month, countriesAndTerritories) %&gt;%  
+    group_by(month, month_name, countriesAndTerritories) %&gt;%  
     summarize(cases_month = sum(cases_weekly)) %&gt;%
     arrange(countriesAndTerritories)%&gt;%
     group_by(countriesAndTerritories) %&gt;%
-    mutate( cases_month_aux = ifelse( is.na(cases_month), 0, cases_month ), #remove NA
+    mutate(cases_month_aux = ifelse( is.na(cases_month), 0, cases_month ), #remove NA
           cum_cases_month = cumsum(cases_month_aux) )%&gt;%
-    select(month, countriesAndTerritories, cases_month, cum_cases_month)
-covid_data_cumulative_by_month_tbl</code></pre>
-<pre><code>## # A tibble: 2,218 x 4
-## # Groups:   countriesAndTerritories [214]
-##    month countriesAndTerritories cases_month cum_cases_month
-##    &lt;int&gt; &lt;chr&gt;                         &lt;dbl&gt;           &lt;dbl&gt;
-##  1     1 Afghanistan                       0               0
-##  2     2 Afghanistan                       0               0
-##  3     3 Afghanistan                     114             114
-##  4     4 Afghanistan                    1417            1531
-##  5     5 Afghanistan                    9051           10582
-##  6     6 Afghanistan                   20385           30967
-##  7     7 Afghanistan                    5296           36263
-##  8     8 Afghanistan                    1899           38162
-##  9     9 Afghanistan                    1065           39227
-## 10    10 Afghanistan                    1606           40833
-## # ... with 2,208 more rows</code></pre>
+    mutate(cum_cases_month_abbr = scales::dollar(cum_cases_month, 
+                                                      scale = 1e-6, 
+                                                      prefix       = &quot;&quot;, 
+                                                      suffix       = &quot; M&quot;)) %&gt;%
+    mutate(cum_cases_month_in_millions = cum_cases_month/1e6) %&gt;%
+    select(month,countriesAndTerritories, cases_month, cum_cases_month, month_name, cum_cases_month_abbr, cum_cases_month_in_millions )
+    
+covid_data_cumulative_by_month_tbl %&gt;%
+filter(countriesAndTerritories %in% c(&quot;United_Kingdom&quot;,&quot;United_States_of_America&quot;, &quot;Germany&quot;, &quot;Spain&quot;, &quot;France&quot;, &quot;Brazil&quot;))%&gt;%
+
+  # Set up x, y, fill
+  ggplot(aes(x = factor(month_name, 
+                        level=c(&quot;Januar&quot;, &quot;Februar&quot;, &quot;März&quot;, &quot;April&quot;, &quot;Mai&quot;, &quot;Juni&quot;, &quot;Juli&quot;, &quot;August&quot;, &quot;September&quot;,&quot;Oktober&quot;, &quot;November&quot;, &quot;Dezember&quot;)), 
+                        y = cum_cases_month_in_millions, group=countriesAndTerritories, color=countriesAndTerritories)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  # Geometries
+  geom_point() +
+  geom_line(aes(label=countriesAndTerritories)) +
+  #geom_smooth(method = &quot;lm&quot;, se = FALSE)+
+  
+  #scale_x_continuous(breaks = seq(1, 12, by=1)) +
+  #scale_y_discrete() +
+  #xlim(1,12)+
+  ylim(0, 20)+
+  
+  #verify with Prof geom_label
+  #geom_label(label = covid_data_cumulative_by_month_tbl %&gt;%
+   #                   filter(cum_cases_month_in_millions &gt; 1000000),
+    #           vjust = -0.5, 
+     #          size  = 3,
+      #         fill  = &quot;#1f78b4&quot;,
+       #        color = &quot;white&quot;,
+        #       fontface = &quot;italic&quot;,
+         #      data = covid_data_cumulative_by_month_tbl %&gt;%
+          #            filter(cum_cases_month_in_millions &gt; 1000000)) +
+    
+labs(
+      title = &quot;COVID-19 Confirmed Cases Worldwide&quot;,
+      subtitle = &quot;-&quot;,
+      x = &quot;YEAR 2020&quot;,
+      y = &quot;Cumulative Cases (in millions)&quot;
+      )</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 </div>
 <div id="challenge-05.2--" class="section level2">
 <h2><span class="header-section-number">5.2</span> Challenge 05.2 —-</h2>
