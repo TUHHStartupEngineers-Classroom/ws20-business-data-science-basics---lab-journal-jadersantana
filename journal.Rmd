@@ -587,4 +587,82 @@ plot_data %>% ggplot( ... ) +
 
 ```{r}
 library(tidyverse)
+#install.packages("maps")
+library(maps)
+library(vroom)
+library(data.table)
+library(dplyr)
+library(base)
+library(tictoc)
+
+world <- map_data("world")
+col_types_covid_data_tbl <- list(
+    dateRep = col_date("%d/%m/%Y"),
+    year_week = col_character(),
+    cases_weekly = col_double(),
+    deaths_weekly = col_double(),
+    countriesAndTerritories = col_character(),
+    geoId = col_character(),
+    countryterritoryCode = col_character(),
+    popData2019 = col_double(),
+    continentExp = col_character(),
+    `notification_rate_per_100000_population_14-days` = col_double()
+    )
+   
+covid_data_tbl <- vroom(
+            file       = "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", 
+            delim      = ",", 
+            col_types  = col_types_covid_data_tbl,
+            na         = c("", "NA", "NULL")
+        )
+covid_data_cumulative_death_by_country_tbl <- covid_data_tbl %>%
+    
+    # Select relevant columns
+    select(dateRep,countriesAndTerritories,deaths_weekly, popData2019) %>%
+    mutate(year = year(dateRep)) %>%
+    filter(year=="2020")%>%
+    group_by(countriesAndTerritories, popData2019) %>%  
+    summarize(deaths_sum = sum(deaths_weekly)) %>%
+    arrange(countriesAndTerritories)%>%
+    mutate(mortality_per_million= deaths_sum/popData2019*100*1000)
+  
+#tic()
+#combined_covid_death_world_tbl <- merge(x = covid_data_cumulative_death_by_country_tbl, y = world, 
+#                       by.x = "countriesAndTerritories", by.y = "region",
+#                       all.x = TRUE, 
+#                       all.y = TRUE)%>%
+#mutate(patents_unit=1)%>%
+# group_by(organization) %>%
+ # summarize(number_of_patents = sum(patents_unit)) %>%
+# # ungroup()%>%
+#arrange(number_of_patents)
+#toc()
+
+#combined_assignee_patent_assignee_tbl %>%
+   # select(organization, number_of_patents) %>%
+  #  arrange(desc(number_of_patents)) %>%
+  #  slice(1:11) %>%
+  #  filter(organization!="")
+
+
+
+#cas <- covid_data_cumulative_death_by_country_tbl %>%
+  #  select(countriesAndTerritories,deaths_sum, popData2019, mortality_per_million)%>%
+  #  mutate(across(countriesAndTerritories, str_replace_all, "_", " ")) %>%
+  #  mutate(countriesAndTerritories = case_when(countriesAndTerritories == "United Kingdom" ~ "UK",
+    #      countriesAndTerritories == "United States of America" ~ "USA",
+      #    countriesAndTerritories == "Czechia" ~ "Czech Republic",
+      #    TRUE ~ countriesAndTerritories
+       #   ))
+#
+```
+
+# Challenge 06 Machine Learning Fundamentals
+
+Company Segmentation with Stock Prices
+
+In your assignment folder you will find a .Rmd file that contains all instructions and also intermediate results in case you get stuck. You can knit the .Rmd file to a html/pdf file by clicking the knit button.
+
+```{r}
+library(tidyverse)
 ```

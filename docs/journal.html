@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-01-18 16:03:59</p>
+<p>Last compiled: 2021-01-18 23:18:18</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -679,7 +679,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-01-18 16:03:59</p>
+<p>Last compiled: 2021-01-18 23:18:18</p>
 <div id="load-libraries---1" class="section level2">
 <h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -1094,8 +1094,82 @@ labs(
 <p>world &lt;- map_data(“world”)</p>
 <p>This data has also to be put in the map argument of geom_map():</p>
 <p>plot_data %&gt;% ggplot( … ) + geom_map(aes(map_id = …, … ), map = world, … ) + …</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
+<pre class="r"><code>library(tidyverse)
+#install.packages(&quot;maps&quot;)
+library(maps)
+library(vroom)
+library(data.table)
+library(dplyr)
+library(base)
+library(tictoc)
+
+world &lt;- map_data(&quot;world&quot;)
+col_types_covid_data_tbl &lt;- list(
+    dateRep = col_date(&quot;%d/%m/%Y&quot;),
+    year_week = col_character(),
+    cases_weekly = col_double(),
+    deaths_weekly = col_double(),
+    countriesAndTerritories = col_character(),
+    geoId = col_character(),
+    countryterritoryCode = col_character(),
+    popData2019 = col_double(),
+    continentExp = col_character(),
+    `notification_rate_per_100000_population_14-days` = col_double()
+    )
+   
+covid_data_tbl &lt;- vroom(
+            file       = &quot;https://opendata.ecdc.europa.eu/covid19/casedistribution/csv&quot;, 
+            delim      = &quot;,&quot;, 
+            col_types  = col_types_covid_data_tbl,
+            na         = c(&quot;&quot;, &quot;NA&quot;, &quot;NULL&quot;)
+        )
+covid_data_cumulative_death_by_country_tbl &lt;- covid_data_tbl %&gt;%
+    
+    # Select relevant columns
+    select(dateRep,countriesAndTerritories,deaths_weekly, popData2019) %&gt;%
+    mutate(year = year(dateRep)) %&gt;%
+    filter(year==&quot;2020&quot;)%&gt;%
+    group_by(countriesAndTerritories, popData2019) %&gt;%  
+    summarize(deaths_sum = sum(deaths_weekly)) %&gt;%
+    arrange(countriesAndTerritories)%&gt;%
+    mutate(mortality_per_million= deaths_sum/popData2019*100*1000)
+  
+#tic()
+#combined_covid_death_world_tbl &lt;- merge(x = covid_data_cumulative_death_by_country_tbl, y = world, 
+#                       by.x = &quot;countriesAndTerritories&quot;, by.y = &quot;region&quot;,
+#                       all.x = TRUE, 
+#                       all.y = TRUE)%&gt;%
+#mutate(patents_unit=1)%&gt;%
+# group_by(organization) %&gt;%
+ # summarize(number_of_patents = sum(patents_unit)) %&gt;%
+# # ungroup()%&gt;%
+#arrange(number_of_patents)
+#toc()
+
+#combined_assignee_patent_assignee_tbl %&gt;%
+   # select(organization, number_of_patents) %&gt;%
+  #  arrange(desc(number_of_patents)) %&gt;%
+  #  slice(1:11) %&gt;%
+  #  filter(organization!=&quot;&quot;)
+
+
+
+#cas &lt;- covid_data_cumulative_death_by_country_tbl %&gt;%
+  #  select(countriesAndTerritories,deaths_sum, popData2019, mortality_per_million)%&gt;%
+  #  mutate(across(countriesAndTerritories, str_replace_all, &quot;_&quot;, &quot; &quot;)) %&gt;%
+  #  mutate(countriesAndTerritories = case_when(countriesAndTerritories == &quot;United Kingdom&quot; ~ &quot;UK&quot;,
+    #      countriesAndTerritories == &quot;United States of America&quot; ~ &quot;USA&quot;,
+      #    countriesAndTerritories == &quot;Czechia&quot; ~ &quot;Czech Republic&quot;,
+      #    TRUE ~ countriesAndTerritories
+       #   ))
+#</code></pre>
 </div>
+</div>
+<div id="challenge-06-machine-learning-fundamentals" class="section level1">
+<h1><span class="header-section-number">6</span> Challenge 06 Machine Learning Fundamentals</h1>
+<p>Company Segmentation with Stock Prices</p>
+<p>In your assignment folder you will find a .Rmd file that contains all instructions and also intermediate results in case you get stuck. You can knit the .Rmd file to a html/pdf file by clicking the knit button.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
 </div>
 
 
