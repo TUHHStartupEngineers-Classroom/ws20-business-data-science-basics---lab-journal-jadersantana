@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-01-18 23:18:18</p>
+<p>Last compiled: 2021-01-20 22:05:10</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -679,7 +679,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-01-18 23:18:18</p>
+<p>Last compiled: 2021-01-20 22:05:10</p>
 <div id="load-libraries---1" class="section level2">
 <h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -1165,11 +1165,224 @@ covid_data_cumulative_death_by_country_tbl &lt;- covid_data_tbl %&gt;%
 #</code></pre>
 </div>
 </div>
-<div id="challenge-06-machine-learning-fundamentals" class="section level1">
-<h1><span class="header-section-number">6</span> Challenge 06 Machine Learning Fundamentals</h1>
-<p>Company Segmentation with Stock Prices</p>
-<p>In your assignment folder you will find a .Rmd file that contains all instructions and also intermediate results in case you get stuck. You can knit the .Rmd file to a html/pdf file by clicking the knit button.</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
+<div id="challenge-06_machine-learning-fundamentals" class="section level1">
+<h1><span class="header-section-number">6</span> Challenge 06_Machine Learning Fundamentals</h1>
+<div id="summary" class="section level2">
+<h2><span class="header-section-number">6.1</span> Summary</h2>
+<p><strong>Your organization wants to know which companies are similar to each other to help in identifying potential customers of a SAAS software solution (e.g. Salesforce CRM or equivalent) in various segments of the market. The Sales Department is very interested in this analysis, which will help them more easily penetrate various market segments.</strong></p>
+<p>You will be using stock prices in this analysis. You come up with a method to classify companies based on how their stocks trade using their daily stock returns (percentage movement from one day to the next). This analysis will help your organization determine which companies are related to each other (competitors and have similar attributes).</p>
+<p>You can analyze the stock prices using what you’ve learned in the unsupervised learning tools including K-Means and UMAP. You will use a combination of <code>kmeans()</code> to find groups and <code>umap()</code> to visualize similarity of daily stock returns.</p>
+</div>
+<div id="objectives" class="section level2">
+<h2><span class="header-section-number">6.2</span> Objectives</h2>
+<p>Apply your knowledge on K-Means and UMAP along with <code>dplyr</code>, <code>ggplot2</code>, and <code>purrr</code> to create a visualization that identifies subgroups in the S&amp;P 500 Index. You will specifically apply:</p>
+<ul>
+<li>Modeling: <code>kmeans()</code> and <code>umap()</code></li>
+<li>Iteration: <code>purrr</code></li>
+<li>Data Manipulation: <code>dplyr</code>, <code>tidyr</code>, and <code>tibble</code></li>
+<li>Visualization: <code>ggplot2</code> (bonus <code>plotly</code>)</li>
+</ul>
+</div>
+<div id="libraries" class="section level2">
+<h2><span class="header-section-number">6.3</span> Libraries</h2>
+<p>Load the following libraries.</p>
+<pre class="r"><code>#install.packages(&quot;plotly&quot;)
+#install.packages(&quot;tidyquant&quot;)
+#install.packages(&quot;umap&quot;)
+
+library(tidyverse)
+library(tidyquant)
+library(broom)
+library(umap)</code></pre>
+</div>
+<div id="data" class="section level2">
+<h2><span class="header-section-number">6.4</span> Data</h2>
+<p>We will be using stock prices in this analysis. Although some of you know already how to use an API to retrieve stock prices I obtained the stock prices for every stock in the S&amp;P 500 index for you already. The files are saved in the <code>session_6_data</code> directory.</p>
+<p>We can read in the stock prices. The data is 1.2M observations. The most important columns for our analysis are:</p>
+<ul>
+<li><code>symbol</code>: The stock ticker symbol that corresponds to a company’s stock price</li>
+<li><code>date</code>: The timestamp relating the symbol to the share price at that point in time</li>
+<li><code>adjusted</code>: The stock price, adjusted for any splits and dividends (we use this when analyzing stock data over long periods of time)</li>
+</ul>
+<pre class="r"><code># STOCK PRICES
+sp_500_prices_tbl &lt;- read_rds(&quot;00_data/06/sp_500_prices_tbl.rds&quot;)
+#sp_500_prices_tbl</code></pre>
+<p>The second data frame contains information about the stocks the most important of which are:</p>
+<ul>
+<li><code>company</code>: The company name</li>
+<li><code>sector</code>: The sector that the company belongs to</li>
+</ul>
+<pre class="r"><code># SECTOR INFORMATION
+#sp_500_index_tbl &lt;- read_rds(&quot;sp_500_index_tbl.rds&quot;)
+#sp_500_index_tbl</code></pre>
+</div>
+<div id="question" class="section level2">
+<h2><span class="header-section-number">6.5</span> Question</h2>
+<p><mark>Which stock prices behave similarly?</mark></p>
+<p>Answering this question helps us <strong>understand which companies are related</strong>, and we can use clustering to help us answer it!</p>
+<p>Even if you’re not interested in finance, this is still a great analysis because it will tell you which companies are competitors and which are likely in the same space (often called sectors) and can be categorized together. Bottom line - This analysis can help you better understand the dynamics of the market and competition, which is useful for all types of analyses from finance to sales to marketing.</p>
+<p>Let’s get started.</p>
+<div id="step-1---convert-stock-prices-to-a-standardized-format-daily-returns" class="section level3">
+<h3><span class="header-section-number">6.5.1</span> Step 1 - Convert stock prices to a standardized format (daily returns)</h3>
+<p>What you first need to do is get the data in a format that can be converted to a “user-item” style matrix. The challenge here is to connect the dots between what we have and what we need to do to format it properly.</p>
+<p>We know that in order to compare the data, it needs to be standardized or normalized. Why? Because we cannot compare values (stock prices) that are of completely different magnitudes. In order to standardize, we will convert from adjusted stock price (dollar value) to daily returns (percent change from previous day). Here is the formula.</p>
+<p><span class="math display">\[ 
+return_{daily} = \frac{price_{i}-price_{i-1}}{price_{i-1}}
+\]</span></p>
+<p>First, what do we have? We have stock prices for every stock in the <a href="https://finance.yahoo.com/quote/%5EGSPC?p=%5EGSPC">SP 500 Index</a>, which is the daily stock prices for over 500 stocks. The data set is over 1.2M observations.</p>
+<pre class="r"><code>sp_500_prices_tbl %&gt;% glimpse()</code></pre>
+<pre><code>## Rows: 1,225,765
+## Columns: 8
+## $ symbol   &lt;chr&gt; &quot;MSFT&quot;, &quot;MSFT&quot;, &quot;MSFT&quot;, &quot;MSFT&quot;, &quot;MSFT&quot;, &quot;MSFT&quot;, &quot;MSFT&quot;, &quot;M...
+## $ date     &lt;date&gt; 2009-01-02, 2009-01-05, 2009-01-06, 2009-01-07, 2009-01-0...
+## $ open     &lt;dbl&gt; 19.53, 20.20, 20.75, 20.19, 19.63, 20.17, 19.71, 19.52, 19...
+## $ high     &lt;dbl&gt; 20.40, 20.67, 21.00, 20.29, 20.19, 20.30, 19.79, 19.99, 19...
+## $ low      &lt;dbl&gt; 19.37, 20.06, 20.61, 19.48, 19.55, 19.41, 19.30, 19.52, 19...
+## $ close    &lt;dbl&gt; 20.33, 20.52, 20.76, 19.51, 20.12, 19.52, 19.47, 19.82, 19...
+## $ volume   &lt;dbl&gt; 50084000, 61475200, 58083400, 72709900, 70255400, 49815300...
+## $ adjusted &lt;dbl&gt; 15.86624, 16.01451, 16.20183, 15.22628, 15.70234, 15.23408...</code></pre>
+<p>Your first task is to convert to a tibble named <code>sp_500_daily_returns_tbl</code> by performing the following operations:</p>
+<ul>
+<li>Select the <code>symbol</code>, <code>date</code> and <code>adjusted</code> columns</li>
+<li>Filter to dates beginning in the year 2018 and beyond.</li>
+<li>Compute a Lag of 1 day on the adjusted stock price. Be sure to group by symbol first, otherwise we will have lags computed using values from the previous stock in the data frame.</li>
+<li>Remove a <code>NA</code> values from the lagging operation</li>
+<li>Compute the difference between adjusted and the lag</li>
+<li>Compute the percentage difference by dividing the difference by that lag. Name this column <code>pct_return</code>.</li>
+<li>Return only the <code>symbol</code>, <code>date</code>, and <code>pct_return</code> columns</li>
+<li>Save as a variable named <code>sp_500_daily_returns_tbl</code></li>
+</ul>
+<pre class="r"><code># Apply your data transformation skills!
+
+# Output: sp_500_daily_returns_tbl</code></pre>
+</div>
+<div id="step-2---convert-to-user-item-format" class="section level3">
+<h3><span class="header-section-number">6.5.2</span> Step 2 - Convert to User-Item Format</h3>
+<p>The next step is to convert to a user-item format with the <code>symbol</code> in the first column and every other column the value of the <em>daily returns</em> (<code>pct_return</code>) for every stock at each <code>date</code>.</p>
+<p>We’re going to import the correct results first (just in case you were not able to complete the last step).</p>
+<pre class="r"><code>#sp_500_daily_returns_tbl &lt;- read_rds(&quot;sp_500_daily_returns_tbl.rds&quot;)
+#sp_500_daily_returns_tbl</code></pre>
+<p>Now that we have the daily returns (percentage change from one day to the next), we can convert to a user-item format. The user in this case is the <code>symbol</code> (company), and the item in this case is the <code>pct_return</code> at each <code>date</code>.</p>
+<ul>
+<li>Spread the <code>date</code> column to get the values as percentage returns. Make sure to fill an <code>NA</code> values with zeros.</li>
+<li>Save the result as <code>stock_date_matrix_tbl</code></li>
+</ul>
+<pre class="r"><code># Convert to User-Item Format
+
+# Output: stock_date_matrix_tbl</code></pre>
+</div>
+<div id="step-3---perform-k-means-clustering" class="section level3">
+<h3><span class="header-section-number">6.5.3</span> Step 3 - Perform K-Means Clustering</h3>
+<p>Next, we’ll perform <strong>K-Means clustering</strong>.</p>
+<p>We’re going to import the correct results first (just in case you were not able to complete the last step).</p>
+<pre class="r"><code>#stock_date_matrix_tbl &lt;- read_rds(&quot;stock_date_matrix_tbl.rds&quot;)</code></pre>
+<p>Beginning with the <code>stock_date_matrix_tbl</code>, perform the following operations:</p>
+<ul>
+<li>Drop the non-numeric column, <code>symbol</code></li>
+<li>Perform <code>kmeans()</code> with <code>centers = 4</code> and <code>nstart = 20</code></li>
+<li>Save the result as <code>kmeans_obj</code></li>
+</ul>
+<pre class="r"><code># Create kmeans_obj for 4 centers</code></pre>
+<p>Use <code>glance()</code> to get the <code>tot.withinss</code>.</p>
+<pre class="r"><code># Apply glance() to get the tot.withinss</code></pre>
+</div>
+<div id="step-4---find-the-optimal-value-of-k" class="section level3">
+<h3><span class="header-section-number">6.5.4</span> Step 4 - Find the optimal value of K</h3>
+<p>Now that we are familiar with the process for calculating <code>kmeans()</code>, let’s use <code>purrr</code> to iterate over many values of “k” using the <code>centers</code> argument.</p>
+<p>We’ll use this <strong>custom function</strong> called <code>kmeans_mapper()</code>:</p>
+<pre class="r"><code>#kmeans_mapper &lt;- function(center = 3) {
+ #   stock_date_matrix_tbl %&gt;%
+  #      select(-symbol) %&gt;%
+   #     kmeans(centers = center, nstart = 20)
+#}</code></pre>
+<p>Apply the <code>kmeans_mapper()</code> and <code>glance()</code> functions iteratively using <code>purrr</code>.</p>
+<ul>
+<li>Create a tibble containing column called <code>centers</code> that go from 1 to 30</li>
+<li>Add a column named <code>k_means</code> with the <code>kmeans_mapper()</code> output. Use <code>mutate()</code> to add the column and <code>map()</code> to map centers to the <code>kmeans_mapper()</code> function.</li>
+<li>Add a column named <code>glance</code> with the <code>glance()</code> output. Use <code>mutate()</code> and <code>map()</code> again to iterate over the column of <code>k_means</code>.</li>
+<li>Save the output as <code>k_means_mapped_tbl</code></li>
+</ul>
+<pre class="r"><code># Use purrr to map
+
+
+# Output: k_means_mapped_tbl </code></pre>
+<p>Next, let’s visualize the “tot.withinss” from the glance output as a <strong><em>Scree Plot</em></strong>.</p>
+<ul>
+<li>Begin with the <code>k_means_mapped_tbl</code></li>
+<li>Unnest the <code>glance</code> column</li>
+<li>Plot the <code>centers</code> column (x-axis) versus the <code>tot.withinss</code> column (y-axis) using <code>geom_point()</code> and <code>geom_line()</code></li>
+<li>Add a title “Scree Plot” and feel free to style it with your favorite theme</li>
+</ul>
+<pre class="r"><code># Visualize Scree Plot</code></pre>
+<p>We can see that the Scree Plot becomes linear (constant rate of change) between 5 and 10 centers for K.</p>
+</div>
+<div id="step-5---apply-umap" class="section level3">
+<h3><span class="header-section-number">6.5.5</span> Step 5 - Apply UMAP</h3>
+<p>Next, let’s plot the <code>UMAP</code> 2D visualization to help us investigate cluster assignments.</p>
+<p>We’re going to import the correct results first (just in case you were not able to complete the last step).</p>
+<pre class="r"><code>#k_means_mapped_tbl &lt;- read_rds(&quot;k_means_mapped_tbl.rds&quot;)</code></pre>
+<p>First, let’s apply the <code>umap()</code> function to the <code>stock_date_matrix_tbl</code>, which contains our user-item matrix in tibble format.</p>
+<ul>
+<li>Start with <code>stock_date_matrix_tbl</code></li>
+<li>De-select the <code>symbol</code> column</li>
+<li>Use the <code>umap()</code> function storing the output as <code>umap_results</code></li>
+</ul>
+<pre class="r"><code># Apply UMAP
+
+# Store results as: umap_results </code></pre>
+<p>Next, we want to combine the <code>layout</code> from the <code>umap_results</code> with the <code>symbol</code> column from the <code>stock_date_matrix_tbl</code>.</p>
+<ul>
+<li>Start with <code>umap_results$layout</code></li>
+<li>Convert from a <code>matrix</code> data type to a <code>tibble</code> with <code>as_tibble()</code></li>
+<li>Bind the columns of the umap tibble with the <code>symbol</code> column from the <code>stock_date_matrix_tbl</code>.</li>
+<li>Save the results as <code>umap_results_tbl</code>.</li>
+</ul>
+<pre class="r"><code># Convert umap results to tibble with symbols
+
+# Output: umap_results_tbl</code></pre>
+<p>Finally, let’s make a quick visualization of the <code>umap_results_tbl</code>.</p>
+<ul>
+<li>Pipe the <code>umap_results_tbl</code> into <code>ggplot()</code> mapping the columns to x-axis and y-axis</li>
+<li>Add a <code>geom_point()</code> geometry with an <code>alpha = 0.5</code></li>
+<li>Apply <code>theme_tq()</code> and add a title “UMAP Projection”</li>
+</ul>
+<pre class="r"><code># Visualize UMAP results</code></pre>
+<p>We can now see that we have some clusters. However, we still need to combine the K-Means clusters and the UMAP 2D representation.</p>
+</div>
+<div id="step-6---combine-k-means-and-umap" class="section level3">
+<h3><span class="header-section-number">6.5.6</span> Step 6 - Combine K-Means and UMAP</h3>
+<p>Next, we combine the K-Means clusters and the UMAP 2D representation</p>
+<p>We’re going to import the correct results first (just in case you were not able to complete the last step).</p>
+<pre class="r"><code>#k_means_mapped_tbl &lt;- read_rds(&quot;k_means_mapped_tbl.rds&quot;)
+#umap_results_tbl   &lt;- read_rds(&quot;umap_results_tbl.rds&quot;)</code></pre>
+<p>First, pull out the K-Means for 10 Centers. Use this since beyond this value the Scree Plot flattens. Have a look at the business case to recall how that works.</p>
+<pre class="r"><code># Get the k_means_obj from the 10th center
+
+# Store as k_means_obj</code></pre>
+<p>Next, we’ll combine the clusters from the <code>k_means_obj</code> with the <code>umap_results_tbl</code>.</p>
+<ul>
+<li>Begin with the <code>k_means_obj</code></li>
+<li>Augment the <code>k_means_obj</code> with the <code>stock_date_matrix_tbl</code> to get the clusters added to the end of the tibble</li>
+<li>Select just the <code>symbol</code> and <code>.cluster</code> columns</li>
+<li>Left join the result with the <code>umap_results_tbl</code> by the <code>symbol</code> column</li>
+<li>Left join the result with the result of <code>sp_500_index_tbl %&gt;% select(symbol, company, sector)</code> by the <code>symbol</code> column.</li>
+<li>Store the output as <code>umap_kmeans_results_tbl</code></li>
+</ul>
+<pre class="r"><code># Use your dplyr &amp; broom skills to combine the k_means_obj with the umap_results_tbl
+
+
+# Output: umap_kmeans_results_tbl </code></pre>
+<p>Plot the K-Means and UMAP results.</p>
+<ul>
+<li>Begin with the <code>umap_kmeans_results_tbl</code></li>
+<li>Use <code>ggplot()</code> mapping <code>V1</code>, <code>V2</code> and <code>color = .cluster</code></li>
+<li>Add the <code>geom_point()</code> geometry with <code>alpha = 0.5</code></li>
+<li>Apply colors as you desire (e.g. <code>scale_color_manual(values = palette_light() %&gt;% rep(3))</code>)</li>
+</ul>
+<pre class="r"><code># Visualize the combined K-Means and UMAP results</code></pre>
+<p>Congratulations! You are done with the 1st challenge!</p>
+</div>
+</div>
 </div>
 
 
