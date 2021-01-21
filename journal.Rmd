@@ -708,7 +708,7 @@ We can read in the stock prices. The data is 1.2M observations. The most importa
 ```{r}
 # STOCK PRICES
 sp_500_prices_tbl <- read_rds("00_data/06/sp_500_prices_tbl.rds")
-#sp_500_prices_tbl
+sp_500_prices_tbl
 ```
 
 The second data frame contains information about the stocks the most important of which are:
@@ -718,8 +718,8 @@ The second data frame contains information about the stocks the most important o
 
 ```{r}
 # SECTOR INFORMATION
-#sp_500_index_tbl <- read_rds("sp_500_index_tbl.rds")
-#sp_500_index_tbl
+sp_500_index_tbl <- read_rds("00_data/06/sp_500_index_tbl.rds")
+sp_500_index_tbl
 ```
 
 
@@ -762,6 +762,19 @@ Your first task is to convert to a tibble named `sp_500_daily_returns_tbl` by pe
 
 ```{r}
 # Apply your data transformation skills!
+
+sp_500_daily_returns_tbl <- sp_500_prices_tbl %>%
+    
+    # Select relevant columns
+    select(symbol, date, adjusted) %>%
+    filter(year(date)>="2018")%>%
+    group_by(symbol) %>%  
+    mutate(adjusted_lag = lag(adjusted,1))%>%  
+    filter(adjusted_lag!="NA")%>%
+    mutate(pct_return = (adjusted -adjusted_lag)/adjusted_lag)%>% 
+    select(symbol, date, pct_return)
+
+sp_500_daily_returns_tbl
 
 # Output: sp_500_daily_returns_tbl
 ```
