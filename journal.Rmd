@@ -775,7 +775,6 @@ sp_500_daily_returns_tbl <- sp_500_prices_tbl %>%
     select(symbol, date, pct_return)
 
 sp_500_daily_returns_tbl
-
 # Output: sp_500_daily_returns_tbl
 ```
 
@@ -787,8 +786,10 @@ The next step is to convert to a user-item format with the `symbol` in the first
 We're going to import the correct results first (just in case you were not able to complete the last step).
 
 ```{r}
-#sp_500_daily_returns_tbl <- read_rds("sp_500_daily_returns_tbl.rds")
-#sp_500_daily_returns_tbl
+
+sp_500_daily_returns_tbl <- read_rds("00_data/06/sp_500_daily_returns_tbl.rds")
+sp_500_daily_returns_tbl
+
 ```
 
 
@@ -799,6 +800,13 @@ Now that we have the daily returns (percentage change from one day to the next),
 
 ```{r}
 # Convert to User-Item Format
+stock_date_matrix_tbl <- sp_500_daily_returns_tbl %>%
+
+    select(symbol, date, pct_return) %>%
+    pivot_wider(names_from = date, values_from = pct_return, values_fill = 0) %>%
+    ungroup()
+
+stock_date_matrix_tbl
 
 # Output: stock_date_matrix_tbl
 ```
@@ -811,7 +819,8 @@ Next, we'll perform __K-Means clustering__.
 
 We're going to import the correct results first (just in case you were not able to complete the last step).
 ```{r}
-#stock_date_matrix_tbl <- read_rds("stock_date_matrix_tbl.rds")
+#if I load this data bas I get an error: for 
+#stock_date_matrix_tbl <- read_rds("00_data/06/stock_date_matrix_tbl.rds")
 ```
 
 Beginning with the `stock_date_matrix_tbl`, perform the following operations:
@@ -821,7 +830,11 @@ Beginning with the `stock_date_matrix_tbl`, perform the following operations:
 - Save the result as `kmeans_obj`
 
 ```{r}
-# Create kmeans_obj for 4 centers
+#Create kmeans_obj for 4 centers
+
+kmeans_obj <- stock_date_matrix_tbl %>%
+    select(-symbol) %>%
+    kmeans(centers = 4, nstart = 20)
 
 ```
 
@@ -829,7 +842,7 @@ Use `glance()` to get the `tot.withinss`.
 
 ```{r}
 # Apply glance() to get the tot.withinss
-
+broom::glance(kmeans_obj)
 ```
 
 ### Step 4 - Find the optimal value of K
@@ -839,11 +852,12 @@ Now that we are familiar with the process for calculating `kmeans()`, let's use 
 We'll use this __custom function__ called `kmeans_mapper()`:
 
 ```{r}
-#kmeans_mapper <- function(center = 3) {
- #   stock_date_matrix_tbl %>%
-  #      select(-symbol) %>%
-   #     kmeans(centers = center, nstart = 20)
-#}
+kmeans_mapper <- function(center = 3) {
+    stock_date_matrix_tbl %>%
+        select(-symbol) %>%
+        kmeans(centers = center, nstart = 20)
+
+}
 ```
 
 Apply the `kmeans_mapper()` and `glance()` functions iteratively using `purrr`.
@@ -854,9 +868,65 @@ Apply the `kmeans_mapper()` and `glance()` functions iteratively using `purrr`.
 - Save the output as `k_means_mapped_tbl` 
 
 
-```{r}
-# Use purrr to map
+```{r K Means Error}
 
+#library(purrr)
+
+#k_means_mapped_tbl <- tibble(centers = 1:30) %>%
+ #   mutate(k_means = centers %>% map(kmeans_mapper)) %>%
+  #  mutate(glance = k_means %>% map(glance))
+#k_means_mapper_tbl
+
+#Error generated only when building site:
+
+#Error: Problem with `mutate()` input `k_means`.
+#x cannot coerce type 'closure' to vector of type 'character'
+#i Input `k_means` is `centers %>% map(kmeans_mapper)`.
+#Backtrace:
+ #    x
+ # 1. +-rmarkdown::render_site(encoding = "UTF-8")
+#  2. | \-generator$render(...)
+ # 3. |   \-base::sapply(...)
+  #4. |     \-base::lapply(X = X, FUN = FUN, ...)
+#  5. |       \-rmarkdown:::FUN(X[[i]], ...)
+ # 6. |         \-rmarkdown:::render_one(...)
+  #7. |           +-base::suppressMessages(rmarkdown::render(...))
+#  8. |           | \-base::withCallingHandlers(...)
+ # 9. |           \-rmarkdown::render(...)
+ #10. |             \-knitr::knit(knit_input, knit_output, envir = envir, quiet = quiet)
+ #11. |               \-knitr:::process_file(text, output)
+ #12. |                 +-base::withCallingHandlers(...)
+ #13. |                 +-knitr:::process_group(group)
+ #14. |                 \-knitr:::process_group.block(group)
+ #15. |                   \-knitr:::call_block(x)
+ #16. |                     \-knitr:::block_exec(params)
+ #17. |                       +-knitr:::in_dir(...)
+ #18. |                       \-knitr:::evaluate(...)
+ #19. |                         \-evaluate::evaluate(...)
+ #20. |                           \-evaluate:::evaluate_call(...)
+ #21. |                             +-evaluate:::timing_fn(...)
+ #22. |                             +-base:::handle(...)
+ #23. |                             +-base::withCallingHandlers(...)
+ #24. |                             +-base::withVisible(eval(expr, envir, enclos))
+ #25. |                             \-base::eval(expr, envir, enclos)
+ #26. |                               \-base::eval(expr, envir, enclos)
+ #27. +-`%>%`(...)
+ #28. +-dplyr::mutate(., glance = k_means %>% map(glance))
+ #29. +-dplyr::mutate(., k_means = centers %>% map(kmeans_mapper))
+ #30. +-dplyr:::mutate.data.frame(., k_means = centers %>% map(kmeans_mapper))
+ #31. | \-dplyr:::mutate_cols(.data, ...)
+ #32. |   +-base::withCallingHandlers(...)
+ #33. |   \-mask$eval_all_mutate(dots[[i]])
+ #34. +-centers %>% map(kmeans_mapper)
+ #35. +-maps::map(., kmeans_mapper)
+ #36. | \-maps:::map.poly(...)
+ #37. |   \-base::paste("(^", regions, ")", sep = "", collapse = "|")
+ #38. \-base::.handleSimpleError(...)
+ #39.   \-dplyr:::h(simpleError(msg, call))
+
+#Ausf�hrung angehalten
+
+#Exited with status 1.
 
 # Output: k_means_mapped_tbl 
 ```
@@ -869,10 +939,22 @@ Next, let's visualize the "tot.withinss" from the glance output as a ___Scree Pl
 - Add a title "Scree Plot" and feel free to style it with your favorite theme
 
 ```{r}
+
 # Visualize Scree Plot
-
-
-
+#k_means_mapped_tbl %>%
+ #   unnest(glance) %>%
+  #  select(centers, tot.withinss)%>%
+    
+    # Visualization
+   # ggplot(aes(centers, tot.withinss)) +
+    #geom_point(color = "#2DC6D6", size = 4) +
+    #geom_line(color = "#2DC6D6", size = 1) +
+    # Add labels (which are repelled a little)
+    #ggrepel::geom_label_repel(aes(label = centers), color = "#2DC6D6") +
+    # Formatting
+    #labs(title = "Scree Plot",
+    #subtitle = "",
+    #caption = "")  
 ```
 
 We can see that the Scree Plot becomes linear (constant rate of change) between 5 and 10 centers for K.
@@ -885,7 +967,8 @@ Next, let's plot the `UMAP` 2D visualization to help us investigate cluster assi
 
 We're going to import the correct results first (just in case you were not able to complete the last step).
 ```{r}
-#k_means_mapped_tbl <- read_rds("k_means_mapped_tbl.rds")
+
+k_means_mapped_tbl <- read_rds("00_data/06/k_means_mapped_tbl.rds")
 ```
 
 First, let's apply the `umap()` function to the `stock_date_matrix_tbl`, which contains our user-item matrix in tibble format.
@@ -896,6 +979,9 @@ First, let's apply the `umap()` function to the `stock_date_matrix_tbl`, which c
 ```{r}
 # Apply UMAP
 
+umap_results <- stock_date_matrix_tbl %>%
+    select(-symbol) %>%
+    umap()
 # Store results as: umap_results 
 ```
 
@@ -908,7 +994,13 @@ Next, we want to combine the `layout` from the `umap_results` with the `symbol` 
 
 ```{r}
 # Convert umap results to tibble with symbols
-
+umap_results_tbl <- umap_results$layout %>%
+    as_tibble(.name_repair = "unique") %>% # argument is required to set names in the next step
+    set_names(c("x", "y")) %>%
+    bind_cols(
+        stock_date_matrix_tbl %>% select(symbol)
+    )
+umap_results_tbl
 # Output: umap_results_tbl
 ```
 
@@ -920,7 +1012,13 @@ Finally, let's make a quick visualization of the `umap_results_tbl`.
 
 ```{r}
 # Visualize UMAP results
-
+umap_results_tbl %>%
+  ggplot(aes(x,y))+
+  geom_point(size=0.5)+
+  theme_tq(base_size=11)+
+  labs(title = "UMAP Projection",
+    subtitle = "",
+    caption = "")  
 ```
 
 We can now see that we have some clusters. However, we still need to combine the K-Means clusters and the UMAP 2D representation. 
@@ -933,8 +1031,9 @@ Next, we combine the K-Means clusters and the UMAP 2D representation
 
 We're going to import the correct results first (just in case you were not able to complete the last step).
 ```{r}
-#k_means_mapped_tbl <- read_rds("k_means_mapped_tbl.rds")
-#umap_results_tbl   <- read_rds("umap_results_tbl.rds")
+
+k_means_mapped_tbl <- read_rds("00_data/06/k_means_mapped_tbl.rds")
+umap_results_tbl   <- read_rds("00_data/06/umap_results_tbl.rds")
 ```
 
 
@@ -943,6 +1042,11 @@ Have a look at the business case to recall how that works.
 
 ```{r}
 # Get the k_means_obj from the 10th center
+
+# Get the data for the third element (which we have chosen in the skree plot)
+k_means_obj <- k_means_mapped_tbl %>%
+    pull(k_means) %>%
+    pluck(10)
 
 # Store as k_means_obj
 ```
@@ -959,6 +1063,15 @@ Next, we'll combine the clusters from the `k_means_obj` with the `umap_results_t
 ```{r}
 # Use your dplyr & broom skills to combine the k_means_obj with the umap_results_tbl
 
+# Convert it to a tibble with broom
+kmeans_clusters_tbl <- k_means_obj %>% 
+    augment(stock_date_matrix_tbl) %>%
+    # Select the data we need
+    select(symbol, .cluster)
+
+# Bind data together
+umap_kmeans_results_tbl <- umap_results_tbl %>%
+    left_join(kmeans_clusters_tbl)
 
 # Output: umap_kmeans_results_tbl 
 ```
@@ -972,6 +1085,22 @@ Plot the K-Means and UMAP results.
 
 ```{r}
 # Visualize the combined K-Means and UMAP results
+
+umap_kmeans_results_tbl %>%
+    mutate(label_text = str_glue("Customer: {symbol}
+                                 Cluster: {.cluster}")) %>%
+                                 
+    ggplot(aes(V1,V2,color = .cluster)) +
+    # Geometries
+    
+    geom_point(size=0.5) +
+    
+    # Formatting
+    scale_color_manual(values=c("#2d72d6", "#2dc6d6", "#2dd692","#641E16","#1ABC9C","#F9E79F", "#E5E7E9", "#E6B0AA", "#2874A6", "#17202A")) +
+    labs(title = "K-Means and UMAP results",
+    subtitle = "",
+    caption = "") +
+    theme(legend.position = "none")
 
 
 ```

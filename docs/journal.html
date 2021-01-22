@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-01-21 21:02:00</p>
+<p>Last compiled: 2021-01-22 01:09:52</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -679,7 +679,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-01-21 21:02:00</p>
+<p>Last compiled: 2021-01-22 01:09:52</p>
 <div id="load-libraries---1" class="section level2">
 <h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -2315,41 +2315,120 @@ sp_500_daily_returns_tbl</code></pre>
 <h3><span class="header-section-number">6.5.2</span> Step 2 - Convert to User-Item Format</h3>
 <p>The next step is to convert to a user-item format with the <code>symbol</code> in the first column and every other column the value of the <em>daily returns</em> (<code>pct_return</code>) for every stock at each <code>date</code>.</p>
 <p>We’re going to import the correct results first (just in case you were not able to complete the last step).</p>
-<pre class="r"><code>#sp_500_daily_returns_tbl &lt;- read_rds(&quot;sp_500_daily_returns_tbl.rds&quot;)
-#sp_500_daily_returns_tbl</code></pre>
+<pre class="r"><code>sp_500_daily_returns_tbl &lt;- read_rds(&quot;00_data/06/sp_500_daily_returns_tbl.rds&quot;)
+sp_500_daily_returns_tbl</code></pre>
+<pre><code>## # A tibble: 141,340 x 3
+## # Groups:   symbol [502]
+##    symbol date       pct_return
+##    &lt;chr&gt;  &lt;date&gt;          &lt;dbl&gt;
+##  1 MSFT   2018-01-03   0.00465 
+##  2 MSFT   2018-01-04   0.00880 
+##  3 MSFT   2018-01-05   0.0124  
+##  4 MSFT   2018-01-08   0.00102 
+##  5 MSFT   2018-01-09  -0.000680
+##  6 MSFT   2018-01-10  -0.00453 
+##  7 MSFT   2018-01-11   0.00296 
+##  8 MSFT   2018-01-12   0.0173  
+##  9 MSFT   2018-01-16  -0.0140  
+## 10 MSFT   2018-01-17   0.0203  
+## # ... with 141,330 more rows</code></pre>
 <p>Now that we have the daily returns (percentage change from one day to the next), we can convert to a user-item format. The user in this case is the <code>symbol</code> (company), and the item in this case is the <code>pct_return</code> at each <code>date</code>.</p>
 <ul>
 <li>Spread the <code>date</code> column to get the values as percentage returns. Make sure to fill an <code>NA</code> values with zeros.</li>
 <li>Save the result as <code>stock_date_matrix_tbl</code></li>
 </ul>
 <pre class="r"><code># Convert to User-Item Format
+stock_date_matrix_tbl &lt;- sp_500_daily_returns_tbl %&gt;%
 
-# Output: stock_date_matrix_tbl</code></pre>
+    select(symbol, date, pct_return) %&gt;%
+    pivot_wider(names_from = date, values_from = pct_return, values_fill = 0) %&gt;%
+    ungroup()
+
+stock_date_matrix_tbl</code></pre>
+<pre><code>## # A tibble: 502 x 283
+##    symbol `2018-01-03` `2018-01-04` `2018-01-05` `2018-01-08` `2018-01-09`
+##    &lt;chr&gt;         &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;
+##  1 MSFT       0.00465     0.00880       0.0124        0.00102    -0.000680
+##  2 AAPL      -0.000174    0.00465       0.0114       -0.00371    -0.000115
+##  3 AMZN       0.0128      0.00448       0.0162        0.0144      0.00468 
+##  4 FB         0.0179     -0.00184       0.0137        0.00765    -0.00218 
+##  5 JNJ        0.00955    -0.0000712     0.00825       0.00127     0.0159  
+##  6 JPM        0.00102     0.0143       -0.00642       0.00148     0.00507 
+##  7 GOOG       0.0164      0.00362       0.0146        0.00427    -0.000614
+##  8 GOOGL      0.0171      0.00388       0.0133        0.00353    -0.00127 
+##  9 XOM        0.0196      0.00138      -0.000806      0.00450    -0.00425 
+## 10 BAC       -0.00334     0.0131        0.00464      -0.00692     0.00498 
+## # ... with 492 more rows, and 277 more variables: `2018-01-10` &lt;dbl&gt;,
+## #   `2018-01-11` &lt;dbl&gt;, `2018-01-12` &lt;dbl&gt;, `2018-01-16` &lt;dbl&gt;,
+## #   `2018-01-17` &lt;dbl&gt;, `2018-01-18` &lt;dbl&gt;, `2018-01-19` &lt;dbl&gt;,
+## #   `2018-01-22` &lt;dbl&gt;, `2018-01-23` &lt;dbl&gt;, `2018-01-24` &lt;dbl&gt;,
+## #   `2018-01-25` &lt;dbl&gt;, `2018-01-26` &lt;dbl&gt;, `2018-01-29` &lt;dbl&gt;,
+## #   `2018-01-30` &lt;dbl&gt;, `2018-01-31` &lt;dbl&gt;, `2018-02-01` &lt;dbl&gt;,
+## #   `2018-02-02` &lt;dbl&gt;, `2018-02-05` &lt;dbl&gt;, `2018-02-06` &lt;dbl&gt;,
+## #   `2018-02-07` &lt;dbl&gt;, `2018-02-08` &lt;dbl&gt;, `2018-02-09` &lt;dbl&gt;,
+## #   `2018-02-12` &lt;dbl&gt;, `2018-02-13` &lt;dbl&gt;, `2018-02-14` &lt;dbl&gt;,
+## #   `2018-02-15` &lt;dbl&gt;, `2018-02-16` &lt;dbl&gt;, `2018-02-20` &lt;dbl&gt;,
+## #   `2018-02-21` &lt;dbl&gt;, `2018-02-22` &lt;dbl&gt;, `2018-02-23` &lt;dbl&gt;,
+## #   `2018-02-26` &lt;dbl&gt;, `2018-02-27` &lt;dbl&gt;, `2018-02-28` &lt;dbl&gt;,
+## #   `2018-03-01` &lt;dbl&gt;, `2018-03-02` &lt;dbl&gt;, `2018-03-05` &lt;dbl&gt;,
+## #   `2018-03-06` &lt;dbl&gt;, `2018-03-07` &lt;dbl&gt;, `2018-03-08` &lt;dbl&gt;,
+## #   `2018-03-09` &lt;dbl&gt;, `2018-03-12` &lt;dbl&gt;, `2018-03-13` &lt;dbl&gt;,
+## #   `2018-03-14` &lt;dbl&gt;, `2018-03-15` &lt;dbl&gt;, `2018-03-16` &lt;dbl&gt;,
+## #   `2018-03-19` &lt;dbl&gt;, `2018-03-20` &lt;dbl&gt;, `2018-03-21` &lt;dbl&gt;,
+## #   `2018-03-22` &lt;dbl&gt;, `2018-03-23` &lt;dbl&gt;, `2018-03-26` &lt;dbl&gt;,
+## #   `2018-03-27` &lt;dbl&gt;, `2018-03-28` &lt;dbl&gt;, `2018-03-29` &lt;dbl&gt;,
+## #   `2018-04-02` &lt;dbl&gt;, `2018-04-03` &lt;dbl&gt;, `2018-04-04` &lt;dbl&gt;,
+## #   `2018-04-05` &lt;dbl&gt;, `2018-04-06` &lt;dbl&gt;, `2018-04-09` &lt;dbl&gt;,
+## #   `2018-04-10` &lt;dbl&gt;, `2018-04-11` &lt;dbl&gt;, `2018-04-12` &lt;dbl&gt;,
+## #   `2018-04-13` &lt;dbl&gt;, `2018-04-16` &lt;dbl&gt;, `2018-04-17` &lt;dbl&gt;,
+## #   `2018-04-18` &lt;dbl&gt;, `2018-04-19` &lt;dbl&gt;, `2018-04-20` &lt;dbl&gt;,
+## #   `2018-04-23` &lt;dbl&gt;, `2018-04-24` &lt;dbl&gt;, `2018-04-25` &lt;dbl&gt;,
+## #   `2018-04-26` &lt;dbl&gt;, `2018-04-27` &lt;dbl&gt;, `2018-04-30` &lt;dbl&gt;,
+## #   `2018-05-01` &lt;dbl&gt;, `2018-05-02` &lt;dbl&gt;, `2018-05-03` &lt;dbl&gt;,
+## #   `2018-05-04` &lt;dbl&gt;, `2018-05-07` &lt;dbl&gt;, `2018-05-08` &lt;dbl&gt;,
+## #   `2018-05-09` &lt;dbl&gt;, `2018-05-10` &lt;dbl&gt;, `2018-05-11` &lt;dbl&gt;,
+## #   `2018-05-14` &lt;dbl&gt;, `2018-05-15` &lt;dbl&gt;, `2018-05-16` &lt;dbl&gt;,
+## #   `2018-05-17` &lt;dbl&gt;, `2018-05-18` &lt;dbl&gt;, `2018-05-21` &lt;dbl&gt;,
+## #   `2018-05-22` &lt;dbl&gt;, `2018-05-23` &lt;dbl&gt;, `2018-05-24` &lt;dbl&gt;,
+## #   `2018-05-25` &lt;dbl&gt;, `2018-05-29` &lt;dbl&gt;, `2018-05-30` &lt;dbl&gt;,
+## #   `2018-05-31` &lt;dbl&gt;, `2018-06-01` &lt;dbl&gt;, `2018-06-04` &lt;dbl&gt;, ...</code></pre>
+<pre class="r"><code># Output: stock_date_matrix_tbl</code></pre>
 </div>
 <div id="step-3---perform-k-means-clustering" class="section level3">
 <h3><span class="header-section-number">6.5.3</span> Step 3 - Perform K-Means Clustering</h3>
 <p>Next, we’ll perform <strong>K-Means clustering</strong>.</p>
 <p>We’re going to import the correct results first (just in case you were not able to complete the last step).</p>
-<pre class="r"><code>#stock_date_matrix_tbl &lt;- read_rds(&quot;stock_date_matrix_tbl.rds&quot;)</code></pre>
+<pre class="r"><code>#if I load this data bas I get an error: for 
+#stock_date_matrix_tbl &lt;- read_rds(&quot;00_data/06/stock_date_matrix_tbl.rds&quot;)</code></pre>
 <p>Beginning with the <code>stock_date_matrix_tbl</code>, perform the following operations:</p>
 <ul>
 <li>Drop the non-numeric column, <code>symbol</code></li>
 <li>Perform <code>kmeans()</code> with <code>centers = 4</code> and <code>nstart = 20</code></li>
 <li>Save the result as <code>kmeans_obj</code></li>
 </ul>
-<pre class="r"><code># Create kmeans_obj for 4 centers</code></pre>
+<pre class="r"><code>#Create kmeans_obj for 4 centers
+
+kmeans_obj &lt;- stock_date_matrix_tbl %&gt;%
+    select(-symbol) %&gt;%
+    kmeans(centers = 4, nstart = 20)</code></pre>
 <p>Use <code>glance()</code> to get the <code>tot.withinss</code>.</p>
-<pre class="r"><code># Apply glance() to get the tot.withinss</code></pre>
+<pre class="r"><code># Apply glance() to get the tot.withinss
+broom::glance(kmeans_obj)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##   totss tot.withinss betweenss  iter
+##   &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt; &lt;int&gt;
+## 1  33.6         29.2      4.40     4</code></pre>
 </div>
 <div id="step-4---find-the-optimal-value-of-k" class="section level3">
 <h3><span class="header-section-number">6.5.4</span> Step 4 - Find the optimal value of K</h3>
 <p>Now that we are familiar with the process for calculating <code>kmeans()</code>, let’s use <code>purrr</code> to iterate over many values of “k” using the <code>centers</code> argument.</p>
 <p>We’ll use this <strong>custom function</strong> called <code>kmeans_mapper()</code>:</p>
-<pre class="r"><code>#kmeans_mapper &lt;- function(center = 3) {
- #   stock_date_matrix_tbl %&gt;%
-  #      select(-symbol) %&gt;%
-   #     kmeans(centers = center, nstart = 20)
-#}</code></pre>
+<pre class="r"><code>kmeans_mapper &lt;- function(center = 3) {
+    stock_date_matrix_tbl %&gt;%
+        select(-symbol) %&gt;%
+        kmeans(centers = center, nstart = 20)
+
+}</code></pre>
 <p>Apply the <code>kmeans_mapper()</code> and <code>glance()</code> functions iteratively using <code>purrr</code>.</p>
 <ul>
 <li>Create a tibble containing column called <code>centers</code> that go from 1 to 30</li>
@@ -2357,8 +2436,63 @@ sp_500_daily_returns_tbl</code></pre>
 <li>Add a column named <code>glance</code> with the <code>glance()</code> output. Use <code>mutate()</code> and <code>map()</code> again to iterate over the column of <code>k_means</code>.</li>
 <li>Save the output as <code>k_means_mapped_tbl</code></li>
 </ul>
-<pre class="r"><code># Use purrr to map
+<pre class="r"><code>#library(purrr)
 
+#k_means_mapped_tbl &lt;- tibble(centers = 1:30) %&gt;%
+ #   mutate(k_means = centers %&gt;% map(kmeans_mapper)) %&gt;%
+  #  mutate(glance = k_means %&gt;% map(glance))
+#k_means_mapper_tbl
+
+#Error generated only when building site:
+
+#Error: Problem with `mutate()` input `k_means`.
+#x cannot coerce type &#39;closure&#39; to vector of type &#39;character&#39;
+#i Input `k_means` is `centers %&gt;% map(kmeans_mapper)`.
+#Backtrace:
+ #    x
+ # 1. +-rmarkdown::render_site(encoding = &quot;UTF-8&quot;)
+#  2. | \-generator$render(...)
+ # 3. |   \-base::sapply(...)
+  #4. |     \-base::lapply(X = X, FUN = FUN, ...)
+#  5. |       \-rmarkdown:::FUN(X[[i]], ...)
+ # 6. |         \-rmarkdown:::render_one(...)
+  #7. |           +-base::suppressMessages(rmarkdown::render(...))
+#  8. |           | \-base::withCallingHandlers(...)
+ # 9. |           \-rmarkdown::render(...)
+ #10. |             \-knitr::knit(knit_input, knit_output, envir = envir, quiet = quiet)
+ #11. |               \-knitr:::process_file(text, output)
+ #12. |                 +-base::withCallingHandlers(...)
+ #13. |                 +-knitr:::process_group(group)
+ #14. |                 \-knitr:::process_group.block(group)
+ #15. |                   \-knitr:::call_block(x)
+ #16. |                     \-knitr:::block_exec(params)
+ #17. |                       +-knitr:::in_dir(...)
+ #18. |                       \-knitr:::evaluate(...)
+ #19. |                         \-evaluate::evaluate(...)
+ #20. |                           \-evaluate:::evaluate_call(...)
+ #21. |                             +-evaluate:::timing_fn(...)
+ #22. |                             +-base:::handle(...)
+ #23. |                             +-base::withCallingHandlers(...)
+ #24. |                             +-base::withVisible(eval(expr, envir, enclos))
+ #25. |                             \-base::eval(expr, envir, enclos)
+ #26. |                               \-base::eval(expr, envir, enclos)
+ #27. +-`%&gt;%`(...)
+ #28. +-dplyr::mutate(., glance = k_means %&gt;% map(glance))
+ #29. +-dplyr::mutate(., k_means = centers %&gt;% map(kmeans_mapper))
+ #30. +-dplyr:::mutate.data.frame(., k_means = centers %&gt;% map(kmeans_mapper))
+ #31. | \-dplyr:::mutate_cols(.data, ...)
+ #32. |   +-base::withCallingHandlers(...)
+ #33. |   \-mask$eval_all_mutate(dots[[i]])
+ #34. +-centers %&gt;% map(kmeans_mapper)
+ #35. +-maps::map(., kmeans_mapper)
+ #36. | \-maps:::map.poly(...)
+ #37. |   \-base::paste(&quot;(^&quot;, regions, &quot;)&quot;, sep = &quot;&quot;, collapse = &quot;|&quot;)
+ #38. \-base::.handleSimpleError(...)
+ #39.   \-dplyr:::h(simpleError(msg, call))
+
+#Ausf�hrung angehalten
+
+#Exited with status 1.
 
 # Output: k_means_mapped_tbl </code></pre>
 <p>Next, let’s visualize the “tot.withinss” from the glance output as a <strong><em>Scree Plot</em></strong>.</p>
@@ -2368,14 +2502,28 @@ sp_500_daily_returns_tbl</code></pre>
 <li>Plot the <code>centers</code> column (x-axis) versus the <code>tot.withinss</code> column (y-axis) using <code>geom_point()</code> and <code>geom_line()</code></li>
 <li>Add a title “Scree Plot” and feel free to style it with your favorite theme</li>
 </ul>
-<pre class="r"><code># Visualize Scree Plot</code></pre>
+<pre class="r"><code># Visualize Scree Plot
+#k_means_mapped_tbl %&gt;%
+ #   unnest(glance) %&gt;%
+  #  select(centers, tot.withinss)%&gt;%
+    
+    # Visualization
+   # ggplot(aes(centers, tot.withinss)) +
+    #geom_point(color = &quot;#2DC6D6&quot;, size = 4) +
+    #geom_line(color = &quot;#2DC6D6&quot;, size = 1) +
+    # Add labels (which are repelled a little)
+    #ggrepel::geom_label_repel(aes(label = centers), color = &quot;#2DC6D6&quot;) +
+    # Formatting
+    #labs(title = &quot;Scree Plot&quot;,
+    #subtitle = &quot;&quot;,
+    #caption = &quot;&quot;)  </code></pre>
 <p>We can see that the Scree Plot becomes linear (constant rate of change) between 5 and 10 centers for K.</p>
 </div>
 <div id="step-5---apply-umap" class="section level3">
 <h3><span class="header-section-number">6.5.5</span> Step 5 - Apply UMAP</h3>
 <p>Next, let’s plot the <code>UMAP</code> 2D visualization to help us investigate cluster assignments.</p>
 <p>We’re going to import the correct results first (just in case you were not able to complete the last step).</p>
-<pre class="r"><code>#k_means_mapped_tbl &lt;- read_rds(&quot;k_means_mapped_tbl.rds&quot;)</code></pre>
+<pre class="r"><code>k_means_mapped_tbl &lt;- read_rds(&quot;00_data/06/k_means_mapped_tbl.rds&quot;)</code></pre>
 <p>First, let’s apply the <code>umap()</code> function to the <code>stock_date_matrix_tbl</code>, which contains our user-item matrix in tibble format.</p>
 <ul>
 <li>Start with <code>stock_date_matrix_tbl</code></li>
@@ -2384,6 +2532,9 @@ sp_500_daily_returns_tbl</code></pre>
 </ul>
 <pre class="r"><code># Apply UMAP
 
+umap_results &lt;- stock_date_matrix_tbl %&gt;%
+    select(-symbol) %&gt;%
+    umap()
 # Store results as: umap_results </code></pre>
 <p>Next, we want to combine the <code>layout</code> from the <code>umap_results</code> with the <code>symbol</code> column from the <code>stock_date_matrix_tbl</code>.</p>
 <ul>
@@ -2393,25 +2544,58 @@ sp_500_daily_returns_tbl</code></pre>
 <li>Save the results as <code>umap_results_tbl</code>.</li>
 </ul>
 <pre class="r"><code># Convert umap results to tibble with symbols
-
-# Output: umap_results_tbl</code></pre>
+umap_results_tbl &lt;- umap_results$layout %&gt;%
+    as_tibble(.name_repair = &quot;unique&quot;) %&gt;% # argument is required to set names in the next step
+    set_names(c(&quot;x&quot;, &quot;y&quot;)) %&gt;%
+    bind_cols(
+        stock_date_matrix_tbl %&gt;% select(symbol)
+    )
+umap_results_tbl</code></pre>
+<pre><code>## # A tibble: 502 x 3
+##         x       y symbol
+##     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt; 
+##  1 -2.02  -2.67   MSFT  
+##  2 -1.61  -2.94   AAPL  
+##  3 -2.29  -2.79   AMZN  
+##  4 -2.24  -2.53   FB    
+##  5 -0.107  0.0807 JNJ   
+##  6 -1.47   1.98   JPM   
+##  7 -2.26  -2.62   GOOG  
+##  8 -2.35  -2.73   GOOGL 
+##  9  3.44  -0.873  XOM   
+## 10 -1.65   2.10   BAC   
+## # ... with 492 more rows</code></pre>
+<pre class="r"><code># Output: umap_results_tbl</code></pre>
 <p>Finally, let’s make a quick visualization of the <code>umap_results_tbl</code>.</p>
 <ul>
 <li>Pipe the <code>umap_results_tbl</code> into <code>ggplot()</code> mapping the columns to x-axis and y-axis</li>
 <li>Add a <code>geom_point()</code> geometry with an <code>alpha = 0.5</code></li>
 <li>Apply <code>theme_tq()</code> and add a title “UMAP Projection”</li>
 </ul>
-<pre class="r"><code># Visualize UMAP results</code></pre>
+<pre class="r"><code># Visualize UMAP results
+umap_results_tbl %&gt;%
+  ggplot(aes(x,y))+
+  geom_point(size=0.5)+
+  theme_tq(base_size=11)+
+  labs(title = &quot;UMAP Projection&quot;,
+    subtitle = &quot;&quot;,
+    caption = &quot;&quot;)  </code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
 <p>We can now see that we have some clusters. However, we still need to combine the K-Means clusters and the UMAP 2D representation.</p>
 </div>
 <div id="step-6---combine-k-means-and-umap" class="section level3">
 <h3><span class="header-section-number">6.5.6</span> Step 6 - Combine K-Means and UMAP</h3>
 <p>Next, we combine the K-Means clusters and the UMAP 2D representation</p>
 <p>We’re going to import the correct results first (just in case you were not able to complete the last step).</p>
-<pre class="r"><code>#k_means_mapped_tbl &lt;- read_rds(&quot;k_means_mapped_tbl.rds&quot;)
-#umap_results_tbl   &lt;- read_rds(&quot;umap_results_tbl.rds&quot;)</code></pre>
+<pre class="r"><code>k_means_mapped_tbl &lt;- read_rds(&quot;00_data/06/k_means_mapped_tbl.rds&quot;)
+umap_results_tbl   &lt;- read_rds(&quot;00_data/06/umap_results_tbl.rds&quot;)</code></pre>
 <p>First, pull out the K-Means for 10 Centers. Use this since beyond this value the Scree Plot flattens. Have a look at the business case to recall how that works.</p>
 <pre class="r"><code># Get the k_means_obj from the 10th center
+
+# Get the data for the third element (which we have chosen in the skree plot)
+k_means_obj &lt;- k_means_mapped_tbl %&gt;%
+    pull(k_means) %&gt;%
+    pluck(10)
 
 # Store as k_means_obj</code></pre>
 <p>Next, we’ll combine the clusters from the <code>k_means_obj</code> with the <code>umap_results_tbl</code>.</p>
@@ -2425,6 +2609,15 @@ sp_500_daily_returns_tbl</code></pre>
 </ul>
 <pre class="r"><code># Use your dplyr &amp; broom skills to combine the k_means_obj with the umap_results_tbl
 
+# Convert it to a tibble with broom
+kmeans_clusters_tbl &lt;- k_means_obj %&gt;% 
+    augment(stock_date_matrix_tbl) %&gt;%
+    # Select the data we need
+    select(symbol, .cluster)
+
+# Bind data together
+umap_kmeans_results_tbl &lt;- umap_results_tbl %&gt;%
+    left_join(kmeans_clusters_tbl)
 
 # Output: umap_kmeans_results_tbl </code></pre>
 <p>Plot the K-Means and UMAP results.</p>
@@ -2434,7 +2627,24 @@ sp_500_daily_returns_tbl</code></pre>
 <li>Add the <code>geom_point()</code> geometry with <code>alpha = 0.5</code></li>
 <li>Apply colors as you desire (e.g. <code>scale_color_manual(values = palette_light() %&gt;% rep(3))</code>)</li>
 </ul>
-<pre class="r"><code># Visualize the combined K-Means and UMAP results</code></pre>
+<pre class="r"><code># Visualize the combined K-Means and UMAP results
+
+umap_kmeans_results_tbl %&gt;%
+    mutate(label_text = str_glue(&quot;Customer: {symbol}
+                                 Cluster: {.cluster}&quot;)) %&gt;%
+                                 
+    ggplot(aes(V1,V2,color = .cluster)) +
+    # Geometries
+    
+    geom_point(size=0.5) +
+    
+    # Formatting
+    scale_color_manual(values=c(&quot;#2d72d6&quot;, &quot;#2dc6d6&quot;, &quot;#2dd692&quot;,&quot;#641E16&quot;,&quot;#1ABC9C&quot;,&quot;#F9E79F&quot;, &quot;#E5E7E9&quot;, &quot;#E6B0AA&quot;, &quot;#2874A6&quot;, &quot;#17202A&quot;)) +
+    labs(title = &quot;K-Means and UMAP results&quot;,
+    subtitle = &quot;&quot;,
+    caption = &quot;&quot;) +
+    theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 <p>Congratulations! You are done with the 1st challenge!</p>
 </div>
 </div>
