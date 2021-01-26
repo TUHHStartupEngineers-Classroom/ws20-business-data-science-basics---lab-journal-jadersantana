@@ -870,11 +870,11 @@ Apply the `kmeans_mapper()` and `glance()` functions iteratively using `purrr`.
 
 ```{r K Means Error}
 
-#library(purrr)
+library(purrr)
 
 #k_means_mapped_tbl <- tibble(centers = 1:30) %>%
- #   mutate(k_means = centers %>% map(kmeans_mapper)) %>%
-  #  mutate(glance = k_means %>% map(glance))
+  #  mutate(k_means = centers %>% purrr:map(kmeans_mapper)) %>%
+ #   mutate(glance = k_means %>% purrr:map(glance))
 #k_means_mapper_tbl
 
 #Error generated only when building site:
@@ -1106,3 +1106,39 @@ umap_kmeans_results_tbl %>%
 ```
 
 Congratulations! You are done with the 1st challenge!
+
+# Challenge 07_Supervised ML Regression(I)
+
+no challenge for this chapter
+
+# Challenge 08_Supervised ML Regression(II)
+
+In this session we did not use the recipes packages to prepare our data. This is going to be your challenge. For further information take a look at the last session or just use google. Prepare the data for the models with the steps provided below. Remember, you don’t need to set the flags by yourself (see all_nominal()).
+
+##I. Build a model
+
+```{r }
+
+```
+
+##II. Create features with the recipes package
+
+This is just a template. Check the documentation for further information.
+
+?recipe
+?step_dummy
+?prep
+?bake
+
+recipe_obj <- recipe(...) %>% 
+                step_rm(...) %>% 
+                step_dummy(... ) %>% # Check out the argument one_hot = T
+                prep()
+
+train_transformed_tbl <- bake(..., ...)
+test_transformed_tbl  <- bake(..., ...)
+III. Bundle the model and recipe with the workflow package
+
+##IV. Evaluate your model with the yardstick package
+
+Just use the function, that we have created in this session.

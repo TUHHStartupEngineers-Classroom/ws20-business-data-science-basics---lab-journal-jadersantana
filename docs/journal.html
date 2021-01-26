@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-01-22 12:58:51</p>
+<p>Last compiled: 2021-01-26 20:43:59</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -679,7 +679,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-01-22 12:58:51</p>
+<p>Last compiled: 2021-01-26 20:43:59</p>
 <div id="load-libraries---1" class="section level2">
 <h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -2436,11 +2436,11 @@ broom::glance(kmeans_obj)</code></pre>
 <li>Add a column named <code>glance</code> with the <code>glance()</code> output. Use <code>mutate()</code> and <code>map()</code> again to iterate over the column of <code>k_means</code>.</li>
 <li>Save the output as <code>k_means_mapped_tbl</code></li>
 </ul>
-<pre class="r"><code>#library(purrr)
+<pre class="r"><code>library(purrr)
 
 #k_means_mapped_tbl &lt;- tibble(centers = 1:30) %&gt;%
- #   mutate(k_means = centers %&gt;% map(kmeans_mapper)) %&gt;%
-  #  mutate(glance = k_means %&gt;% map(glance))
+  #  mutate(k_means = centers %&gt;% purrr:map(kmeans_mapper)) %&gt;%
+ #   mutate(glance = k_means %&gt;% purrr:map(glance))
 #k_means_mapper_tbl
 
 #Error generated only when building site:
@@ -2648,6 +2648,22 @@ umap_kmeans_results_tbl %&gt;%
 <p>Congratulations! You are done with the 1st challenge!</p>
 </div>
 </div>
+</div>
+<div id="challenge-07_supervised-ml-regressioni" class="section level1">
+<h1><span class="header-section-number">7</span> Challenge 07_Supervised ML Regression(I)</h1>
+<p>no challenge for this chapter</p>
+</div>
+<div id="challenge-08_supervised-ml-regressionii" class="section level1">
+<h1><span class="header-section-number">8</span> Challenge 08_Supervised ML Regression(II)</h1>
+<p>In this session we did not use the recipes packages to prepare our data. This is going to be your challenge. For further information take a look at the last session or just use google. Prepare the data for the models with the steps provided below. Remember, you don’t need to set the flags by yourself (see all_nominal()).</p>
+<p>##I. Build a model</p>
+<p>##II. Create features with the recipes package</p>
+<p>This is just a template. Check the documentation for further information.</p>
+<p>?recipe ?step_dummy ?prep ?bake</p>
+<p>recipe_obj &lt;- recipe(…) %&gt;% step_rm(…) %&gt;% step_dummy(… ) %&gt;% # Check out the argument one_hot = T prep()</p>
+<p>train_transformed_tbl &lt;- bake(…, …) test_transformed_tbl &lt;- bake(…, …) III. Bundle the model and recipe with the workflow package</p>
+<p>##IV. Evaluate your model with the yardstick package</p>
+<p>Just use the function, that we have created in this session.</p>
 </div>
 
 

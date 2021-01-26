@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Unit 7</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">MyLabJournal</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="journal.html">Journal</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Class notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="dictionary.html">Dictionary</a>
+    </li>
+    <li>
+      <a href="data_wrangling.html">Data Wrangling</a>
+    </li>
+    <li>
+      <a href="ggplot_graphs.html">ggplot graphs</a>
+    </li>
+    <li>
+      <a href="machine_learning.html">machine learning</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="links.html">Links</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Unit 7</h1>
+
+</div>
+
+
+<div id="theory-input" class="section level1">
+<h1>Theory Input</h1>
+<div id="modeling" class="section level2">
+<h2>1. Modeling</h2>
+<pre class="r"><code>#install.packages(&quot;tidymodels&quot;)
+#install.packages(&quot;broom.mixed&quot;)
+
+library(tidyverse)
+library(tidyquant)
+library(broom)
+library(umap)
+library(dplyr)
+
+library(tidymodels)  # for the parsnip package, along with the rest of tidymodels</code></pre>
+<pre><code>## -- Attaching packages -------------------------------------- tidymodels 0.1.2 --</code></pre>
+<pre><code>## v dials     0.0.9      v rsample   0.0.8 
+## v infer     0.5.4      v tune      0.1.2 
+## v modeldata 0.1.0      v workflows 0.2.1 
+## v parsnip   0.1.5      v yardstick 0.0.7 
+## v recipes   0.1.15</code></pre>
+<pre><code>## -- Conflicts ----------------------------------------- tidymodels_conflicts() --
+## x data.table::between()   masks dplyr::between()
+## x scales::discard()       masks purrr::discard()
+## x dplyr::filter()         masks stats::filter()
+## x xts::first()            masks data.table::first(), dplyr::first()
+## x recipes::fixed()        masks stringr::fixed()
+## x dplyr::lag()            masks stats::lag()
+## x xts::last()             masks data.table::last(), dplyr::last()
+## x maps::map()             masks purrr::map()
+## x yardstick::spec()       masks vroom::spec(), readr::spec()
+## x recipes::step()         masks stats::step()
+## x data.table::transpose() masks purrr::transpose()</code></pre>
+<pre class="r"><code># Helper packages
+library(broom.mixed) # for converting bayesian models to tidy tibbles</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;broom.mixed&#39;:
+##   method      from 
+##   tidy.gamlss broom</code></pre>
+<pre class="r"><code># Data set
+bike_data_tbl_import &lt;- readRDS(&quot;00_data/01_bike_sales/02_wrangled_data/bike_orderlines.rds&quot;) 
+
+bike_data_tbl &lt;- bike_data_tbl_import %&gt;% select(everything()) %&gt;% filter(category_1 != &quot;Gravel&quot;)
+
+ggplot(bike_data_tbl,
+       aes(x = price, 
+           y = weight, 
+           group = category_1, 
+           col = category_1)) +
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE) +
+  scale_color_manual(values=c(&quot;#2dc6d6&quot;, &quot;#d65a2d&quot;, &quot;#d6af2d&quot;, &quot;#8a2dd6&quot;,&quot;#641E16&quot;))</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="unit07_files/figure-html/I.%20Resources-1.png" width="672" /></p>
+<pre class="r"><code>#install.packages(&quot;parnsnip&quot;)
+
+library(tidymodels)
+
+weight ~ price * category_1</code></pre>
+<pre><code>## weight ~ price * category_1</code></pre>
+<pre class="r"><code>linear_reg()</code></pre>
+<pre><code>## Linear Regression Model Specification (regression)</code></pre>
+<pre class="r"><code>lm_mod &lt;- linear_reg() %&gt;% 
+              set_engine(&quot;lm&quot;)
+              
+lm_mod</code></pre>
+<pre><code>## Linear Regression Model Specification (regression)
+## 
+## Computational engine: lm</code></pre>
+<pre class="r"><code>lm_fit &lt;- lm_mod %&gt;% 
+            fit(weight ~ price * category_1, 
+                data = bike_data_tbl)
+tidy(lm_fit)</code></pre>
+<pre><code>## # A tibble: 8 x 5
+##   term                            estimate std.error statistic   p.value
+##   &lt;chr&gt;                              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)                    20.1      0.150        134.   0.       
+## 2 price                           0.000137 0.0000384      3.56 3.74e-  4
+## 3 category_1Hybrid / City        -7.40     0.188        -39.3  1.42e-320
+## 4 category_1Mountain             -5.50     0.159        -34.6  6.21e-252
+## 5 category_1Road                -11.5      0.158        -73.1  0.       
+## 6 price:category_1Hybrid / City  -0.00172  0.0000961    -17.9  4.70e- 71
+## 7 price:category_1Mountain       -0.000539 0.0000414    -13.0  1.94e- 38
+## 8 price:category_1Road           -0.000341 0.0000403     -8.45 3.21e- 17</code></pre>
+<pre class="r"><code>new_points &lt;- expand.grid(price = 20000, 
+                          category_1 = c(&quot;E-Bikes&quot;, &quot;Hybrid / City&quot;, &quot;Mountain&quot;, &quot;Road&quot;))
+new_points</code></pre>
+<pre><code>##   price    category_1
+## 1 20000       E-Bikes
+## 2 20000 Hybrid / City
+## 3 20000      Mountain
+## 4 20000          Road</code></pre>
+<pre class="r"><code>mean_pred &lt;- predict(lm_fit, new_data = new_points)
+mean_pred</code></pre>
+<pre><code>## # A tibble: 4 x 1
+##    .pred
+##    &lt;dbl&gt;
+## 1  22.8 
+## 2 -19.0 
+## 3   6.56
+## 4   4.50</code></pre>
+<pre class="r"><code>conf_int_pred &lt;- predict(lm_fit, 
+                         new_data = new_points, 
+                         type = &quot;conf_int&quot;)
+conf_int_pred</code></pre>
+<pre><code>## # A tibble: 4 x 2
+##   .pred_lower .pred_upper
+##         &lt;dbl&gt;       &lt;dbl&gt;
+## 1       21.6        24.1 
+## 2      -22.2       -15.8 
+## 3        6.04        7.08
+## 4        4.10        4.90</code></pre>
+<pre class="r"><code>plot_data &lt;- new_points %&gt;% 
+              bind_cols(mean_pred) %&gt;% 
+              bind_cols(conf_int_pred)
+ggplot(plot_data, aes(x = category_1)) + 
+  geom_point(aes(y = .pred)) + 
+  geom_errorbar(aes(ymin = .pred_lower, 
+                    ymax = .pred_upper),
+                width = .2) + 
+  labs(y = &quot;Bike weight&quot;, x = &quot;Category&quot;) </code></pre>
+<p><img src="unit07_files/figure-html/II.%20Build%20and%20fit%20a%20model-1.png" width="672" /></p>
+<pre class="r"><code>#install.packages(&quot;rstanarm&quot;)
+
+library(rstanarm)</code></pre>
+<pre><code>## Loading required package: Rcpp</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Rcpp&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:rsample&#39;:
+## 
+##     populate</code></pre>
+<pre><code>## This is rstanarm version 2.21.1</code></pre>
+<pre><code>## - See https://mc-stan.org/rstanarm/articles/priors for changes to default priors!</code></pre>
+<pre><code>## - Default priors may change, so it&#39;s safest to specify priors, even if equivalent to the defaults.</code></pre>
+<pre><code>## - For execution on a local, multicore CPU with excess RAM we recommend calling</code></pre>
+<pre><code>##   options(mc.cores = parallel::detectCores())</code></pre>
+<pre class="r"><code># set the prior distribution
+prior_dist &lt;- rstanarm::student_t(df = 1)
+
+set.seed(123)
+
+# make the parsnip model
+bayes_mod &lt;- linear_reg() %&gt;% 
+              set_engine(&quot;stan&quot;,
+              prior_intercept = prior_dist, 
+              prior = prior_dist) 
+
+# train the model
+
+bayes_fit &lt;-  bayes_mod %&gt;% 
+                fit(weight ~ price * category_1, 
+                data = bike_data_tbl)
+
+print(bayes_fit, digits = 5)</code></pre>
+<pre><code>## parsnip model object
+## 
+## Fit time:  4m 57.6s 
+## stan_glm
+##  family:       gaussian [identity]
+##  formula:      weight ~ price * category_1
+##  observations: 14447
+##  predictors:   8
+## ------
+##                               Median    MAD_SD   
+## (Intercept)                    20.08939   0.14844
+## price                           0.00014   0.00004
+## category_1Hybrid / City        -7.38172   0.19766
+## category_1Mountain             -5.47925   0.16208
+## category_1Road                -11.50344   0.15572
+## price:category_1Hybrid / City  -0.00173   0.00010
+## price:category_1Mountain       -0.00054   0.00004
+## price:category_1Road           -0.00035   0.00004
+## 
+## Auxiliary parameter(s):
+##       Median  MAD_SD 
+## sigma 1.66615 0.01010
+## 
+## ------
+## * For help interpreting the printed output see ?print.stanreg
+## * For info on the priors used see ?prior_summary.stanreg</code></pre>
+<pre class="r"><code>tidy(bayes_fit, conf.int = TRUE)</code></pre>
+<pre><code>## # A tibble: 8 x 5
+##   term                            estimate std.error    conf.low  conf.high
+##   &lt;chr&gt;                              &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;
+## 1 (Intercept)                    20.1      0.148      19.8        20.3     
+## 2 price                           0.000141 0.0000384   0.0000765   0.000206
+## 3 category_1Hybrid / City        -7.38     0.198      -7.69       -7.07    
+## 4 category_1Mountain             -5.48     0.162      -5.76       -5.22    
+## 5 category_1Road                -11.5      0.156     -11.8       -11.2     
+## 6 price:category_1Hybrid / City  -0.00173  0.0000966  -0.00189    -0.00157 
+## 7 price:category_1Mountain       -0.000545 0.0000420  -0.000614   -0.000472
+## 8 price:category_1Road           -0.000346 0.0000394  -0.000415   -0.000277</code></pre>
+<pre class="r"><code>bayes_plot_data &lt;- 
+  new_points %&gt;%
+  bind_cols(predict(bayes_fit, new_data = new_points)) %&gt;% 
+  bind_cols(predict(bayes_fit, new_data = new_points, type = &quot;conf_int&quot;))
+
+ggplot(bayes_plot_data, aes(x = category_1)) + 
+  geom_point(aes(y = .pred)) + 
+  geom_errorbar(aes(ymin = .pred_lower, ymax = .pred_upper), width = .2) + 
+  labs(y = &quot;Bike weight&quot;) + 
+  ggtitle(&quot;Bayesian model with t(1) prior distribution&quot;)</code></pre>
+<p><img src="unit07_files/figure-html/II.%20Build%20and%20fit%20a%20model-2.png" width="672" /></p>
+<pre class="r"><code>## parsnip model object
+## 
+## Fit time:  1m 39.2s 
+## stan_glm
+##  family:       gaussian [identity]
+##  formula:      weight ~ price * category_1
+##  observations: 218
+##  predictors:   8
+## ------
+##                                    Median   MAD_SD  
+## (Intercept)                        15.24134  1.25450
+## price                          0.00158  0.00032
+## category_1Hybrid / City            -2.34716  1.53781
+## category_1Mountain                 -1.52799  1.31226
+## category_1Road                     -6.47532  1.31294
+## price:category_1Hybrid / City -0.00310  0.00066
+## price:category_1Mountain      -0.00180  0.00035
+## price:category_1Road          -0.00180  0.00033
+## 
+## Auxiliary parameter(s):
+##       Median  MAD_SD 
+## sigma 1.63413 0.07824
+## 
+## ------
+## * For help interpreting the printed output see ?print.stanreg
+## * For info on the priors used see ?prior_summary.stanreg</code></pre>
+</div>
+<div id="preprocessing" class="section level2">
+<h2>2. Preprocessing</h2>
+<div id="i.-the-data" class="section level3">
+<h3>I. The data</h3>
+<pre class="r"><code>#install.packages(&quot;nycflights13&quot;)
+#install.packages(&quot;skimr&quot;)
+
+library(nycflights13)
+library(skimr)
+
+set.seed(123)
+
+flight_data &lt;- 
+  flights %&gt;% 
+  mutate(
+    # Convert the arrival delay to a factor
+    arr_delay = ifelse(arr_delay &gt;= 30, &quot;late&quot;, &quot;on_time&quot;),
+    arr_delay = factor(arr_delay),
+    # We will use the date (not date-time) in the recipe below
+    date = as.Date(time_hour)
+  ) %&gt;% 
+  # Include the weather data
+  inner_join(weather, by = c(&quot;origin&quot;, &quot;time_hour&quot;)) %&gt;% 
+  # Only retain the specific columns we will use
+  select(dep_time, flight, origin, dest, air_time, distance, 
+         carrier, date, arr_delay, time_hour) %&gt;% 
+  # Exclude missing data
+  na.omit() %&gt;% 
+  # For creating models, it is better to have qualitative columns
+  # encoded as factors (instead of character strings)
+  mutate_if(is.character, as.factor)
+
+flight_data %&gt;% 
+  count(arr_delay) %&gt;% 
+  mutate(prop = n/sum(n))</code></pre>
+<pre><code>## # A tibble: 2 x 3
+##   arr_delay      n  prop
+##   &lt;fct&gt;      &lt;int&gt; &lt;dbl&gt;
+## 1 late       52540 0.161
+## 2 on_time   273279 0.839</code></pre>
+<pre class="r"><code>glimpse(flight_data)</code></pre>
+<pre><code>## Rows: 325,819
+## Columns: 10
+## $ dep_time  &lt;int&gt; 517, 533, 542, 544, 554, 554, 555, 557, 557, 558, 558, 55...
+## $ flight    &lt;int&gt; 1545, 1714, 1141, 725, 461, 1696, 507, 5708, 79, 301, 49,...
+## $ origin    &lt;fct&gt; EWR, LGA, JFK, JFK, LGA, EWR, EWR, LGA, JFK, LGA, JFK, JF...
+## $ dest      &lt;fct&gt; IAH, IAH, MIA, BQN, ATL, ORD, FLL, IAD, MCO, ORD, PBI, TP...
+## $ air_time  &lt;dbl&gt; 227, 227, 160, 183, 116, 150, 158, 53, 140, 138, 149, 158...
+## $ distance  &lt;dbl&gt; 1400, 1416, 1089, 1576, 762, 719, 1065, 229, 944, 733, 10...
+## $ carrier   &lt;fct&gt; UA, UA, AA, B6, DL, UA, B6, EV, B6, AA, B6, B6, UA, UA, A...
+## $ date      &lt;date&gt; 2013-01-01, 2013-01-01, 2013-01-01, 2013-01-01, 2013-01-...
+## $ arr_delay &lt;fct&gt; on_time, on_time, late, on_time, on_time, on_time, on_tim...
+## $ time_hour &lt;dttm&gt; 2013-01-01 05:00:00, 2013-01-01 05:00:00, 2013-01-01 05:...</code></pre>
+<pre class="r"><code>flight_data %&gt;% 
+  skimr::skim(dest, carrier)</code></pre>
+<table>
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">Piped data</td>
+</tr>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">325819</td>
+</tr>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">10</td>
+</tr>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">factor</td>
+<td align="left">2</td>
+</tr>
+<tr class="odd">
+<td align="left">________________________</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Group variables</td>
+<td align="left">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: factor</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="left">ordered</th>
+<th align="right">n_unique</th>
+<th align="left">top_counts</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">dest</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="left">FALSE</td>
+<td align="right">104</td>
+<td align="left">ATL: 16771, ORD: 16507, LAX: 15942, BOS: 14948</td>
+</tr>
+<tr class="even">
+<td align="left">carrier</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="left">FALSE</td>
+<td align="right">16</td>
+<td align="left">UA: 57489, B6: 53715, EV: 50868, DL: 47465</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="ii.-data-splitting" class="section level3">
+<h3>II. Data Splitting</h3>
+<pre class="r"><code>## Data Splitting
+
+#install.packages(&quot;rsample&quot;)
+library(rsample)
+
+# Fix the random numbers by setting the seed 
+# This enables the analysis to be reproducible when random numbers are used 
+set.seed(555)
+# Put 3/4 of the data into the training set 
+data_split &lt;- initial_split(flight_data, prop = 3/4)
+
+# Create data frames for the two sets:
+train_data &lt;- training(data_split)
+test_data  &lt;- testing(data_split)</code></pre>
+</div>
+<div id="iii.-create-recipe-and-roles" class="section level3">
+<h3>III. Create recipe and roles</h3>
+<pre class="r"><code>library(recipes)
+
+flights_rec &lt;- 
+  recipe(arr_delay ~ ., data = train_data) 
+
+flights_rec &lt;- 
+  recipe(arr_delay ~ ., data = train_data) %&gt;% 
+  update_role(flight, time_hour, new_role = &quot;ID&quot;) 
+
+summary(flights_rec)</code></pre>
+<pre><code>## # A tibble: 10 x 4
+##    variable  type    role      source  
+##    &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;     &lt;chr&gt;   
+##  1 dep_time  numeric predictor original
+##  2 flight    numeric ID        original
+##  3 origin    nominal predictor original
+##  4 dest      nominal predictor original
+##  5 air_time  numeric predictor original
+##  6 distance  numeric predictor original
+##  7 carrier   nominal predictor original
+##  8 date      date    predictor original
+##  9 time_hour date    ID        original
+## 10 arr_delay nominal outcome   original</code></pre>
+</div>
+<div id="iv.-create-features" class="section level3">
+<h3>IV. Create features</h3>
+<pre class="r"><code>flight_data %&gt;% 
+  distinct(date) %&gt;% 
+  mutate(numeric_date = as.numeric(date)) </code></pre>
+<pre><code>## # A tibble: 364 x 2
+##    date       numeric_date
+##    &lt;date&gt;            &lt;dbl&gt;
+##  1 2013-01-01        15706
+##  2 2013-01-02        15707
+##  3 2013-01-03        15708
+##  4 2013-01-04        15709
+##  5 2013-01-05        15710
+##  6 2013-01-06        15711
+##  7 2013-01-07        15712
+##  8 2013-01-08        15713
+##  9 2013-01-09        15714
+## 10 2013-01-10        15715
+## # ... with 354 more rows</code></pre>
+<pre class="r"><code>flights_rec &lt;- 
+ recipe(arr_delay ~ ., data = train_data) %&gt;% 
+ update_role(flight, time_hour, new_role = &quot;ID&quot;) %&gt;% 
+ step_date(date, features = c(&quot;dow&quot;, &quot;month&quot;)) %&gt;%               
+ step_holiday(date, holidays = timeDate::listHolidays(&quot;US&quot;)) %&gt;% 
+ step_rm(date)
+
+test_data %&gt;% 
+  distinct(dest) %&gt;% 
+  anti_join(train_data)</code></pre>
+<pre><code>## Joining, by = &quot;dest&quot;</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   dest 
+##   &lt;fct&gt;
+## 1 LEX</code></pre>
+<pre class="r"><code>flights_rec &lt;- 
+  recipe(arr_delay ~ ., data = train_data) %&gt;% 
+  update_role(flight, time_hour, new_role = &quot;ID&quot;) %&gt;% 
+  step_date(date, features = c(&quot;dow&quot;, &quot;month&quot;)) %&gt;% 
+  step_holiday(date, holidays = timeDate::listHolidays(&quot;US&quot;)) %&gt;% 
+  step_rm(date) %&gt;% 
+  step_dummy(all_nominal(), -all_outcomes()) %&gt;% 
+  step_zv(all_predictors())</code></pre>
+</div>
+<div id="v.-fit-a-model-with-a-recipe" class="section level3">
+<h3>V. Fit a model with a recipe</h3>
+<pre class="r"><code>lr_mod &lt;- 
+  logistic_reg() %&gt;% 
+  set_engine(&quot;glm&quot;)
+
+library(workflows)
+library(parsnip)
+
+flights_wflow &lt;- 
+  workflow() %&gt;% 
+  add_model(lr_mod) %&gt;% 
+  add_recipe(flights_rec)
+flights_wflow</code></pre>
+<pre><code>## == Workflow ====================================================================
+## Preprocessor: Recipe
+## Model: logistic_reg()
+## 
+## -- Preprocessor ----------------------------------------------------------------
+## 5 Recipe Steps
+## 
+## * step_date()
+## * step_holiday()
+## * step_rm()
+## * step_dummy()
+## * step_zv()
+## 
+## -- Model -----------------------------------------------------------------------
+## Logistic Regression Model Specification (classification)
+## 
+## Computational engine: glm</code></pre>
+<pre class="r"><code>flights_fit &lt;- 
+  flights_wflow %&gt;% 
+  fit(data = train_data)
+
+flights_fit %&gt;% 
+  pull_workflow_fit() %&gt;% 
+  tidy()</code></pre>
+<pre><code>## # A tibble: 157 x 5
+##    term                         estimate std.error statistic  p.value
+##    &lt;chr&gt;                           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+##  1 (Intercept)                   3.91    2.73           1.43 1.51e- 1
+##  2 dep_time                     -0.00167 0.0000141   -118.   0.      
+##  3 air_time                     -0.0439  0.000561     -78.4  0.      
+##  4 distance                      0.00686 0.00150        4.57 4.84e- 6
+##  5 date_USChristmasDay           1.12    0.173          6.49 8.45e-11
+##  6 date_USColumbusDay            0.474   0.159          2.99 2.81e- 3
+##  7 date_USCPulaskisBirthday      0.864   0.139          6.21 5.47e-10
+##  8 date_USDecorationMemorialDay  0.279   0.110          2.53 1.15e- 2
+##  9 date_USElectionDay            0.696   0.169          4.12 3.82e- 5
+## 10 date_USGoodFriday             1.28    0.166          7.71 1.27e-14
+## # ... with 147 more rows</code></pre>
+<pre class="r"><code>predict(flights_fit, test_data)</code></pre>
+<pre><code>## # A tibble: 81,454 x 1
+##    .pred_class
+##    &lt;fct&gt;      
+##  1 on_time    
+##  2 on_time    
+##  3 on_time    
+##  4 on_time    
+##  5 on_time    
+##  6 on_time    
+##  7 on_time    
+##  8 on_time    
+##  9 on_time    
+## 10 on_time    
+## # ... with 81,444 more rows</code></pre>
+<pre class="r"><code>flights_pred &lt;- 
+  predict(flights_fit, test_data, type = &quot;prob&quot;) %&gt;% 
+  bind_cols(test_data %&gt;% select(arr_delay, time_hour, flight)) 
+
+# The data look like: 
+flights_pred</code></pre>
+<pre><code>## # A tibble: 81,454 x 5
+##    .pred_late .pred_on_time arr_delay time_hour           flight
+##         &lt;dbl&gt;         &lt;dbl&gt; &lt;fct&gt;     &lt;dttm&gt;               &lt;int&gt;
+##  1     0.0565         0.944 on_time   2013-01-01 05:00:00   1714
+##  2     0.0264         0.974 on_time   2013-01-01 06:00:00     79
+##  3     0.0481         0.952 on_time   2013-01-01 06:00:00    301
+##  4     0.0325         0.967 on_time   2013-01-01 06:00:00     49
+##  5     0.0711         0.929 on_time   2013-01-01 06:00:00   1187
+##  6     0.0583         0.942 on_time   2013-01-01 06:00:00   4401
+##  7     0.0171         0.983 on_time   2013-01-01 06:00:00   1895
+##  8     0.0458         0.954 on_time   2013-01-01 06:00:00    135
+##  9     0.0221         0.978 on_time   2013-01-01 06:00:00   4646
+## 10     0.0502         0.950 on_time   2013-01-01 06:00:00   4144
+## # ... with 81,444 more rows</code></pre>
+<pre class="r"><code>flights_pred %&gt;% 
+  roc_curve(truth = arr_delay, .pred_late) %&gt;% 
+  autoplot()</code></pre>
+<p><img src="unit07_files/figure-html/V.%20Fit%20a%20model%20with%20a%20recipe-1.png" width="672" /></p>
+<pre class="r"><code>flights_pred %&gt;% 
+  roc_auc(truth = arr_delay, .pred_late)</code></pre>
+<pre><code>## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 roc_auc binary         0.765</code></pre>
+</div>
+</div>
+<div id="evaluating" class="section level2">
+<h2>3. Evaluating</h2>
+<pre class="r"><code>library(tidymodels)
+
+library(modeldata)</code></pre>
+<div id="i.-the-data-1" class="section level3">
+<h3>I. The Data</h3>
+<pre class="r"><code>data(cells, package = &quot;modeldata&quot;)
+cells</code></pre>
+<pre><code>## # A tibble: 2,019 x 58
+##    case  class angle_ch_1 area_ch_1 avg_inten_ch_1 avg_inten_ch_2 avg_inten_ch_3
+##    &lt;fct&gt; &lt;fct&gt;      &lt;dbl&gt;     &lt;int&gt;          &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;
+##  1 Test  PS        143.         185           15.7           4.95           9.55
+##  2 Train PS        134.         819           31.9         207.            69.9 
+##  3 Train WS        107.         431           28.0         116.            63.9 
+##  4 Train PS         69.2        298           19.5         102.            28.2 
+##  5 Test  PS          2.89       285           24.3         112.            20.5 
+##  6 Test  WS         40.7        172          326.          654.           129.  
+##  7 Test  WS        174.         177          260.          596.           124.  
+##  8 Test  PS        180.         251           18.3           5.73          17.2 
+##  9 Test  WS         18.9        495           16.1          89.5           13.7 
+## 10 Test  WS        153.         384           17.7          89.9           20.4 
+## # ... with 2,009 more rows, and 51 more variables: avg_inten_ch_4 &lt;dbl&gt;,
+## #   convex_hull_area_ratio_ch_1 &lt;dbl&gt;, convex_hull_perim_ratio_ch_1 &lt;dbl&gt;,
+## #   diff_inten_density_ch_1 &lt;dbl&gt;, diff_inten_density_ch_3 &lt;dbl&gt;,
+## #   diff_inten_density_ch_4 &lt;dbl&gt;, entropy_inten_ch_1 &lt;dbl&gt;,
+## #   entropy_inten_ch_3 &lt;dbl&gt;, entropy_inten_ch_4 &lt;dbl&gt;,
+## #   eq_circ_diam_ch_1 &lt;dbl&gt;, eq_ellipse_lwr_ch_1 &lt;dbl&gt;,
+## #   eq_ellipse_oblate_vol_ch_1 &lt;dbl&gt;, eq_ellipse_prolate_vol_ch_1 &lt;dbl&gt;,
+## #   eq_sphere_area_ch_1 &lt;dbl&gt;, eq_sphere_vol_ch_1 &lt;dbl&gt;,
+## #   fiber_align_2_ch_3 &lt;dbl&gt;, fiber_align_2_ch_4 &lt;dbl&gt;,
+## #   fiber_length_ch_1 &lt;dbl&gt;, fiber_width_ch_1 &lt;dbl&gt;, inten_cooc_asm_ch_3 &lt;dbl&gt;,
+## #   inten_cooc_asm_ch_4 &lt;dbl&gt;, inten_cooc_contrast_ch_3 &lt;dbl&gt;,
+## #   inten_cooc_contrast_ch_4 &lt;dbl&gt;, inten_cooc_entropy_ch_3 &lt;dbl&gt;,
+## #   inten_cooc_entropy_ch_4 &lt;dbl&gt;, inten_cooc_max_ch_3 &lt;dbl&gt;,
+## #   inten_cooc_max_ch_4 &lt;dbl&gt;, kurt_inten_ch_1 &lt;dbl&gt;, kurt_inten_ch_3 &lt;dbl&gt;,
+## #   kurt_inten_ch_4 &lt;dbl&gt;, length_ch_1 &lt;dbl&gt;, neighbor_avg_dist_ch_1 &lt;dbl&gt;,
+## #   neighbor_min_dist_ch_1 &lt;dbl&gt;, neighbor_var_dist_ch_1 &lt;dbl&gt;,
+## #   perim_ch_1 &lt;dbl&gt;, shape_bfr_ch_1 &lt;dbl&gt;, shape_lwr_ch_1 &lt;dbl&gt;,
+## #   shape_p_2_a_ch_1 &lt;dbl&gt;, skew_inten_ch_1 &lt;dbl&gt;, skew_inten_ch_3 &lt;dbl&gt;,
+## #   skew_inten_ch_4 &lt;dbl&gt;, spot_fiber_count_ch_3 &lt;int&gt;,
+## #   spot_fiber_count_ch_4 &lt;dbl&gt;, total_inten_ch_1 &lt;int&gt;,
+## #   total_inten_ch_2 &lt;dbl&gt;, total_inten_ch_3 &lt;int&gt;, total_inten_ch_4 &lt;int&gt;,
+## #   var_inten_ch_1 &lt;dbl&gt;, var_inten_ch_3 &lt;dbl&gt;, var_inten_ch_4 &lt;dbl&gt;,
+## #   width_ch_1 &lt;dbl&gt;</code></pre>
+<pre class="r"><code>cells %&gt;% 
+  count(class) %&gt;% 
+  mutate(prop = n/sum(n))</code></pre>
+<pre><code>## # A tibble: 2 x 3
+##   class     n  prop
+##   &lt;fct&gt; &lt;int&gt; &lt;dbl&gt;
+## 1 PS     1300 0.644
+## 2 WS      719 0.356</code></pre>
+</div>
+<div id="ii.-data-splitting-1" class="section level3">
+<h3>II. Data splitting</h3>
+<pre class="r"><code>set.seed(123)
+cell_split &lt;- initial_split(cells %&gt;% select(-case), 
+                            strata = class)
+cell_train &lt;- training(cell_split)
+cell_test  &lt;- testing(cell_split)
+
+nrow(cell_train)</code></pre>
+<pre><code>## [1] 1515</code></pre>
+<pre class="r"><code>## 1515
+nrow(cell_train)/nrow(cells)</code></pre>
+<pre><code>## [1] 0.7503715</code></pre>
+<pre class="r"><code>## 0.7503715
+
+# training set proportions by class
+cell_train %&gt;% 
+  count(class) %&gt;% 
+  mutate(prop = n/sum(n))</code></pre>
+<pre><code>## # A tibble: 2 x 3
+##   class     n  prop
+##   &lt;fct&gt; &lt;int&gt; &lt;dbl&gt;
+## 1 PS      975 0.644
+## 2 WS      540 0.356</code></pre>
+<pre class="r"><code>## # A tibble: 2 x 3
+##   class     n  prop
+##   &lt;fct&gt; &lt;int&gt; &lt;dbl&gt;
+## 1 PS      975 0.644
+## 2 WS      540 0.356  
+
+# test set proportions by class
+cell_test %&gt;% 
+  count(class) %&gt;% 
+  mutate(prop = n/sum(n))</code></pre>
+<pre><code>## # A tibble: 2 x 3
+##   class     n  prop
+##   &lt;fct&gt; &lt;int&gt; &lt;dbl&gt;
+## 1 PS      325 0.645
+## 2 WS      179 0.355</code></pre>
+<pre class="r"><code>## # A tibble: 2 x 3
+##   class     n  prop
+##   &lt;fct&gt; &lt;int&gt; &lt;dbl&gt;
+## 1 PS      325 0.645
+## 2 WS      179 0.355</code></pre>
+</div>
+<div id="iii.-modeling" class="section level3">
+<h3>III. Modeling</h3>
+<pre class="r"><code>#install.packages(&quot;ranger&quot;)
+library(ranger)
+
+rf_mod &lt;- 
+  rand_forest(trees = 1000) %&gt;%
+  set_engine(&quot;ranger&quot;) %&gt;% 
+  set_mode(&quot;classification&quot;)
+
+set.seed(234)
+rf_fit &lt;- 
+  rf_mod %&gt;% 
+  fit(class ~ ., data = cell_train)
+rf_fit</code></pre>
+<pre><code>## parsnip model object
+## 
+## Fit time:  3.7s 
+## Ranger result
+## 
+## Call:
+##  ranger::ranger(x = maybe_data_frame(x), y = y, num.trees = ~1000,      num.threads = 1, verbose = FALSE, seed = sample.int(10^5,          1), probability = TRUE) 
+## 
+## Type:                             Probability estimation 
+## Number of trees:                  1000 
+## Sample size:                      1515 
+## Number of independent variables:  56 
+## Mtry:                             7 
+## Target node size:                 10 
+## Variable importance mode:         none 
+## Splitrule:                        gini 
+## OOB prediction error (Brier s.):  0.1220191</code></pre>
+<pre class="r"><code>rf_training_pred &lt;- 
+  predict(rf_fit, cell_train) %&gt;% 
+  bind_cols(predict(rf_fit, cell_train, type = &quot;prob&quot;)) %&gt;% 
+  # Add the true outcome data back in
+  bind_cols(cell_train %&gt;% 
+              select(class))
+
+rf_training_pred %&gt;%                # training set predictions
+  roc_auc(truth = class, .pred_PS)</code></pre>
+<pre><code>## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 roc_auc binary          1.00</code></pre>
+<pre class="r"><code>## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 roc_auc binary          1.00
+rf_training_pred %&gt;%                # training set predictions
+  accuracy(truth = class, .pred_class)</code></pre>
+<pre><code>## # A tibble: 1 x 3
+##   .metric  .estimator .estimate
+##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+## 1 accuracy binary         0.994</code></pre>
+<pre class="r"><code>## # A tibble: 1 x 3
+##   .metric  .estimator .estimate
+##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+## 1 accuracy binary         0.993  
+
+rf_testing_pred &lt;- 
+  predict(rf_fit, cell_test) %&gt;% 
+  bind_cols(predict(rf_fit, cell_test, type = &quot;prob&quot;)) %&gt;% 
+  bind_cols(cell_test %&gt;% select(class))
+
+rf_testing_pred %&gt;%                   # test set predictions
+  roc_auc(truth = class, .pred_PS)</code></pre>
+<pre><code>## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 roc_auc binary         0.909</code></pre>
+<pre class="r"><code>## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 roc_auc binary         0.909
+
+rf_testing_pred %&gt;%                   # test set predictions
+  accuracy(truth = class, .pred_class)</code></pre>
+<pre><code>## # A tibble: 1 x 3
+##   .metric  .estimator .estimate
+##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+## 1 accuracy binary         0.841</code></pre>
+<pre class="r"><code>## # A tibble: 1 x 3
+##   .metric  .estimator .estimate
+##   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+## 1 accuracy binary         0.837</code></pre>
+</div>
+<div id="iv.-estimating-performance" class="section level3">
+<h3>IV. Estimating performance</h3>
+</div>
+<div id="v.-resampling-to-the-rescue" class="section level3">
+<h3>V. Resampling to the rescue</h3>
+<p>```{V. Resampling to the rescue}</p>
+<pre><code>### VI. Fit a model with resampling
+
+
+## 4. Tuning
+
+### I. The cell image data, revisited
+
+### II. Predicting image segmentation, but better
+
+### III. Tuning hyperparameters
+
+### IV. Model tuning with a grid
+
+### V. Finalizing our model
+
+### VI. Exploring results
+
+### VII. The last fit
+
+
+
+# Chapter 8 - Business Case
+
+
+```r
+# Standard
+library(tidyverse)
+
+# Modeling
+library(parsnip)
+
+# Preprocessing &amp; Sampling
+library(recipes)
+library(rsample)
+
+# Modeling Error Metrics
+library(yardstick)
+
+#install.packages(&quot;rpart.plot&quot;)
+
+# Plotting Decision Trees
+library(rpart.plot)</code></pre>
+<pre><code>## Loading required package: rpart</code></pre>
+<pre><code>## 
+## Attaching package: &#39;rpart&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dials&#39;:
+## 
+##     prune</code></pre>
+</div>
+<div id="section" class="section level3">
+<h3></h3>
+<pre class="r"><code># Modeling ----------------------------------------------------------------
+bike_orderlines_tbl &lt;- readRDS(&quot;00_data/01_bike_sales/01_raw_data/bike_orderlines.rds&quot;)
+glimpse(bike_orderlines_tbl)</code></pre>
+<pre><code>## Rows: 15,644
+## Columns: 18
+## $ order_id       &lt;dbl&gt; 1, 1, 2, 2, 3, 3, 3, 3, 3, 4, 5, 5, 5, 5, 6, 6, 6, 6...
+## $ order_line     &lt;dbl&gt; 1, 2, 1, 2, 1, 2, 3, 4, 5, 1, 1, 2, 3, 4, 1, 2, 3, 4...
+## $ order_date     &lt;dttm&gt; 2015-01-07, 2015-01-07, 2015-01-10, 2015-01-10, 201...
+## $ model          &lt;chr&gt; &quot;Spectral CF 7 WMN&quot;, &quot;Ultimate CF SLX Disc 8.0 ETAP&quot;...
+## $ model_year     &lt;dbl&gt; 2021, 2020, 2021, 2019, 2020, 2020, 2020, 2021, 2020...
+## $ category_1     &lt;chr&gt; &quot;Mountain&quot;, &quot;Road&quot;, &quot;Mountain&quot;, &quot;Road&quot;, &quot;Mountain&quot;, ...
+## $ category_2     &lt;chr&gt; &quot;Trail&quot;, &quot;Race&quot;, &quot;Trail&quot;, &quot;Triathlon Bike&quot;, &quot;Dirt Ju...
+## $ category_3     &lt;chr&gt; &quot;Spectral&quot;, &quot;Ultimate&quot;, &quot;Neuron&quot;, &quot;Speedmax&quot;, &quot;Stitc...
+## $ price          &lt;dbl&gt; 3119, 5359, 2729, 1749, 1219, 1359, 2529, 1559, 3899...
+## $ quantity       &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1...
+## $ total_price    &lt;dbl&gt; 3119, 5359, 2729, 1749, 1219, 1359, 2529, 1559, 3899...
+## $ frame_material &lt;chr&gt; &quot;carbon&quot;, &quot;carbon&quot;, &quot;carbon&quot;, &quot;carbon&quot;, &quot;aluminium&quot;,...
+## $ weight         &lt;dbl&gt; 13.80, 7.44, 14.06, 8.80, 11.50, 8.80, 8.20, 8.85, 1...
+## $ url            &lt;chr&gt; &quot;https://www.canyon.com/en-de/mountain-bikes/trail-b...
+## $ bikeshop       &lt;chr&gt; &quot;AlexandeRad&quot;, &quot;AlexandeRad&quot;, &quot;WITT-RAD&quot;, &quot;WITT-RAD&quot;...
+## $ location       &lt;chr&gt; &quot;Hamburg, Hamburg&quot;, &quot;Hamburg, Hamburg&quot;, &quot;Bremen, Bre...
+## $ lat            &lt;dbl&gt; 53.57532, 53.57532, 53.07379, 53.07379, 48.78234, 48...
+## $ lng            &lt;dbl&gt; 10.015340, 10.015340, 8.826754, 8.826754, 9.180819, ...</code></pre>
+<pre class="r"><code>model_sales_tbl &lt;- bike_orderlines_tbl %&gt;%
+    select(total_price, model, category_2, frame_material) %&gt;%
+    
+    group_by(model, category_2, frame_material) %&gt;%
+    summarise(total_sales = sum(total_price)) %&gt;%
+    ungroup() %&gt;%
+    
+    arrange(desc(total_sales))</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;model&#39;, &#39;category_2&#39; (override with `.groups` argument)</code></pre>
+<pre class="r"><code>model_sales_tbl %&gt;%
+    mutate(category_2 = as_factor(category_2) %&gt;% 
+               fct_reorder(total_sales, .fun = max) %&gt;% 
+               fct_rev()) %&gt;%
+    
+    ggplot(aes(frame_material, total_sales)) +
+    geom_violin() +
+    geom_jitter(width = 0.1, alpha = 0.5, color = &quot;#2c3e50&quot;) +
+    #coord_flip() +
+    facet_wrap(~ category_2) +
+    scale_y_continuous(labels = scales::dollar_format(scale = 1e-6, suffix = &quot;M&quot;, accuracy = 0.1)) +
+    tidyquant::theme_tq() +
+    labs(
+        title = &quot;Total Sales for Each Model&quot;,
+        x = &quot;Frame Material&quot;, y = &quot;Revenue&quot;
+    )</code></pre>
+<pre><code>## Warning in max(data$density): kein nicht-fehlendes Argument für max; gebe -Inf
+## zurück</code></pre>
+<pre><code>## Warning: Computation failed in `stat_ydensity()`:
+## replacement has 1 row, data has 0</code></pre>
+<pre><code>## Warning in max(data$density): kein nicht-fehlendes Argument für max; gebe -Inf
+## zurück</code></pre>
+<pre><code>## Warning: Computation failed in `stat_ydensity()`:
+## replacement has 1 row, data has 0</code></pre>
+<pre><code>## Warning in max(data$density): kein nicht-fehlendes Argument für max; gebe -Inf
+## zurück</code></pre>
+<pre><code>## Warning: Computation failed in `stat_ydensity()`:
+## replacement has 1 row, data has 0</code></pre>
+<pre><code>## Warning in max(data$density): kein nicht-fehlendes Argument für max; gebe -Inf
+## zurück</code></pre>
+<pre><code>## Warning: Computation failed in `stat_ydensity()`:
+## replacement has 1 row, data has 0</code></pre>
+<p><img src="unit07_files/figure-html/unnamed-chunk-4-1.png" width="672" /> ###</p>
+<pre class="r"><code>bike_features_tbl &lt;- readRDS(&quot;00_data/01_bike_sales/01_raw_data/bike_features_tbl.rds&quot;)
+glimpse(bike_features_tbl)</code></pre>
+<pre><code>## Rows: 231
+## Columns: 67
+## $ bike_id                     &lt;dbl&gt; 2875, 2873, 2874, 2876, 2877, 2225, 209...
+## $ model                       &lt;chr&gt; &quot;Aeroad CF SL Disc 8.0 Di2&quot;, &quot;Aeroad CF...
+## $ model_year                  &lt;dbl&gt; 2020, 2020, 2020, 2020, 2020, 2019, 201...
+## $ frame_material              &lt;chr&gt; &quot;carbon&quot;, &quot;carbon&quot;, &quot;carbon&quot;, &quot;carbon&quot;,...
+## $ weight                      &lt;dbl&gt; 7.60, 7.27, 7.10, 7.73, 7.83, 6.80, 6.8...
+## $ price                       &lt;dbl&gt; 4579, 6919, 6429, 5069, 3609, 6139, 535...
+## $ category_1                  &lt;chr&gt; &quot;Road&quot;, &quot;Road&quot;, &quot;Road&quot;, &quot;Road&quot;, &quot;Road&quot;,...
+## $ category_2                  &lt;chr&gt; &quot;Race&quot;, &quot;Race&quot;, &quot;Race&quot;, &quot;Race&quot;, &quot;Race&quot;,...
+## $ category_3                  &lt;chr&gt; &quot;Aeroad&quot;, &quot;Aeroad&quot;, &quot;Aeroad&quot;, &quot;Aeroad&quot;,...
+## $ gender                      &lt;chr&gt; &quot;unisex&quot;, &quot;unisex&quot;, &quot;unisex&quot;, &quot;unisex&quot;,...
+## $ url                         &lt;chr&gt; &quot;https://www.canyon.com/en-de/road-bike...
+## $ Frame                       &lt;chr&gt; &quot;Canyon Aeroad CF SL Disc&quot;, &quot;Canyon Aer...
+## $ Fork                        &lt;chr&gt; &quot;Canyon FK0041 CF SLX Disc&quot;, &quot;Canyon FK...
+## $ `Rear Derailleur`           &lt;chr&gt; &quot;Shimano Ultegra Di2 R8050 SS&quot;, &quot;SRAM R...
+## $ `Front Derailleur`          &lt;chr&gt; &quot;Shimano Ultegra Di2 R8050&quot;, &quot;SRAM RED ...
+## $ Cassette                    &lt;chr&gt; &quot;Shimano Ultegra R8000, 11-speed, 11-28...
+## $ Crank                       &lt;chr&gt; &quot;Shimano Ultegra R8000&quot;, &quot;SRAM RED D1&quot;,...
+## $ `Bottom bracket`            &lt;chr&gt; &quot;Shimano Pressfit BB72&quot;, &quot;SRAM Pressfit...
+## $ `Thru Axle`                 &lt;chr&gt; &quot;Canyon Thru Axle&quot;, &quot;Canyon Thru Axle&quot;,...
+## $ Cockpit                     &lt;chr&gt; &quot;Canyon H36 Aerocockpit CF&quot;, &quot;Canyon H3...
+## $ Saddle                      &lt;chr&gt; &quot;Selle Italia SLR&quot;, &quot;Selle Italia SLR&quot;,...
+## $ Seatpost                    &lt;chr&gt; &quot;Canyon S27 Aero VCLS CF&quot;, &quot;Canyon S27 ...
+## $ Pedals                      &lt;chr&gt; &quot;None included&quot;, &quot;None included&quot;, &quot;None...
+## $ `Derailleur hanger`         &lt;chr&gt; &quot;Shop Derailleur Hanger GP0211-01&quot;, &quot;Sh...
+## $ Battery                     &lt;chr&gt; &quot;&quot;, &quot;SRAM eTap Powerpack&quot;, &quot;&quot;, &quot;SRAM eT...
+## $ Brake                       &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Shift Lever`               &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;Shimano Di2 Re...
+## $ Chain                       &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;Shimano CN-HG9...
+## $ Stem                        &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;Canyon V13...
+## $ Handlebar                   &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;Canyon H16...
+## $ Headset                     &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ Motor                       &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Battery Charger`           &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Flat Pedals`               &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ Chainguard                  &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Aero Bar`                  &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Brake Lever / Master`      &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Wheel Tire System`         &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Suspension Fork`           &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Disc Brake`                &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ Grips                       &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ Chainring                   &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ Display                     &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ Modeswitch                  &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Rear Shock`                &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ Light                       &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ Fender                      &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Bike Racks`                &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Brake 1`                   &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;SRAM S-900 Direct ...
+## $ `Brake 2`                   &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;SRAM S-900 Direct ...
+## $ `Shift-/ Brake Lever 1`     &lt;chr&gt; &quot;Shimano Ultegra Di2 R8070, 11-speed&quot;, ...
+## $ `Shift-/ Brake Lever 2`     &lt;chr&gt; &quot;Shimano Ultegra Di2 R8070, 11-speed&quot;, ...
+## $ `Wheel 1`                   &lt;chr&gt; &quot;DT Swiss ARC 1400 Dicut&quot;, &quot;DT Swiss AR...
+## $ `Wheel 2`                   &lt;chr&gt; &quot;DT Swiss ARC 1400 Dicut&quot;, &quot;DT Swiss AR...
+## $ `Tyre 1`                    &lt;chr&gt; &quot;Continental Grand Prix 5000 / Attack  ...
+## $ `Tyre 2`                    &lt;chr&gt; &quot;Continental Grand Prix 5000, 25 mm&quot;, &quot;...
+## $ `Handlebar Tape 1`          &lt;chr&gt; &quot;Canyon Ergospeed Gel&quot;, &quot;Canyon Ergospe...
+## $ `Handlebar Tape 2`          &lt;chr&gt; &quot;Canyon bar-end plug&quot;, &quot;Canyon bar-end ...
+## $ `Manuals and Accessories 1` &lt;chr&gt; &quot;Canyon tool case&quot;, &quot;Canyon tool case&quot;,...
+## $ `Manuals and Accessories 2` &lt;chr&gt; &quot;DT Swiss warranty &amp; intended use manua...
+## $ `Manuals and Accessories 3` &lt;chr&gt; &quot;Canyon starter box&quot;, &quot;Canyon starter b...
+## $ `Manuals and Accessories 4` &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;BA...
+## $ `Manuals and Accessories 5` &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Manuals and Accessories 6` &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Manuals and Accessories 7` &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Manuals and Accessories 8` &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;,...
+## $ `Brake Rotor`               &lt;list&gt; [&quot;Shimano RT800&quot;, &quot;SRAM Centerline X&quot;,...</code></pre>
+<pre class="r"><code>bike_features_tbl &lt;- bike_features_tbl %&gt;% 
+    select(model:url, `Rear Derailleur`, `Shift Lever`) %&gt;% 
+    mutate(
+      `shimano dura-ace`        = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;shimano dura-ace &quot;) %&gt;% as.numeric(),
+      `shimano ultegra`         = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;shimano ultegra &quot;) %&gt;% as.numeric(),
+      `shimano 105`             = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;shimano 105 &quot;) %&gt;% as.numeric(),
+      `shimano tiagra`          = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;shimano tiagra &quot;) %&gt;% as.numeric(),
+      `Shimano sora`            = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;shimano sora&quot;) %&gt;% as.numeric(),
+      `shimano deore`           = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;shimano deore(?! xt)&quot;) %&gt;% as.numeric(),
+      `shimano slx`             = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;shimano slx&quot;) %&gt;% as.numeric(),
+      `shimano grx`             = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;shimano grx&quot;) %&gt;% as.numeric(),
+      `Shimano xt`              = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;shimano deore xt |shimano xt &quot;) %&gt;% as.numeric(),
+      `Shimano xtr`             = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;shimano xtr&quot;) %&gt;% as.numeric(),
+      `Shimano saint`           = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;shimano saint&quot;) %&gt;% as.numeric(),
+      `SRAM red`                = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;sram red&quot;) %&gt;% as.numeric(),
+      `SRAM force`              = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;sram force&quot;) %&gt;% as.numeric(),
+      `SRAM rival`              = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;sram rival&quot;) %&gt;% as.numeric(),
+      `SRAM apex`               = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;sram apex&quot;) %&gt;% as.numeric(),
+      `SRAM xx1`                = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;sram xx1&quot;) %&gt;% as.numeric(),
+      `SRAM x01`                = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;sram x01|sram xo1&quot;) %&gt;% as.numeric(),
+      `SRAM gx`                 = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;sram gx&quot;) %&gt;% as.numeric(),
+      `SRAM nx`                 = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;sram nx&quot;) %&gt;% as.numeric(),
+      `SRAM sx`                 = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;sram sx&quot;) %&gt;% as.numeric(),
+      `SRAM sx`                 = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;sram sx&quot;) %&gt;% as.numeric(),
+      `Campagnolo potenza`      = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;campagnolo potenza&quot;) %&gt;% as.numeric(),
+      `Campagnolo super record` = `Rear Derailleur` %&gt;% str_to_lower() %&gt;% str_detect(&quot;campagnolo super record&quot;) %&gt;% as.numeric(),
+      `shimano nexus`           = `Shift Lever`     %&gt;% str_to_lower() %&gt;% str_detect(&quot;shimano nexus&quot;) %&gt;% as.numeric(),
+      `shimano alfine`          = `Shift Lever`     %&gt;% str_to_lower() %&gt;% str_detect(&quot;shimano alfine&quot;) %&gt;% as.numeric()
+    ) %&gt;% 
+  # Remove original columns  
+  select(-c(`Rear Derailleur`, `Shift Lever`)) %&gt;% 
+  # Set all NAs to 0
+  mutate_if(is.numeric, ~replace(., is.na(.), 0))
+
+# 2.0 TRAINING &amp; TEST SETS ----
+bike_features_tbl &lt;- bike_features_tbl %&gt;% 
+  
+  mutate(id = row_number()) %&gt;% 
+  
+  select(id, everything(), -url)</code></pre>
+</div>
+<div id="section-1" class="section level3">
+<h3></h3>
+</div>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
