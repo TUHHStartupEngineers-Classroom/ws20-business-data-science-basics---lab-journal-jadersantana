@@ -1142,3 +1142,249 @@ III. Bundle the model and recipe with the workflow package
 ##IV. Evaluate your model with the yardstick package
 
 Just use the function, that we have created in this session.
+
+# Challenge 09_Automated Machine Learning with H20 (I)
+
+Use your learning from descriptive features and plot_ggpairs() to further investigate the features. Run the functions above according to the features needed. Answer the following questions. Most of the time, you will only need the images from diagonal.
+
+```{r }
+
+employee_attrition_tbl <- read_csv("00_data/09/datasets-1067-1925-WA_Fn-UseC_-HR-Employee-Attrition.csv")
+
+# Libraries 
+library(tidyverse)
+library(readxl)
+library(skimr)
+library(GGally)
+
+# Load Data data definitions
+
+path_data_definitions <- "00_data/09/data_definitions.xlsx"
+definitions_raw_tbl   <- read_excel(path_data_definitions, sheet = 1, col_names = FALSE)
+
+employee_attrition_tbl
+
+```
+
+```{r }
+# Create data tibble, to potentially debug the plot_ggpairs function (because it has a data argument)
+data <- employee_attrition_tbl %>%
+    select(Attrition, Age, Gender, MaritalStatus, NumCompaniesWorked, Over18, DistanceFromHome)
+
+plot_ggpairs <- function(data, color = NULL, density_alpha = 0.5) {
+    
+    color_expr <- enquo(color)
+    
+    if (rlang::quo_is_null(color_expr)) {
+        
+        g <- data %>%
+            ggpairs(lower = "blank") 
+        
+    } else {
+        
+        color_name <- quo_name(color_expr)
+        
+        g <- data %>%
+            ggpairs(mapping = aes_string(color = color_name), 
+                    lower = "blank", legend = 1,
+                    diag = list(continuous = wrap("densityDiag", 
+                                                  alpha = density_alpha))) +
+            theme(legend.position = "bottom")
+    }
+    
+    return(g)
+    
+}
+
+
+```
+
+##1. Compensation Features
+
+What can you deduce about the interaction between Monthly Income and Attrition?
+
+a. Those that are leaving the company have a higher Monthly Income
+b. That those are staying have a lower Monthly Income
+c. Those that are leaving have a lower Monthly Income
+d. It's difficult to deduce anything based on the visualization
+
+Answer: alternative C - the density of YES-Attrition is higher of a lower income, only in the first part of the chart collum 2 row 2. WIth a small exception of a peak around 10k of Monthly income, that can be taken out of account.
+```{r }
+#   3. Compensation features: MonthlyIncome 
+employee_attrition_tbl %>%
+    select(Attrition, contains("income")) %>%
+    plot_ggpairs(Attrition)
+```
+##2. Compensation Features
+
+What can you deduce about the interaction between Percent Salary Hike and Attrition?
+
+a.Those that are leaving the company have a higher Percent Salary Hike
+b.Those that are staying have a lower Percent Salary Hike
+c.Those that are leaving have lower Percent Salary Hike
+d.It's difficult to deduce anything based on the visualization
+
+Answer: alternative D - the percent of salary against the Attrition does not show anything that could be interpreted as a role player or as a predictor.
+
+```{r }
+#   3. Compensation features: PercentSalaryHike 
+employee_attrition_tbl %>%
+    select(Attrition, contains("salaryhike")) %>%
+    plot_ggpairs(Attrition)
+```
+##3. Compensation Features
+
+What can you deduce about the interaction between Stock Option Level and Attrition?
+
+a.Those that are leaving the company have a higher stock option level
+b.Those that are staying have a higher stock option level
+c.It's difficult to deduce anything based on the visualization
+
+Answer: alternative B - the density chart show us that the ones leaving the company tend to have a lower Stock Option Level than the ones staying.Or that the ones staying tend to have a higher stock option level than the ones leaving.
+
+from the box plot, we can deduce that at least 50% of the ones who left the company had stock level in 0. We can also deduce that at least 50% of the ones staying have Stock Option level 1 or more. 
+
+```{r }
+#   3. Compensation features: Stock 
+employee_attrition_tbl %>%
+    select(Attrition, contains("stock")) %>%
+    plot_ggpairs(Attrition)
+```
+##4. Survey Results
+
+What can you deduce about the interaction between Environment Satisfaction and Attrition?
+
+a. A higher proportion of those leaving have a low environment satisfaction level
+b. A higher proportion of those leaving have a high environment satisfaction level
+c. It's difficult to deduce anything based on the visualization
+
+Answer: alternative B - at least 50% of the ones leaving the company have high environmental satisfactions, based on the box plot.
+```{r }
+#   4. Survey Results: Environment
+employee_attrition_tbl %>%
+    select(Attrition, contains("Environment")) %>%
+    plot_ggpairs(Attrition)
+```
+##5. Survey Results
+
+What can you deduce about the interaction between Work Life Balance and Attrition
+
+a. Those that are leaving have higher density of 2's and 3's
+b. Those that are staying have a higher density of 2's and 3's
+c. Those that are staying have a lower density of 2's and 3's
+d. It's difficult to deduce anything based on the visualization
+
+Answer: alternative B as shown in the density chart in red
+
+```{r }
+#   4. Survey Results: WorkLifeBalance 
+employee_attrition_tbl %>%
+    select(Attrition, contains("life")) %>%
+    plot_ggpairs(Attrition)
+```
+
+##6. Performance Data
+
+What Can you deduce about the interaction between Job Involvement and Attrition?
+
+a. Those that are leaving have a lower density of 3's and 4's
+b. Those that are leaving have a lower density of 1's and 2's
+c. Those that are staying have a lower density of 2's and 3's
+d. It's difficult to deduce anything based on the visualization
+
+Answer: alternative B as shown in the density chart in red
+
+```{r }
+#   5. Performance Data: Job Involvement
+employee_attrition_tbl %>%
+    select(Attrition, contains("involvement")) %>%
+    plot_ggpairs(Attrition)
+```
+
+##7. Work-Life Features
+
+What can you deduce about the interaction between Over Time and Attrition?
+
+a. The proportion of those leaving that are working Over Time are high compared to those that are not leaving
+b. The proportion of those staying that are working Over Time are high compared to those that are not staying
+
+Answer: alternative A - the employees staying have a much smaller proportion of overtime x no overtime than the ones leaving.
+
+```{r }
+#   6. Work-Life Features 
+employee_attrition_tbl %>%
+    select(Attrition, contains("overtime")) %>%
+    plot_ggpairs(Attrition)
+```
+
+##8. Training and Education
+
+What can you deduce about the interaction between Training Times Last Year and Attrition
+
+a. People that leave tend to have more annual trainings
+b. People that leave tend to have less annual trainings
+c. It's difficult to deduce anything based on the visualization
+
+Answer: alternative B
+
+```{r }
+#   7. Training and Education 
+employee_attrition_tbl %>%
+    select(Attrition, contains("training")) %>%
+    plot_ggpairs(Attrition)
+
+```
+
+##9. Time-Based Features
+
+What can you deduce about the interaction between Years At Company and Attrition
+
+a. People that leave tend to have more working years at the company
+b. People that leave tend to have less working years at the company
+c. It's difficult to deduce anything based on the visualization
+
+Answer: alternative B
+```{r }
+#   8. Time-Based Features: Years at company
+employee_attrition_tbl %>%
+    select(Attrition, contains("yearsatcompany")) %>%
+    plot_ggpairs(Attrition)
+```
+
+##10. Time-Based Features
+
+What can you deduce about the interaction between Years Since Last Promotion and Attrition?
+
+a. Those that are leaving have more years since last promotion than those that are staying
+b. Those that are leaving have fewer years since last promotion than those that are staying
+c. It's difficult to deduce anything based on the visualization
+
+answer: alternative C
+```{r }
+#   8. Time-Based Features: Promotion
+employee_attrition_tbl %>%
+    select(Attrition, contains("promotion")) %>%
+    plot_ggpairs(Attrition)
+```
+
+
+```{r }
+
+```
+
+
+```{r }
+
+```
+
+
+```{r }
+
+```
+
+
+```{r }
+
+```
+
+

@@ -498,6 +498,7 @@ model_sales_tbl <- bike_orderlines_tbl %>%
     
     group_by(model, category_2, frame_material) %>%
     summarise(total_sales = sum(total_price)) %>%
+    filter(!(category_2 %in% c("Downhill", "Adventure", "E-Road", "Fat Bikes"))) %>%
     ungroup() %>%
     
     arrange(desc(total_sales))

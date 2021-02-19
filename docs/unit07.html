@@ -337,9 +337,48 @@ $(document).ready(function () {
 <pre class="r"><code>#install.packages(&quot;tidymodels&quot;)
 #install.packages(&quot;broom.mixed&quot;)
 
-library(tidyverse)
-library(tidyquant)
-library(broom)
+library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.0 --</code></pre>
+<pre><code>## v tibble  3.0.4     v purrr   0.3.4
+## v tidyr   1.1.2     v stringr 1.4.0
+## v readr   1.4.0     v forcats 0.5.0</code></pre>
+<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(tidyquant)</code></pre>
+<pre><code>## Loading required package: lubridate</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     date, intersect, setdiff, union</code></pre>
+<pre><code>## Loading required package: PerformanceAnalytics</code></pre>
+<pre><code>## Loading required package: xts</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre><code>## 
+## Attaching package: &#39;xts&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     first, last</code></pre>
+<pre><code>## 
+## Attaching package: &#39;PerformanceAnalytics&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     legend</code></pre>
+<pre><code>## Loading required package: quantmod</code></pre>
+<pre><code>## Loading required package: TTR</code></pre>
+<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
+##   method            from
+##   as.zoo.data.frame zoo</code></pre>
+<pre><code>## == Need to Learn tidyquant? ====================================================
+## Business Science offers a 1-hour course - Learning Lab #9: Performance Analysis &amp; Portfolio Optimization with tidyquant!
+## &lt;/&gt; Learn more at: https://university.business-science.io/p/learning-labs-pro &lt;/&gt;</code></pre>
+<pre class="r"><code>library(broom)
 library(umap)
 library(dplyr)
 
@@ -351,17 +390,14 @@ library(tidymodels)  # for the parsnip package, along with the rest of tidymodel
 ## v parsnip   0.1.5      v yardstick 0.0.7 
 ## v recipes   0.1.15</code></pre>
 <pre><code>## -- Conflicts ----------------------------------------- tidymodels_conflicts() --
-## x data.table::between()   masks dplyr::between()
-## x scales::discard()       masks purrr::discard()
-## x dplyr::filter()         masks stats::filter()
-## x xts::first()            masks data.table::first(), dplyr::first()
-## x recipes::fixed()        masks stringr::fixed()
-## x dplyr::lag()            masks stats::lag()
-## x xts::last()             masks data.table::last(), dplyr::last()
-## x maps::map()             masks purrr::map()
-## x yardstick::spec()       masks vroom::spec(), readr::spec()
-## x recipes::step()         masks stats::step()
-## x data.table::transpose() masks purrr::transpose()</code></pre>
+## x scales::discard() masks purrr::discard()
+## x dplyr::filter()   masks stats::filter()
+## x xts::first()      masks dplyr::first()
+## x recipes::fixed()  masks stringr::fixed()
+## x dplyr::lag()      masks stats::lag()
+## x xts::last()       masks dplyr::last()
+## x yardstick::spec() masks readr::spec()
+## x recipes::step()   masks stats::step()</code></pre>
 <pre class="r"><code># Helper packages
 library(broom.mixed) # for converting bayesian models to tidy tibbles</code></pre>
 <pre><code>## Registered S3 method overwritten by &#39;broom.mixed&#39;:
@@ -484,7 +520,7 @@ bayes_fit &lt;-  bayes_mod %&gt;%
 print(bayes_fit, digits = 5)</code></pre>
 <pre><code>## parsnip model object
 ## 
-## Fit time:  4m 57.6s 
+## Fit time:  5m 50.3s 
 ## stan_glm
 ##  family:       gaussian [identity]
 ##  formula:      weight ~ price * category_1
@@ -983,7 +1019,7 @@ rf_fit &lt;-
 rf_fit</code></pre>
 <pre><code>## parsnip model object
 ## 
-## Fit time:  3.7s 
+## Fit time:  4.2s 
 ## Ranger result
 ## 
 ## Call:
@@ -1138,6 +1174,7 @@ glimpse(bike_orderlines_tbl)</code></pre>
     
     group_by(model, category_2, frame_material) %&gt;%
     summarise(total_sales = sum(total_price)) %&gt;%
+    filter(!(category_2 %in% c(&quot;Downhill&quot;, &quot;Adventure&quot;, &quot;E-Road&quot;, &quot;Fat Bikes&quot;))) %&gt;%
     ungroup() %&gt;%
     
     arrange(desc(total_sales))</code></pre>
@@ -1158,22 +1195,6 @@ glimpse(bike_orderlines_tbl)</code></pre>
         title = &quot;Total Sales for Each Model&quot;,
         x = &quot;Frame Material&quot;, y = &quot;Revenue&quot;
     )</code></pre>
-<pre><code>## Warning in max(data$density): kein nicht-fehlendes Argument für max; gebe -Inf
-## zurück</code></pre>
-<pre><code>## Warning: Computation failed in `stat_ydensity()`:
-## replacement has 1 row, data has 0</code></pre>
-<pre><code>## Warning in max(data$density): kein nicht-fehlendes Argument für max; gebe -Inf
-## zurück</code></pre>
-<pre><code>## Warning: Computation failed in `stat_ydensity()`:
-## replacement has 1 row, data has 0</code></pre>
-<pre><code>## Warning in max(data$density): kein nicht-fehlendes Argument für max; gebe -Inf
-## zurück</code></pre>
-<pre><code>## Warning: Computation failed in `stat_ydensity()`:
-## replacement has 1 row, data has 0</code></pre>
-<pre><code>## Warning in max(data$density): kein nicht-fehlendes Argument für max; gebe -Inf
-## zurück</code></pre>
-<pre><code>## Warning: Computation failed in `stat_ydensity()`:
-## replacement has 1 row, data has 0</code></pre>
 <p><img src="unit07_files/figure-html/unnamed-chunk-4-1.png" width="672" /> ###</p>
 <pre class="r"><code>bike_features_tbl &lt;- readRDS(&quot;00_data/01_bike_sales/01_raw_data/bike_features_tbl.rds&quot;)
 glimpse(bike_features_tbl)</code></pre>

@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-01-26 20:43:59</p>
+<p>Last compiled: 2021-02-19 18:24:34</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -679,7 +679,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-01-26 20:43:59</p>
+<p>Last compiled: 2021-02-19 18:24:34</p>
 <div id="load-libraries---1" class="section level2">
 <h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -2664,6 +2664,198 @@ umap_kmeans_results_tbl %&gt;%
 <p>train_transformed_tbl &lt;- bake(…, …) test_transformed_tbl &lt;- bake(…, …) III. Bundle the model and recipe with the workflow package</p>
 <p>##IV. Evaluate your model with the yardstick package</p>
 <p>Just use the function, that we have created in this session.</p>
+</div>
+<div id="challenge-09_automated-machine-learning-with-h20-i" class="section level1">
+<h1><span class="header-section-number">9</span> Challenge 09_Automated Machine Learning with H20 (I)</h1>
+<p>Use your learning from descriptive features and plot_ggpairs() to further investigate the features. Run the functions above according to the features needed. Answer the following questions. Most of the time, you will only need the images from diagonal.</p>
+<pre class="r"><code>employee_attrition_tbl &lt;- read_csv(&quot;00_data/09/datasets-1067-1925-WA_Fn-UseC_-HR-Employee-Attrition.csv&quot;)
+
+# Libraries 
+library(tidyverse)
+library(readxl)
+library(skimr)
+library(GGally)
+
+# Load Data data definitions
+
+path_data_definitions &lt;- &quot;00_data/09/data_definitions.xlsx&quot;
+definitions_raw_tbl   &lt;- read_excel(path_data_definitions, sheet = 1, col_names = FALSE)
+
+employee_attrition_tbl</code></pre>
+<pre><code>## # A tibble: 1,470 x 35
+##      Age Attrition BusinessTravel DailyRate Department DistanceFromHome
+##    &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;              &lt;dbl&gt; &lt;chr&gt;                 &lt;dbl&gt;
+##  1    41 Yes       Travel_Rarely       1102 Sales                     1
+##  2    49 No        Travel_Freque~       279 Research ~                8
+##  3    37 Yes       Travel_Rarely       1373 Research ~                2
+##  4    33 No        Travel_Freque~      1392 Research ~                3
+##  5    27 No        Travel_Rarely        591 Research ~                2
+##  6    32 No        Travel_Freque~      1005 Research ~                2
+##  7    59 No        Travel_Rarely       1324 Research ~                3
+##  8    30 No        Travel_Rarely       1358 Research ~               24
+##  9    38 No        Travel_Freque~       216 Research ~               23
+## 10    36 No        Travel_Rarely       1299 Research ~               27
+## # ... with 1,460 more rows, and 29 more variables: Education &lt;dbl&gt;,
+## #   EducationField &lt;chr&gt;, EmployeeCount &lt;dbl&gt;, EmployeeNumber &lt;dbl&gt;,
+## #   EnvironmentSatisfaction &lt;dbl&gt;, Gender &lt;chr&gt;, HourlyRate &lt;dbl&gt;,
+## #   JobInvolvement &lt;dbl&gt;, JobLevel &lt;dbl&gt;, JobRole &lt;chr&gt;, JobSatisfaction &lt;dbl&gt;,
+## #   MaritalStatus &lt;chr&gt;, MonthlyIncome &lt;dbl&gt;, MonthlyRate &lt;dbl&gt;,
+## #   NumCompaniesWorked &lt;dbl&gt;, Over18 &lt;chr&gt;, OverTime &lt;chr&gt;,
+## #   PercentSalaryHike &lt;dbl&gt;, PerformanceRating &lt;dbl&gt;,
+## #   RelationshipSatisfaction &lt;dbl&gt;, StandardHours &lt;dbl&gt;,
+## #   StockOptionLevel &lt;dbl&gt;, TotalWorkingYears &lt;dbl&gt;,
+## #   TrainingTimesLastYear &lt;dbl&gt;, WorkLifeBalance &lt;dbl&gt;, YearsAtCompany &lt;dbl&gt;,
+## #   YearsInCurrentRole &lt;dbl&gt;, YearsSinceLastPromotion &lt;dbl&gt;,
+## #   YearsWithCurrManager &lt;dbl&gt;</code></pre>
+<pre class="r"><code># Create data tibble, to potentially debug the plot_ggpairs function (because it has a data argument)
+data &lt;- employee_attrition_tbl %&gt;%
+    select(Attrition, Age, Gender, MaritalStatus, NumCompaniesWorked, Over18, DistanceFromHome)
+
+plot_ggpairs &lt;- function(data, color = NULL, density_alpha = 0.5) {
+    
+    color_expr &lt;- enquo(color)
+    
+    if (rlang::quo_is_null(color_expr)) {
+        
+        g &lt;- data %&gt;%
+            ggpairs(lower = &quot;blank&quot;) 
+        
+    } else {
+        
+        color_name &lt;- quo_name(color_expr)
+        
+        g &lt;- data %&gt;%
+            ggpairs(mapping = aes_string(color = color_name), 
+                    lower = &quot;blank&quot;, legend = 1,
+                    diag = list(continuous = wrap(&quot;densityDiag&quot;, 
+                                                  alpha = density_alpha))) +
+            theme(legend.position = &quot;bottom&quot;)
+    }
+    
+    return(g)
+    
+}</code></pre>
+<p>##1. Compensation Features</p>
+<p>What can you deduce about the interaction between Monthly Income and Attrition?</p>
+<ol style="list-style-type: lower-alpha">
+<li>Those that are leaving the company have a higher Monthly Income</li>
+<li>That those are staying have a lower Monthly Income</li>
+<li>Those that are leaving have a lower Monthly Income</li>
+<li>It’s difficult to deduce anything based on the visualization</li>
+</ol>
+<p>Answer: alternative C - the density of YES-Attrition is higher of a lower income, only in the first part of the chart collum 2 row 2. WIth a small exception of a peak around 10k of Monthly income, that can be taken out of account.</p>
+<pre class="r"><code>#   3. Compensation features: MonthlyIncome 
+employee_attrition_tbl %&gt;%
+    select(Attrition, contains(&quot;income&quot;)) %&gt;%
+    plot_ggpairs(Attrition)</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-35-1.png" width="672" /> ##2. Compensation Features</p>
+<p>What can you deduce about the interaction between Percent Salary Hike and Attrition?</p>
+<p>a.Those that are leaving the company have a higher Percent Salary Hike b.Those that are staying have a lower Percent Salary Hike c.Those that are leaving have lower Percent Salary Hike d.It’s difficult to deduce anything based on the visualization</p>
+<p>Answer: alternative D - the percent of salary against the Attrition does not show anything that could be interpreted as a role player or as a predictor.</p>
+<pre class="r"><code>#   3. Compensation features: PercentSalaryHike 
+employee_attrition_tbl %&gt;%
+    select(Attrition, contains(&quot;salaryhike&quot;)) %&gt;%
+    plot_ggpairs(Attrition)</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-36-1.png" width="672" /> ##3. Compensation Features</p>
+<p>What can you deduce about the interaction between Stock Option Level and Attrition?</p>
+<p>a.Those that are leaving the company have a higher stock option level b.Those that are staying have a higher stock option level c.It’s difficult to deduce anything based on the visualization</p>
+<p>Answer: alternative B - the density chart show us that the ones leaving the company tend to have a lower Stock Option Level than the ones staying.Or that the ones staying tend to have a higher stock option level than the ones leaving.</p>
+<p>from the box plot, we can deduce that at least 50% of the ones who left the company had stock level in 0. We can also deduce that at least 50% of the ones staying have Stock Option level 1 or more.</p>
+<pre class="r"><code>#   3. Compensation features: Stock 
+employee_attrition_tbl %&gt;%
+    select(Attrition, contains(&quot;stock&quot;)) %&gt;%
+    plot_ggpairs(Attrition)</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-37-1.png" width="672" /> ##4. Survey Results</p>
+<p>What can you deduce about the interaction between Environment Satisfaction and Attrition?</p>
+<ol style="list-style-type: lower-alpha">
+<li>A higher proportion of those leaving have a low environment satisfaction level</li>
+<li>A higher proportion of those leaving have a high environment satisfaction level</li>
+<li>It’s difficult to deduce anything based on the visualization</li>
+</ol>
+<p>Answer: alternative B - at least 50% of the ones leaving the company have high environmental satisfactions, based on the box plot.</p>
+<pre class="r"><code>#   4. Survey Results: Environment
+employee_attrition_tbl %&gt;%
+    select(Attrition, contains(&quot;Environment&quot;)) %&gt;%
+    plot_ggpairs(Attrition)</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-38-1.png" width="672" /> ##5. Survey Results</p>
+<p>What can you deduce about the interaction between Work Life Balance and Attrition</p>
+<ol style="list-style-type: lower-alpha">
+<li>Those that are leaving have higher density of 2’s and 3’s</li>
+<li>Those that are staying have a higher density of 2’s and 3’s</li>
+<li>Those that are staying have a lower density of 2’s and 3’s</li>
+<li>It’s difficult to deduce anything based on the visualization</li>
+</ol>
+<p>Answer: alternative B as shown in the density chart in red</p>
+<pre class="r"><code>#   4. Survey Results: WorkLifeBalance 
+employee_attrition_tbl %&gt;%
+    select(Attrition, contains(&quot;life&quot;)) %&gt;%
+    plot_ggpairs(Attrition)</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
+<p>##6. Performance Data</p>
+<p>What Can you deduce about the interaction between Job Involvement and Attrition?</p>
+<ol style="list-style-type: lower-alpha">
+<li>Those that are leaving have a lower density of 3’s and 4’s</li>
+<li>Those that are leaving have a lower density of 1’s and 2’s</li>
+<li>Those that are staying have a lower density of 2’s and 3’s</li>
+<li>It’s difficult to deduce anything based on the visualization</li>
+</ol>
+<p>Answer: alternative B as shown in the density chart in red</p>
+<pre class="r"><code>#   5. Performance Data: Job Involvement
+employee_attrition_tbl %&gt;%
+    select(Attrition, contains(&quot;involvement&quot;)) %&gt;%
+    plot_ggpairs(Attrition)</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
+<p>##7. Work-Life Features</p>
+<p>What can you deduce about the interaction between Over Time and Attrition?</p>
+<ol style="list-style-type: lower-alpha">
+<li>The proportion of those leaving that are working Over Time are high compared to those that are not leaving</li>
+<li>The proportion of those staying that are working Over Time are high compared to those that are not staying</li>
+</ol>
+<p>Answer: alternative A - the employees staying have a much smaller proportion of overtime x no overtime than the ones leaving.</p>
+<pre class="r"><code>#   6. Work-Life Features 
+employee_attrition_tbl %&gt;%
+    select(Attrition, contains(&quot;overtime&quot;)) %&gt;%
+    plot_ggpairs(Attrition)</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
+<p>##8. Training and Education</p>
+<p>What can you deduce about the interaction between Training Times Last Year and Attrition</p>
+<ol style="list-style-type: lower-alpha">
+<li>People that leave tend to have more annual trainings</li>
+<li>People that leave tend to have less annual trainings</li>
+<li>It’s difficult to deduce anything based on the visualization</li>
+</ol>
+<p>Answer: alternative B</p>
+<pre class="r"><code>#   7. Training and Education 
+employee_attrition_tbl %&gt;%
+    select(Attrition, contains(&quot;training&quot;)) %&gt;%
+    plot_ggpairs(Attrition)</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+<p>##9. Time-Based Features</p>
+<p>What can you deduce about the interaction between Years At Company and Attrition</p>
+<ol style="list-style-type: lower-alpha">
+<li>People that leave tend to have more working years at the company</li>
+<li>People that leave tend to have less working years at the company</li>
+<li>It’s difficult to deduce anything based on the visualization</li>
+</ol>
+<p>Answer: alternative B</p>
+<pre class="r"><code>#   8. Time-Based Features: Years at company
+employee_attrition_tbl %&gt;%
+    select(Attrition, contains(&quot;yearsatcompany&quot;)) %&gt;%
+    plot_ggpairs(Attrition)</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-43-1.png" width="672" /></p>
+<p>##10. Time-Based Features</p>
+<p>What can you deduce about the interaction between Years Since Last Promotion and Attrition?</p>
+<ol style="list-style-type: lower-alpha">
+<li>Those that are leaving have more years since last promotion than those that are staying</li>
+<li>Those that are leaving have fewer years since last promotion than those that are staying</li>
+<li>It’s difficult to deduce anything based on the visualization</li>
+</ol>
+<p>answer: alternative C</p>
+<pre class="r"><code>#   8. Time-Based Features: Promotion
+employee_attrition_tbl %&gt;%
+    select(Attrition, contains(&quot;promotion&quot;)) %&gt;%
+    plot_ggpairs(Attrition)</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
 </div>
 
 
