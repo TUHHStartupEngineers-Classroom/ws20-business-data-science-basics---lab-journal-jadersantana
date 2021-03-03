@@ -416,7 +416,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
 <h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-02-19 18:24:34</p>
+<p>Last compiled: 2021-03-03 19:28:17</p>
 <div id="load-libraries--" class="section level2">
 <h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -679,7 +679,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1">
 <h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-02-19 18:24:34</p>
+<p>Last compiled: 2021-03-03 19:28:17</p>
 <div id="load-libraries---1" class="section level2">
 <h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -2856,6 +2856,442 @@ employee_attrition_tbl %&gt;%
     select(Attrition, contains(&quot;promotion&quot;)) %&gt;%
     plot_ggpairs(Attrition)</code></pre>
 <p><img src="journal_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
+</div>
+<div id="challenge-10_automated-machine-learning-with-h20-ii" class="section level1">
+<h1><span class="header-section-number">10</span> Challenge 10_Automated Machine Learning with H20 (II)</h1>
+<div id="load-the-training-test-dataset" class="section level2">
+<h2><span class="header-section-number">10.1</span> 1. Load the training &amp; test dataset</h2>
+<pre class="r"><code># H2O modeling
+library(tidyverse)
+library(readxl)
+library(rsample)
+library(recipes)
+library(PerformanceAnalytics)
+
+library(h2o)
+
+product_backorders_tbl          &lt;- read_csv(&quot;https://github.com/TUHHStartupEngineers/dat_sci_ss20/raw/master/10/product_backorders.csv&quot;)
+
+set.seed(seed = 1113)
+split_obj                       &lt;- rsample::initial_split(product_backorders_tbl, prop = 0.85)
+train_readable_tbl              &lt;- training(split_obj)
+test_readable_tbl               &lt;- testing(split_obj)
+
+recipe_obj &lt;- recipe(went_on_backorder ~., data = train_readable_tbl) %&gt;% 
+    step_zv(all_predictors()) %&gt;% 
+    prep()
+
+train_tbl &lt;- bake(recipe_obj, new_data = train_readable_tbl)
+test_tbl  &lt;- bake(recipe_obj, new_data = test_readable_tbl)</code></pre>
+</div>
+<div id="specifiy-the-response-and-predictor-variables" class="section level2">
+<h2><span class="header-section-number">10.2</span> 2. Specifiy the response and predictor variables</h2>
+<pre class="r"><code># Modeling
+h2o.init()</code></pre>
+<pre><code>##  Connection successful!
+## 
+## R is connected to the H2O cluster: 
+##     H2O cluster uptime:         1 hours 7 minutes 
+##     H2O cluster timezone:       Europe/Berlin 
+##     H2O data parsing timezone:  UTC 
+##     H2O cluster version:        3.32.0.1 
+##     H2O cluster version age:    4 months and 23 days !!! 
+##     H2O cluster name:           H2O_started_from_R_jader_wny421 
+##     H2O cluster total nodes:    1 
+##     H2O cluster total memory:   0.91 GB 
+##     H2O cluster total cores:    8 
+##     H2O cluster allowed cores:  8 
+##     H2O cluster healthy:        TRUE 
+##     H2O Connection ip:          localhost 
+##     H2O Connection port:        54321 
+##     H2O Connection proxy:       NA 
+##     H2O Internal Security:      FALSE 
+##     H2O API Extensions:         Amazon S3, Algos, AutoML, Core V3, TargetEncoder, Core V4 
+##     R Version:                  R version 4.0.3 (2020-10-10)</code></pre>
+<pre class="r"><code># Split data into a training and a validation data frame
+# Setting the seed is just for reproducability
+split_h2o &lt;- h2o.splitFrame(as.h2o(train_tbl), ratios = c(0.85), seed = 1234)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |======================================================================| 100%</code></pre>
+<pre class="r"><code>train_h2o &lt;- split_h2o[[1]]
+valid_h2o &lt;- split_h2o[[2]]
+test_h2o  &lt;- as.h2o(test_tbl)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |======================================================================| 100%</code></pre>
+<pre class="r"><code># Set the target and predictors
+y &lt;- &quot;went_on_backorder&quot;
+x &lt;- setdiff(names(train_h2o), y)</code></pre>
+</div>
+<div id="run-automl-specifying-the-stopping-criterion" class="section level2">
+<h2><span class="header-section-number">10.3</span> 3. run AutoML specifying the stopping criterion</h2>
+<pre class="r"><code>?h2o.automl
+
+automl_models_h2o &lt;- h2o.automl(
+  x = x,
+  y = y,
+  training_frame    = train_h2o,
+  validation_frame  = valid_h2o,
+  leaderboard_frame = test_h2o,
+  max_runtime_secs  = 30,
+  nfolds            = 5 
+)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |                                                                      |   0%
+## 19:03:07.100: User specified a validation frame with cross-validation still enabled. Please note that the models will still be validated using cross-validation only, the validation frame will be used to provide purely informative validation metrics on the trained models.
+## 19:03:07.116: AutoML: XGBoost is not available; skipping it.
+  |                                                                            
+  |===================                                                   |  27%
+  |                                                                            
+  |=================================                                     |  47%
+  |                                                                            
+  |=============================================                         |  65%
+  |                                                                            
+  |======================================================================| 100%</code></pre>
+</div>
+<div id="view-the-leaderboard" class="section level2">
+<h2><span class="header-section-number">10.4</span> 4. View the leaderboard</h2>
+<pre class="r"><code>typeof(automl_models_h2o)</code></pre>
+<pre><code>## [1] &quot;S4&quot;</code></pre>
+<pre class="r"><code>slotNames(automl_models_h2o)</code></pre>
+<pre><code>## [1] &quot;project_name&quot;   &quot;leader&quot;         &quot;leaderboard&quot;    &quot;event_log&quot;     
+## [5] &quot;modeling_steps&quot; &quot;training_info&quot;</code></pre>
+<pre class="r"><code>automl_models_h2o@leaderboard</code></pre>
+<pre><code>##                                              model_id       auc   logloss
+## 1    StackedEnsemble_AllModels_AutoML_20210303_190307 0.9545267 0.1746774
+## 2          GBM_grid__1_AutoML_20210303_190307_model_1 0.9532386 0.1713073
+## 3 StackedEnsemble_BestOfFamily_AutoML_20210303_190307 0.9531775 0.1790109
+## 4                        GBM_3_AutoML_20210303_190307 0.9433125 0.2593115
+## 5                        GBM_2_AutoML_20210303_190307 0.9383724 0.2509438
+## 6                        GBM_1_AutoML_20210303_190307 0.9347245 0.2522020
+##       aucpr mean_per_class_error      rmse        mse
+## 1 0.7633417            0.1578502 0.2223100 0.04942172
+## 2 0.7646279            0.1251385 0.2219236 0.04925009
+## 3 0.7647618            0.1580484 0.2241905 0.05026137
+## 4 0.7053211            0.1399104 0.2723690 0.07418488
+## 5 0.6928967            0.1637528 0.2675052 0.07155901
+## 6 0.6638316            0.1595940 0.2692033 0.07247041
+## 
+## [13 rows x 7 columns]</code></pre>
+<pre class="r"><code>automl_models_h2o@leader</code></pre>
+<pre><code>## Model Details:
+## ==============
+## 
+## H2OBinomialModel: stackedensemble
+## Model ID:  StackedEnsemble_AllModels_AutoML_20210303_190307 
+## Number of Base Models: 11
+## 
+## Base Models (count by algorithm type):
+## 
+## deeplearning          drf          gbm          glm 
+##            1            2            7            1 
+## 
+## Metalearner:
+## 
+## Metalearner algorithm: glm
+## Metalearner cross-validation fold assignment:
+##   Fold assignment scheme: AUTO
+##   Number of folds: 5
+##   Fold column: NULL
+## Metalearner hyperparameters: 
+## 
+## 
+## H2OBinomialMetrics: stackedensemble
+## ** Reported on training data. **
+## 
+## MSE:  0.03464507
+## RMSE:  0.1861319
+## LogLoss:  0.1278253
+## Mean Per-Class Error:  0.1110345
+## AUC:  0.9791177
+## AUCPR:  0.8903992
+## Gini:  0.9582355
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##          No  Yes    Error        Rate
+## No     8619  217 0.024559   =217/8836
+## Yes     238  967 0.197510   =238/1205
+## Totals 8857 1184 0.045314  =455/10041
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold       value idx
+## 1                       max f1  0.328064    0.809544 210
+## 2                       max f2  0.125426    0.852773 282
+## 3                 max f0point5  0.664063    0.844142 120
+## 4                 max accuracy  0.347563    0.954985 204
+## 5                max precision  0.991739    1.000000   0
+## 6                   max recall  0.022611    1.000000 375
+## 7              max specificity  0.991739    1.000000   0
+## 8             max absolute_mcc  0.328064    0.783869 210
+## 9   max min_per_class_accuracy  0.103398    0.924627 293
+## 10 max mean_per_class_accuracy  0.123571    0.927233 283
+## 11                     max tns  0.991739 8836.000000   0
+## 12                     max fns  0.991739 1198.000000   0
+## 13                     max fps  0.016152 8836.000000 399
+## 14                     max tps  0.022611 1205.000000 375
+## 15                     max tnr  0.991739    1.000000   0
+## 16                     max fnr  0.991739    0.994191   0
+## 17                     max fpr  0.016152    1.000000 399
+## 18                     max tpr  0.022611    1.000000 375
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(&lt;model&gt;, &lt;data&gt;)` or `h2o.gainsLift(&lt;model&gt;, valid=&lt;T/F&gt;, xval=&lt;T/F&gt;)`
+## H2OBinomialMetrics: stackedensemble
+## ** Reported on validation data. **
+## 
+## MSE:  0.05109322
+## RMSE:  0.2260381
+## LogLoss:  0.1746508
+## Mean Per-Class Error:  0.1105942
+## AUC:  0.9603179
+## AUCPR:  0.7433557
+## Gini:  0.9206357
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##          No Yes    Error       Rate
+## No     1972 132 0.062738  =132/2104
+## Yes      45 239 0.158451    =45/284
+## Totals 2017 371 0.074121  =177/2388
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold       value idx
+## 1                       max f1  0.195993    0.729771 237
+## 2                       max f2  0.107896    0.812698 274
+## 3                 max f0point5  0.481449    0.725552 154
+## 4                 max accuracy  0.481449    0.932161 154
+## 5                max precision  0.991645    1.000000   0
+## 6                   max recall  0.022454    1.000000 370
+## 7              max specificity  0.991645    1.000000   0
+## 8             max absolute_mcc  0.195993    0.695944 237
+## 9   max min_per_class_accuracy  0.100363    0.904930 279
+## 10 max mean_per_class_accuracy  0.083358    0.909796 289
+## 11                     max tns  0.991645 2104.000000   0
+## 12                     max fns  0.991645  283.000000   0
+## 13                     max fps  0.015371 2104.000000 399
+## 14                     max tps  0.022454  284.000000 370
+## 15                     max tnr  0.991645    1.000000   0
+## 16                     max fnr  0.991645    0.996479   0
+## 17                     max fpr  0.015371    1.000000 399
+## 18                     max tpr  0.022454    1.000000 370
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(&lt;model&gt;, &lt;data&gt;)` or `h2o.gainsLift(&lt;model&gt;, valid=&lt;T/F&gt;, xval=&lt;T/F&gt;)`
+## H2OBinomialMetrics: stackedensemble
+## ** Reported on cross-validation data. **
+## ** 5-fold cross-validation on training data (Metrics computed for combined holdout predictions) **
+## 
+## MSE:  0.05418602
+## RMSE:  0.2327789
+## LogLoss:  0.1890295
+## Mean Per-Class Error:  0.145689
+## AUC:  0.9475247
+## AUCPR:  0.7183496
+## Gini:  0.8950494
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##           No  Yes    Error         Rate
+## No     11465  695 0.057155   =695/12160
+## Yes      386 1262 0.234223    =386/1648
+## Totals 11851 1957 0.078288  =1081/13808
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold        value idx
+## 1                       max f1  0.201585     0.700139 257
+## 2                       max f2  0.083042     0.765126 315
+## 3                 max f0point5  0.553066     0.718614 148
+## 4                 max accuracy  0.494233     0.928737 164
+## 5                max precision  0.992777     0.857143   0
+## 6                   max recall  0.017227     1.000000 393
+## 7              max specificity  0.992777     0.999918   0
+## 8             max absolute_mcc  0.201585     0.658699 257
+## 9   max min_per_class_accuracy  0.074125     0.879770 320
+## 10 max mean_per_class_accuracy  0.059349     0.882333 332
+## 11                     max tns  0.992777 12159.000000   0
+## 12                     max fns  0.992777  1642.000000   0
+## 13                     max fps  0.014312 12160.000000 399
+## 14                     max tps  0.017227  1648.000000 393
+## 15                     max tnr  0.992777     0.999918   0
+## 16                     max fnr  0.992777     0.996359   0
+## 17                     max fpr  0.014312     1.000000 399
+## 18                     max tpr  0.017227     1.000000 393
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(&lt;model&gt;, &lt;data&gt;)` or `h2o.gainsLift(&lt;model&gt;, valid=&lt;T/F&gt;, xval=&lt;T/F&gt;)`</code></pre>
+</div>
+<div id="predicting-using-leader-model" class="section level2">
+<h2><span class="header-section-number">10.5</span> 5. Predicting using Leader Model</h2>
+<pre class="r"><code># Choose whatever model you want
+
+stacked_ensemble_h2o &lt;- h2o.getModel(&quot;StackedEnsemble_AllModels_AutoML_20210303_185831&quot;)
+stacked_ensemble_h2o</code></pre>
+<pre><code>## Model Details:
+## ==============
+## 
+## H2OBinomialModel: stackedensemble
+## Model ID:  StackedEnsemble_AllModels_AutoML_20210303_185831 
+## Number of Base Models: 11
+## 
+## Base Models (count by algorithm type):
+## 
+## deeplearning          drf          gbm          glm 
+##            1            2            7            1 
+## 
+## Metalearner:
+## 
+## Metalearner algorithm: glm
+## Metalearner cross-validation fold assignment:
+##   Fold assignment scheme: AUTO
+##   Number of folds: 5
+##   Fold column: NULL
+## Metalearner hyperparameters: 
+## 
+## 
+## H2OBinomialMetrics: stackedensemble
+## ** Reported on training data. **
+## 
+## MSE:  0.03143499
+## RMSE:  0.1772992
+## LogLoss:  0.1181085
+## Mean Per-Class Error:  0.1045021
+## AUC:  0.9846984
+## AUCPR:  0.9149636
+## Gini:  0.9693967
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##          No  Yes    Error        Rate
+## No     8656  162 0.018372   =162/8818
+## Yes     232  985 0.190633   =232/1217
+## Totals 8888 1147 0.039263  =394/10035
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold       value idx
+## 1                       max f1  0.336119    0.833333 213
+## 2                       max f2  0.115021    0.870666 292
+## 3                 max f0point5  0.624806    0.865851 139
+## 4                 max accuracy  0.336119    0.960737 213
+## 5                max precision  0.996416    1.000000   0
+## 6                   max recall  0.028366    1.000000 363
+## 7              max specificity  0.996416    1.000000   0
+## 8             max absolute_mcc  0.336119    0.811560 213
+## 9   max min_per_class_accuracy  0.107790    0.936730 296
+## 10 max mean_per_class_accuracy  0.089978    0.937558 306
+## 11                     max tns  0.996416 8818.000000   0
+## 12                     max fns  0.996416 1206.000000   0
+## 13                     max fps  0.016557 8818.000000 399
+## 14                     max tps  0.028366 1217.000000 363
+## 15                     max tnr  0.996416    1.000000   0
+## 16                     max fnr  0.996416    0.990961   0
+## 17                     max fpr  0.016557    1.000000 399
+## 18                     max tpr  0.028366    1.000000 363
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(&lt;model&gt;, &lt;data&gt;)` or `h2o.gainsLift(&lt;model&gt;, valid=&lt;T/F&gt;, xval=&lt;T/F&gt;)`
+## H2OBinomialMetrics: stackedensemble
+## ** Reported on validation data. **
+## 
+## MSE:  0.05113197
+## RMSE:  0.2261238
+## LogLoss:  0.1766377
+## Mean Per-Class Error:  0.128491
+## AUC:  0.9595413
+## AUCPR:  0.7544508
+## Gini:  0.9190827
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##          No Yes    Error       Rate
+## No     1993 111 0.052757  =111/2104
+## Yes      58 226 0.204225    =58/284
+## Totals 2051 337 0.070771  =169/2388
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold       value idx
+## 1                       max f1  0.196598    0.727858 226
+## 2                       max f2  0.069913    0.800365 296
+## 3                 max f0point5  0.594621    0.729962 119
+## 4                 max accuracy  0.328531    0.934255 195
+## 5                max precision  0.994352    1.000000   0
+## 6                   max recall  0.023658    1.000000 369
+## 7              max specificity  0.994352    1.000000   0
+## 8             max absolute_mcc  0.196598    0.690850 226
+## 9   max min_per_class_accuracy  0.083720    0.897814 286
+## 10 max mean_per_class_accuracy  0.069913    0.905043 296
+## 11                     max tns  0.994352 2104.000000   0
+## 12                     max fns  0.994352  283.000000   0
+## 13                     max fps  0.016496 2104.000000 399
+## 14                     max tps  0.023658  284.000000 369
+## 15                     max tnr  0.994352    1.000000   0
+## 16                     max fnr  0.994352    0.996479   0
+## 17                     max fpr  0.016496    1.000000 399
+## 18                     max tpr  0.023658    1.000000 369
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(&lt;model&gt;, &lt;data&gt;)` or `h2o.gainsLift(&lt;model&gt;, valid=&lt;T/F&gt;, xval=&lt;T/F&gt;)`
+## H2OBinomialMetrics: stackedensemble
+## ** Reported on cross-validation data. **
+## ** 5-fold cross-validation on training data (Metrics computed for combined holdout predictions) **
+## 
+## MSE:  0.05266234
+## RMSE:  0.2294828
+## LogLoss:  0.1860769
+## Mean Per-Class Error:  0.1546288
+## AUC:  0.9505157
+## AUCPR:  0.7385074
+## Gini:  0.9010313
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##           No  Yes    Error         Rate
+## No     11587  573 0.047122   =573/12160
+## Yes      432 1216 0.262136    =432/1648
+## Totals 12019 1789 0.072784  =1005/13808
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold        value idx
+## 1                       max f1  0.227926     0.707594 246
+## 2                       max f2  0.069602     0.774892 320
+## 3                 max f0point5  0.501017     0.734812 164
+## 4                 max accuracy  0.443831     0.932503 180
+## 5                max precision  0.997091     1.000000   0
+## 6                   max recall  0.018924     1.000000 391
+## 7              max specificity  0.997091     1.000000   0
+## 8             max absolute_mcc  0.227926     0.666841 246
+## 9   max min_per_class_accuracy  0.072302     0.885362 318
+## 10 max mean_per_class_accuracy  0.069602     0.887793 320
+## 11                     max tns  0.997091 12160.000000   0
+## 12                     max fns  0.997091  1645.000000   0
+## 13                     max fps  0.015806 12160.000000 399
+## 14                     max tps  0.018924  1648.000000 391
+## 15                     max tnr  0.997091     1.000000   0
+## 16                     max fnr  0.997091     0.998180   0
+## 17                     max fpr  0.015806     1.000000 399
+## 18                     max tpr  0.018924     1.000000 391
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(&lt;model&gt;, &lt;data&gt;)` or `h2o.gainsLift(&lt;model&gt;, valid=&lt;T/F&gt;, xval=&lt;T/F&gt;)`</code></pre>
+<pre class="r"><code>predictions &lt;- h2o.predict(stacked_ensemble_h2o, newdata = as.h2o(test_tbl))</code></pre>
+<pre><code>## 
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |======================================================================| 100%
+## 
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |======================================================================| 100%</code></pre>
+<pre class="r"><code>typeof(predictions)</code></pre>
+<pre><code>## [1] &quot;environment&quot;</code></pre>
+<pre class="r"><code>## [1] &quot;environment&quot;
+
+predictions_tbl &lt;- predictions %&gt;% as_tibble()</code></pre>
+</div>
+<div id="save-the-leader-model" class="section level2">
+<h2><span class="header-section-number">10.6</span> 6. Save the leader model</h2>
+<pre class="r"><code>#h2o.getModel(&quot;StackedEnsemble_AllModels_AutoML_20210303_185831&quot;) %&gt;% 
+ # h2o.saveModel(path = &quot;04_Modeling/h20_models/&quot;)</code></pre>
+</div>
+</div>
+<div id="challenge-11" class="section level1">
+<h1><span class="header-section-number">11</span> Challenge 11</h1>
 </div>
 
 

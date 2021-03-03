@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## 1. Modeling
 
-```{r I. Resources}
+```{r I. Resources, eval=FALSE, include=FALSE}
 #install.packages("tidymodels")
 #install.packages("broom.mixed")
 
@@ -42,7 +42,7 @@ ggplot(bike_data_tbl,
 
 ```
 
-```{r II. Build and fit a model}
+```{r II. Build and fit a model,eval=FALSE, include=FALSE}
 
 #install.packages("parnsnip")
 
@@ -152,7 +152,7 @@ ggplot(bayes_plot_data, aes(x = category_1)) +
 
 ### I. The data
 
-```{r I. The data}
+```{r I. The data, eval=FALSE, include=FALSE}
 
 #install.packages("nycflights13")
 #install.packages("skimr")
@@ -198,7 +198,7 @@ flight_data %>%
 ```
 
 ### II. Data Splitting   
-```{r}
+```{r eval=FALSE, include=FALSE}
 ## Data Splitting
 
 #install.packages("rsample")
@@ -217,7 +217,7 @@ test_data  <- testing(data_split)
 
 ### III. Create recipe and roles
 
-```{r III. Create recipe and roles}
+```{r III. Create recipe and roles, eval=FALSE, include=FALSE}
 
 library(recipes)
 
@@ -234,7 +234,7 @@ summary(flights_rec)
 
 ### IV. Create features
 
-```{r IV. Create features}
+```{r IV. Create features, eval=FALSE, include=FALSE}
 
 
 flight_data %>% 
@@ -265,7 +265,7 @@ flights_rec <-
 
 ### V. Fit a model with a recipe
 
-```{r V. Fit a model with a recipe}
+```{r V. Fit a model with a recipe, eval=FALSE, include=FALSE}
 
 lr_mod <- 
   logistic_reg() %>% 
@@ -309,7 +309,7 @@ flights_pred %>%
 
 ## 3. Evaluating
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 library(tidymodels)
 
 library(modeldata)
@@ -317,7 +317,7 @@ library(modeldata)
 ```
 ### I. The Data
 
-```{r 3. I. The Data}
+```{r 3. I. The Data, eval=FALSE, include=FALSE}
 data(cells, package = "modeldata")
 cells
 
@@ -326,7 +326,7 @@ cells %>%
   mutate(prop = n/sum(n))
 ```
 ### II. Data splitting
-```{r II. Data splitting}
+```{r II. Data splitting, eval=FALSE, include=FALSE}
 set.seed(123)
 cell_split <- initial_split(cells %>% select(-case), 
                             strata = class)
@@ -360,7 +360,7 @@ cell_test %>%
 ```
 ### III. Modeling
 
-```{r III. Modeling}
+```{r III. Modeling, eval=FALSE, include=FALSE}
 
 #install.packages("ranger")
 library(ranger)
@@ -466,7 +466,7 @@ rf_testing_pred %>%                   # test set predictions
 
 # Chapter 8 - Business Case
 
-```{r }
+```{r eval=FALSE, include=FALSE}
 # Standard
 library(tidyverse)
 
@@ -488,7 +488,7 @@ library(rpart.plot)
 
 ```
 ### 
-```{r }
+```{r eval=FALSE, include=FALSE}
 # Modeling ----------------------------------------------------------------
 bike_orderlines_tbl <- readRDS("00_data/01_bike_sales/01_raw_data/bike_orderlines.rds")
 glimpse(bike_orderlines_tbl)
@@ -521,7 +521,7 @@ model_sales_tbl %>%
     )
 ```
 ### 
-```{r }
+```{r eval=FALSE, include=FALSE}
 bike_features_tbl <- readRDS("00_data/01_bike_sales/01_raw_data/bike_features_tbl.rds")
 glimpse(bike_features_tbl)
 
@@ -568,7 +568,7 @@ bike_features_tbl <- bike_features_tbl %>%
 
 ```
 ### 
-```{r }
+```{r eval=FALSE, include=FALSE}
 
 ```
 

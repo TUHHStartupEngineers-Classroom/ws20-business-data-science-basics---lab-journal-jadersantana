@@ -1372,6 +1372,105 @@ employee_attrition_tbl %>%
 
 ```
 
+# Challenge 10_Automated Machine Learning with H20 (II)
+
+## 1. Load the training & test dataset
+
+```{r }
+# H2O modeling
+library(tidyverse)
+library(readxl)
+library(rsample)
+library(recipes)
+library(PerformanceAnalytics)
+
+library(h2o)
+
+product_backorders_tbl          <- read_csv("https://github.com/TUHHStartupEngineers/dat_sci_ss20/raw/master/10/product_backorders.csv")
+
+set.seed(seed = 1113)
+split_obj                       <- rsample::initial_split(product_backorders_tbl, prop = 0.85)
+train_readable_tbl              <- training(split_obj)
+test_readable_tbl               <- testing(split_obj)
+
+recipe_obj <- recipe(went_on_backorder ~., data = train_readable_tbl) %>% 
+    step_zv(all_predictors()) %>% 
+    prep()
+
+train_tbl <- bake(recipe_obj, new_data = train_readable_tbl)
+test_tbl  <- bake(recipe_obj, new_data = test_readable_tbl)
+```
+
+## 2. Specifiy the response and predictor variables
+
+```{r }
+# Modeling
+h2o.init()
+
+# Split data into a training and a validation data frame
+# Setting the seed is just for reproducability
+split_h2o <- h2o.splitFrame(as.h2o(train_tbl), ratios = c(0.85), seed = 1234)
+train_h2o <- split_h2o[[1]]
+valid_h2o <- split_h2o[[2]]
+test_h2o  <- as.h2o(test_tbl)
+
+# Set the target and predictors
+y <- "went_on_backorder"
+x <- setdiff(names(train_h2o), y)
+```
+
+## 3. run AutoML specifying the stopping criterion
+
+```{r }
+?h2o.automl
+
+automl_models_h2o <- h2o.automl(
+  x = x,
+  y = y,
+  training_frame    = train_h2o,
+  validation_frame  = valid_h2o,
+  leaderboard_frame = test_h2o,
+  max_runtime_secs  = 30,
+  nfolds            = 5 
+)
+```
+
+## 4. View the leaderboard
+
+```{r }
+typeof(automl_models_h2o)
+
+slotNames(automl_models_h2o)
+
+automl_models_h2o@leaderboard
+
+automl_models_h2o@leader
+```
+
+## 5. Predicting using Leader Model
+
+```{r }
+# Choose whatever model you want
+
+stacked_ensemble_h2o <- h2o.getModel("StackedEnsemble_AllModels_AutoML_20210303_185831")
+stacked_ensemble_h2o
+
+predictions <- h2o.predict(stacked_ensemble_h2o, newdata = as.h2o(test_tbl))
+
+typeof(predictions)
+## [1] "environment"
+
+predictions_tbl <- predictions %>% as_tibble()
+
+```
+
+## 6. Save the leader model
+
+```{r}
+#h2o.getModel("StackedEnsemble_AllModels_AutoML_20210303_185831") %>% 
+ # h2o.saveModel(path = "04_Modeling/h20_models/")
+```
+# Challenge 11
 
 ```{r }
 
@@ -1386,5 +1485,46 @@ employee_attrition_tbl %>%
 ```{r }
 
 ```
+
+
+```{r }
+
+```
+
+
+```{r }
+
+```
+
+
+```{r }
+
+```
+
+
+```{r }
+
+```
+
+
+```{r }
+
+```
+
+
+```{r }
+
+```
+
+
+```{r }
+
+```
+
+
+```{r }
+
+```
+
 
 
