@@ -2138,24 +2138,29 @@ plot_h2o_performance <- function(h2o_leaderboard, newdata, order_by = c("auc", "
     h2o.show_progress()
     
     return(ret)
-    
+
 }
 ```
 
-```{r eval=FALSE, include=FALSE}
+```{r}
 
 h2o.init()
+
+newdata
+
+test_tbl
 
 automl_models_h2o@leaderboard %>%
     plot_h2o_performance(newdata = test_tbl, order_by = "logloss", 
                          size = 0.5, max_models = 4)
+
 ```
 
 
 
 # Challenge 12_Explaining Black-Box Models With LIME
 
-##Part 1: Recreate plot_features(). 
+## Part 1: Recreate plot_features(). 
 
 Take the explanation data and use the first case to create a plot similar to the output of plot_features().
 
@@ -2164,19 +2169,11 @@ Take the explanation data and use the first case to create a plot similar to the
 
 ```
 
-##Part 2: Recreate plot_explanations():
-
 ```{r }
 
 ```
 
-```{r }
-
-```
-
-```{r }
-
-```
+## Part 2: Recreate plot_explanations():
 
 ```{r }
 

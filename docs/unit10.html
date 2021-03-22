@@ -13,6 +13,7 @@
 
 <title>Unit 10</title>
 
+<script src="site_libs/header-attrs-2.5/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
@@ -332,6 +333,35 @@ $(document).ready(function () {
 
 <p>#Business Case</p>
 <p>##Data Processing</p>
+<pre class="r"><code># Load data
+library(tidyverse)
+library(readxl)
+
+employee_attrition_tbl &lt;- read_csv(&quot;00_data/09/datasets-1067-1925-WA_Fn-UseC_-HR-Employee-Attrition.csv&quot;)</code></pre>
+<pre><code>## 
+## -- Column specification --------------------------------------------------------
+## cols(
+##   .default = col_double(),
+##   Attrition = col_character(),
+##   BusinessTravel = col_character(),
+##   Department = col_character(),
+##   EducationField = col_character(),
+##   Gender = col_character(),
+##   JobRole = col_character(),
+##   MaritalStatus = col_character(),
+##   Over18 = col_character(),
+##   OverTime = col_character()
+## )
+## i Use `spec()` for the full column specifications.</code></pre>
+<pre class="r"><code>definitions_raw_tbl    &lt;- read_excel(&quot;00_data/09/data_definitions.xlsx&quot;, sheet = 1, col_names = FALSE)</code></pre>
+<pre><code>## New names:
+## * `` -&gt; ...1
+## * `` -&gt; ...2</code></pre>
+<pre class="r"><code>View(definitions_raw_tbl)</code></pre>
+<pre class="r"><code>employee_attrition_tbl %&gt;% 
+        ggplot(aes(Education)) +
+        geom_bar()</code></pre>
+<p><img src="unit10_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <p>##2. Make data readable (for machine readibiltiy)</p>
 <p>##Correlation Analysis</p>
 <p>##Automated machine learning with h2o</p>

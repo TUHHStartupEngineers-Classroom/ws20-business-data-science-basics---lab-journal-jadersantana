@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ##Data Processing
 
-```{r eval=FALSE, include=FALSE}
+```{r}
 # Load data
 library(tidyverse)
 library(readxl)
@@ -21,7 +21,7 @@ definitions_raw_tbl    <- read_excel("00_data/09/data_definitions.xlsx", sheet =
 View(definitions_raw_tbl)
 ```
 
-```{r eval=FALSE, include=FALSE}
+```{r}
 employee_attrition_tbl %>% 
         ggplot(aes(Education)) +
         geom_bar()
@@ -223,7 +223,7 @@ library(recipes)
 
 # Processing pipeline
 # If we had stored our script in an external file
-#source("00_scripts/data_processing_pipeline.R")
+source("00_scripts/data_processing_pipeline.R")
 
 # If we had our raw data already split into train and test data
 #train_readable_tbl <- process_hr_data_readable(train_raw_tbl, definitions_raw_tbl)
@@ -611,6 +611,10 @@ library(h2o)
 
 employee_attrition_tbl          <- read_csv("00_data/09/datasets-1067-1925-WA_Fn-UseC_-HR-Employee-Attrition.csv")
 definitions_raw_tbl    <- read_excel("00_data/09/data_definitions.xlsx", sheet = 1, col_names = FALSE)
+
+source("00_scripts/data_processing_pipeline.R")
+
+
 employee_attrition_readable_tbl <- process_hr_data_readable(employee_attrition_tbl, definitions_raw_tbl)
 set.seed(seed = 1113)
 split_obj                       <- rsample::initial_split(employee_attrition_readable_tbl, prop = 0.85)
@@ -716,7 +720,11 @@ h2o.loadModel("04_Modeling/h20_models/DeepLearning_grid__1_AutoML_20200820_19082
 
 ```{r eval=FALSE, include=FALSE}
 # Choose whatever model you want
-stacked_ensemble_h2o <- h2o.loadModel("04_Modeling/h20_models/StackedEnsemble_BestOfFamily_AutoML_20200820_190823")
+
+h2o.getModel("StackedEnsemble_BestOfFamily_AutoML_20210321_195224") %>% 
+  h2o.saveModel(path = "04_Modeling/h2o_models/attrition")
+
+stacked_ensemble_h2o <- h2o.loadModel("04_Modeling/h20_models/attrition/StackedEnsemble_BestOfFamily_AutoML_20210321_133123")
 stacked_ensemble_h2o
 
 predictions <- h2o.predict(stacked_ensemble_h2o, newdata = as.h2o(test_tbl))

@@ -15,6 +15,7 @@
 
 <title>Journal (reproducible report)</title>
 
+<script src="site_libs/header-attrs-2.5/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
@@ -410,15 +411,15 @@ div.tocify {
 </div>
 
 
-<div id="challenge-01_intro_r-introduction-to-r-rstudio-ide-github" class="section level1">
-<h1><span class="header-section-number">1</span> Challenge 01_intro_r Introduction to R, RStudio IDE &amp; Github</h1>
+<div id="challenge-01_intro_r-introduction-to-r-rstudio-ide-github" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Challenge 01_intro_r Introduction to R, RStudio IDE &amp; Github</h1>
 <p>no specific challenge for this unit</p>
 </div>
-<div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1">
-<h1><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-03-21 17:03:57</p>
-<div id="load-libraries--" class="section level2">
-<h2><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
+<div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
+<p>Last compiled: 2021-03-22 18:59:23</p>
+<div id="load-libraries--" class="section level2" number="2.1">
+<h2 number="2.1"><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
 #  library(tibble)    --&gt; is a modern re-imagining of the data frame
 #  library(readr)     --&gt; provides a fast and friendly way to read rectangular data like csv
@@ -432,8 +433,8 @@ div.tocify {
 # Excel Files
 library(readxl)</code></pre>
 </div>
-<div id="importing-files--" class="section level2">
-<h2><span class="header-section-number">2.2</span> 2.0 Importing Files —-</h2>
+<div id="importing-files--" class="section level2" number="2.2">
+<h2 number="2.2"><span class="header-section-number">2.2</span> 2.0 Importing Files —-</h2>
 <pre class="r"><code># A good convention is to use the file name and suffix it with tbl for the data structure tibble
 bikes_tbl      &lt;- read_excel(path = &quot;00_data/01_bike_sales/01_raw_data/bikes.xlsx&quot;)
 orderlines_tbl &lt;- read_excel(&quot;00_data/01_bike_sales/01_raw_data/orderlines.xlsx&quot;)
@@ -441,8 +442,8 @@ orderlines_tbl &lt;- read_excel(&quot;00_data/01_bike_sales/01_raw_data/orderlin
 # Not necessary for this analysis, but for the sake of completeness
 bikeshops_tbl  &lt;- read_excel(&quot;00_data/01_bike_sales/01_raw_data/bikeshops.xlsx&quot;)</code></pre>
 </div>
-<div id="examining-data--" class="section level2">
-<h2><span class="header-section-number">2.3</span> 3.0 Examining Data —-</h2>
+<div id="examining-data--" class="section level2" number="2.3">
+<h2 number="2.3"><span class="header-section-number">2.3</span> 3.0 Examining Data —-</h2>
 <pre class="r"><code>bikeshops_tbl</code></pre>
 <pre><code>## # A tibble: 30 x 5
 ##    bikeshop.id name                  location                          lat   lng
@@ -467,8 +468,8 @@ bikeshops_tbl  &lt;- read_excel(&quot;00_data/01_bike_sales/01_raw_data/bikeshop
 ## $ lat         &lt;dbl&gt; 52.51667, 53.57532, 48.15000, 50.93333, 50.11552, 48.78...
 ## $ lng         &lt;dbl&gt; 13.400000, 10.015340, 11.583333, 6.950000, 8.684167, 9....</code></pre>
 </div>
-<div id="joining-data--" class="section level2">
-<h2><span class="header-section-number">2.4</span> 4.0 Joining Data —-</h2>
+<div id="joining-data--" class="section level2" number="2.4">
+<h2 number="2.4"><span class="header-section-number">2.4</span> 4.0 Joining Data —-</h2>
 <pre class="r"><code>left_join(orderlines_tbl, bikes_tbl, by = c(&quot;product.id&quot; = &quot;bike.id&quot;))</code></pre>
 <pre><code>## # A tibble: 15,644 x 15
 ##    ...1  order.id order.line order.date          customer.id product.id quantity
@@ -512,8 +513,8 @@ bike_orderlines_joined_tbl %&gt;% glimpse()</code></pre>
 ## $ lat            &lt;dbl&gt; 53.57532, 53.57532, 53.07379, 53.07379, 48.78234, 48...
 ## $ lng            &lt;dbl&gt; 10.015340, 10.015340, 8.826754, 8.826754, 9.180819, ...</code></pre>
 </div>
-<div id="wrangling-data--" class="section level2">
-<h2><span class="header-section-number">2.5</span> 5.0 Wrangling Data —-</h2>
+<div id="wrangling-data--" class="section level2" number="2.5">
+<h2 number="2.5"><span class="header-section-number">2.5</span> 5.0 Wrangling Data —-</h2>
 <pre class="r"><code># All actions are chained with the pipe already. You can perform each step separately and use glimpse() or View() to validate your code. Store the result in a variable at the end of the steps.
 bike_orderlines_wrangled_tbl &lt;- bike_orderlines_joined_tbl %&gt;%
   # 5.1 Separate category name
@@ -548,10 +549,10 @@ bike_orderlines_wrangled_tbl &lt;- bike_orderlines_joined_tbl %&gt;%
   rename(bikeshop = name) %&gt;%
   set_names(names(.) %&gt;% str_replace_all(&quot;\\.&quot;, &quot;_&quot;))</code></pre>
 </div>
-<div id="business-insights--" class="section level2">
-<h2><span class="header-section-number">2.6</span> 6.0 Business Insights —-</h2>
-<div id="sales-by-location--" class="section level3">
-<h3><span class="header-section-number">2.6.1</span> 6.1 Sales by Location —-</h3>
+<div id="business-insights--" class="section level2" number="2.6">
+<h2 number="2.6"><span class="header-section-number">2.6</span> 6.0 Business Insights —-</h2>
+<div id="sales-by-location--" class="section level3" number="2.6.1">
+<h3 number="2.6.1"><span class="header-section-number">2.6.1</span> 6.1 Sales by Location —-</h3>
 <pre class="r"><code>library(lubridate)
 # Step 1 - Manipulate
 sales_by_location_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;%
@@ -616,8 +617,8 @@ sales_by_location_tbl %&gt;%
   )</code></pre>
 <p><img src="journal_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
-<div id="sales-by-year-and-location--" class="section level3">
-<h3><span class="header-section-number">2.6.2</span> 6.2 Sales by Year and Location —-</h3>
+<div id="sales-by-year-and-location--" class="section level3" number="2.6.2">
+<h3 number="2.6.2"><span class="header-section-number">2.6.2</span> 6.2 Sales by Year and Location —-</h3>
 <pre class="r"><code># Step 1 - Manipulate
 sales_by_loc_year_tbl &lt;- bike_orderlines_wrangled_tbl %&gt;%
   
@@ -677,19 +678,19 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 </div>
 </div>
-<div id="challenge-03_data-aquisition" class="section level1">
-<h1><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-03-21 17:03:57</p>
-<div id="load-libraries---1" class="section level2">
-<h2><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
+<div id="challenge-03_data-aquisition" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
+<p>Last compiled: 2021-03-22 18:59:24</p>
+<div id="load-libraries---1" class="section level2" number="3.1">
+<h2 number="3.1"><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
 </div>
 </div>
-<div id="challenge-04_data-wrangling" class="section level1">
-<h1><span class="header-section-number">4</span> Challenge 04_Data Wrangling</h1>
+<div id="challenge-04_data-wrangling" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Challenge 04_Data Wrangling</h1>
 <p>Answer the following questions with that data:</p>
-<div id="patent-dominance--" class="section level2">
-<h2><span class="header-section-number">4.1</span> 1.0 Patent Dominance —-</h2>
+<div id="patent-dominance--" class="section level2" number="4.1">
+<h2 number="4.1"><span class="header-section-number">4.1</span> 1.0 Patent Dominance —-</h2>
 <ol style="list-style-type: decimal">
 <li>Patent Dominance: What US company / corporation has the most patents? List the 10 US companies with the most assigned/granted patents.</li>
 </ol>
@@ -859,8 +860,8 @@ toc()</code></pre>
 ##  9 Fujitsu Limited                                         37461
 ## 10 Hewlett-Packard Development Company, L.P.               36002</code></pre>
 </div>
-<div id="recent-patent-acitivity--" class="section level2">
-<h2><span class="header-section-number">4.2</span> 2.0 Recent Patent Acitivity —-</h2>
+<div id="recent-patent-acitivity--" class="section level2" number="4.2">
+<h2 number="4.2"><span class="header-section-number">4.2</span> 2.0 Recent Patent Acitivity —-</h2>
 <ol start="2" style="list-style-type: decimal">
 <li>Recent patent activity: What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019.</li>
 </ol>
@@ -987,19 +988,19 @@ col_types_patent_assignee_tbl &lt;- list(
     #slice(1:11) %&gt;%
     #filter(organization!=&quot;&quot;)</code></pre>
 </div>
-<div id="innovation-in-tech--" class="section level2">
-<h2><span class="header-section-number">4.3</span> 3.0 Innovation in Tech —-</h2>
+<div id="innovation-in-tech--" class="section level2" number="4.3">
+<h2 number="4.3"><span class="header-section-number">4.3</span> 3.0 Innovation in Tech —-</h2>
 <ol start="3" style="list-style-type: decimal">
 <li>Innovation in Tech: What is the most innovative tech sector? For the top 10 companies (worldwide) with the most patents, what are the top 5 USPTO tech main classes?</li>
 </ol>
 <pre class="r"><code>library(tidyverse)</code></pre>
 </div>
 </div>
-<div id="challenge-05_data-visualisation" class="section level1">
-<h1><span class="header-section-number">5</span> Challenge 05_Data Visualisation</h1>
+<div id="challenge-05_data-visualisation" class="section level1" number="5">
+<h1 number="5"><span class="header-section-number">5</span> Challenge 05_Data Visualisation</h1>
 <p>Answer the following questions with that data:</p>
-<div id="challenge-05.1--" class="section level2">
-<h2><span class="header-section-number">5.1</span> Challenge 05.1 —-</h2>
+<div id="challenge-05.1--" class="section level2" number="5.1">
+<h2 number="5.1"><span class="header-section-number">5.1</span> Challenge 05.1 —-</h2>
 <p>Goal: Map the time course of the cumulative Covid-19 cases! Your plot should look like this: Adding the cases for Europe is optional. You can choose your own color theme, but don’t use the default one. Don’t forget to scale the axis properly. The labels can be added with geom_label() or with geom_label_repel() (from the package ggrepel).</p>
 <pre class="r"><code>library(vroom)
 library(tidyverse)
@@ -1088,8 +1089,8 @@ labs(
       )</code></pre>
 <p><img src="journal_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 </div>
-<div id="challenge-05.2--" class="section level2">
-<h2><span class="header-section-number">5.2</span> Challenge 05.2 —-</h2>
+<div id="challenge-05.2--" class="section level2" number="5.2">
+<h2 number="5.2"><span class="header-section-number">5.2</span> Challenge 05.2 —-</h2>
 <p>Goal: Visualize the distribution of the mortality rate (deaths / population) with geom_map(). The necessary longitudinal and lateral data can be accessed with this function:</p>
 <p>world &lt;- map_data(“world”)</p>
 <p>This data has also to be put in the map argument of geom_map():</p>
@@ -1165,16 +1166,16 @@ covid_data_cumulative_death_by_country_tbl &lt;- covid_data_tbl %&gt;%
 #</code></pre>
 </div>
 </div>
-<div id="challenge-06_machine-learning-fundamentals" class="section level1">
-<h1><span class="header-section-number">6</span> Challenge 06_Machine Learning Fundamentals</h1>
-<div id="summary" class="section level2">
-<h2><span class="header-section-number">6.1</span> Summary</h2>
+<div id="challenge-06_machine-learning-fundamentals" class="section level1" number="6">
+<h1 number="6"><span class="header-section-number">6</span> Challenge 06_Machine Learning Fundamentals</h1>
+<div id="summary" class="section level2" number="6.1">
+<h2 number="6.1"><span class="header-section-number">6.1</span> Summary</h2>
 <p><strong>Your organization wants to know which companies are similar to each other to help in identifying potential customers of a SAAS software solution (e.g. Salesforce CRM or equivalent) in various segments of the market. The Sales Department is very interested in this analysis, which will help them more easily penetrate various market segments.</strong></p>
 <p>You will be using stock prices in this analysis. You come up with a method to classify companies based on how their stocks trade using their daily stock returns (percentage movement from one day to the next). This analysis will help your organization determine which companies are related to each other (competitors and have similar attributes).</p>
 <p>You can analyze the stock prices using what you’ve learned in the unsupervised learning tools including K-Means and UMAP. You will use a combination of <code>kmeans()</code> to find groups and <code>umap()</code> to visualize similarity of daily stock returns.</p>
 </div>
-<div id="objectives" class="section level2">
-<h2><span class="header-section-number">6.2</span> Objectives</h2>
+<div id="objectives" class="section level2" number="6.2">
+<h2 number="6.2"><span class="header-section-number">6.2</span> Objectives</h2>
 <p>Apply your knowledge on K-Means and UMAP along with <code>dplyr</code>, <code>ggplot2</code>, and <code>purrr</code> to create a visualization that identifies subgroups in the S&amp;P 500 Index. You will specifically apply:</p>
 <ul>
 <li>Modeling: <code>kmeans()</code> and <code>umap()</code></li>
@@ -1183,8 +1184,8 @@ covid_data_cumulative_death_by_country_tbl &lt;- covid_data_tbl %&gt;%
 <li>Visualization: <code>ggplot2</code> (bonus <code>plotly</code>)</li>
 </ul>
 </div>
-<div id="libraries" class="section level2">
-<h2><span class="header-section-number">6.3</span> Libraries</h2>
+<div id="libraries" class="section level2" number="6.3">
+<h2 number="6.3"><span class="header-section-number">6.3</span> Libraries</h2>
 <p>Load the following libraries.</p>
 <pre class="r"><code>#install.packages(&quot;plotly&quot;)
 #install.packages(&quot;tidyquant&quot;)
@@ -1195,8 +1196,8 @@ library(tidyquant)
 library(broom)
 library(umap)</code></pre>
 </div>
-<div id="data" class="section level2">
-<h2><span class="header-section-number">6.4</span> Data</h2>
+<div id="data" class="section level2" number="6.4">
+<h2 number="6.4"><span class="header-section-number">6.4</span> Data</h2>
 <p>We will be using stock prices in this analysis. Although some of you know already how to use an API to retrieve stock prices I obtained the stock prices for every stock in the S&amp;P 500 index for you already. The files are saved in the <code>session_6_data</code> directory.</p>
 <p>We can read in the stock prices. The data is 1.2M observations. The most important columns for our analysis are:</p>
 <ul>
@@ -2244,14 +2245,14 @@ sp_500_index_tbl</code></pre>
 ## 505 Communication Services     1244468
 ## 506                 Energy      292529</code></pre>
 </div>
-<div id="question" class="section level2">
-<h2><span class="header-section-number">6.5</span> Question</h2>
+<div id="question" class="section level2" number="6.5">
+<h2 number="6.5"><span class="header-section-number">6.5</span> Question</h2>
 <p><mark>Which stock prices behave similarly?</mark></p>
 <p>Answering this question helps us <strong>understand which companies are related</strong>, and we can use clustering to help us answer it!</p>
 <p>Even if you’re not interested in finance, this is still a great analysis because it will tell you which companies are competitors and which are likely in the same space (often called sectors) and can be categorized together. Bottom line - This analysis can help you better understand the dynamics of the market and competition, which is useful for all types of analyses from finance to sales to marketing.</p>
 <p>Let’s get started.</p>
-<div id="step-1---convert-stock-prices-to-a-standardized-format-daily-returns" class="section level3">
-<h3><span class="header-section-number">6.5.1</span> Step 1 - Convert stock prices to a standardized format (daily returns)</h3>
+<div id="step-1---convert-stock-prices-to-a-standardized-format-daily-returns" class="section level3" number="6.5.1">
+<h3 number="6.5.1"><span class="header-section-number">6.5.1</span> Step 1 - Convert stock prices to a standardized format (daily returns)</h3>
 <p>What you first need to do is get the data in a format that can be converted to a “user-item” style matrix. The challenge here is to connect the dots between what we have and what we need to do to format it properly.</p>
 <p>We know that in order to compare the data, it needs to be standardized or normalized. Why? Because we cannot compare values (stock prices) that are of completely different magnitudes. In order to standardize, we will convert from adjusted stock price (dollar value) to daily returns (percent change from previous day). Here is the formula.</p>
 <p><span class="math display">\[ 
@@ -2311,8 +2312,8 @@ sp_500_daily_returns_tbl</code></pre>
 ## # ... with 141,330 more rows</code></pre>
 <pre class="r"><code># Output: sp_500_daily_returns_tbl</code></pre>
 </div>
-<div id="step-2---convert-to-user-item-format" class="section level3">
-<h3><span class="header-section-number">6.5.2</span> Step 2 - Convert to User-Item Format</h3>
+<div id="step-2---convert-to-user-item-format" class="section level3" number="6.5.2">
+<h3 number="6.5.2"><span class="header-section-number">6.5.2</span> Step 2 - Convert to User-Item Format</h3>
 <p>The next step is to convert to a user-item format with the <code>symbol</code> in the first column and every other column the value of the <em>daily returns</em> (<code>pct_return</code>) for every stock at each <code>date</code>.</p>
 <p>We’re going to import the correct results first (just in case you were not able to complete the last step).</p>
 <pre class="r"><code>sp_500_daily_returns_tbl &lt;- read_rds(&quot;00_data/06/sp_500_daily_returns_tbl.rds&quot;)
@@ -2394,8 +2395,8 @@ stock_date_matrix_tbl</code></pre>
 ## #   `2018-05-31` &lt;dbl&gt;, `2018-06-01` &lt;dbl&gt;, `2018-06-04` &lt;dbl&gt;, ...</code></pre>
 <pre class="r"><code># Output: stock_date_matrix_tbl</code></pre>
 </div>
-<div id="step-3---perform-k-means-clustering" class="section level3">
-<h3><span class="header-section-number">6.5.3</span> Step 3 - Perform K-Means Clustering</h3>
+<div id="step-3---perform-k-means-clustering" class="section level3" number="6.5.3">
+<h3 number="6.5.3"><span class="header-section-number">6.5.3</span> Step 3 - Perform K-Means Clustering</h3>
 <p>Next, we’ll perform <strong>K-Means clustering</strong>.</p>
 <p>We’re going to import the correct results first (just in case you were not able to complete the last step).</p>
 <pre class="r"><code>#if I load this data bas I get an error: for 
@@ -2419,8 +2420,8 @@ broom::glance(kmeans_obj)</code></pre>
 ##   &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt; &lt;int&gt;
 ## 1  33.6         29.2      4.40     4</code></pre>
 </div>
-<div id="step-4---find-the-optimal-value-of-k" class="section level3">
-<h3><span class="header-section-number">6.5.4</span> Step 4 - Find the optimal value of K</h3>
+<div id="step-4---find-the-optimal-value-of-k" class="section level3" number="6.5.4">
+<h3 number="6.5.4"><span class="header-section-number">6.5.4</span> Step 4 - Find the optimal value of K</h3>
 <p>Now that we are familiar with the process for calculating <code>kmeans()</code>, let’s use <code>purrr</code> to iterate over many values of “k” using the <code>centers</code> argument.</p>
 <p>We’ll use this <strong>custom function</strong> called <code>kmeans_mapper()</code>:</p>
 <pre class="r"><code>kmeans_mapper &lt;- function(center = 3) {
@@ -2519,8 +2520,8 @@ broom::glance(kmeans_obj)</code></pre>
     #caption = &quot;&quot;)  </code></pre>
 <p>We can see that the Scree Plot becomes linear (constant rate of change) between 5 and 10 centers for K.</p>
 </div>
-<div id="step-5---apply-umap" class="section level3">
-<h3><span class="header-section-number">6.5.5</span> Step 5 - Apply UMAP</h3>
+<div id="step-5---apply-umap" class="section level3" number="6.5.5">
+<h3 number="6.5.5"><span class="header-section-number">6.5.5</span> Step 5 - Apply UMAP</h3>
 <p>Next, let’s plot the <code>UMAP</code> 2D visualization to help us investigate cluster assignments.</p>
 <p>We’re going to import the correct results first (just in case you were not able to complete the last step).</p>
 <pre class="r"><code>k_means_mapped_tbl &lt;- read_rds(&quot;00_data/06/k_means_mapped_tbl.rds&quot;)</code></pre>
@@ -2583,8 +2584,8 @@ umap_results_tbl %&gt;%
 <p><img src="journal_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
 <p>We can now see that we have some clusters. However, we still need to combine the K-Means clusters and the UMAP 2D representation.</p>
 </div>
-<div id="step-6---combine-k-means-and-umap" class="section level3">
-<h3><span class="header-section-number">6.5.6</span> Step 6 - Combine K-Means and UMAP</h3>
+<div id="step-6---combine-k-means-and-umap" class="section level3" number="6.5.6">
+<h3 number="6.5.6"><span class="header-section-number">6.5.6</span> Step 6 - Combine K-Means and UMAP</h3>
 <p>Next, we combine the K-Means clusters and the UMAP 2D representation</p>
 <p>We’re going to import the correct results first (just in case you were not able to complete the last step).</p>
 <pre class="r"><code>k_means_mapped_tbl &lt;- read_rds(&quot;00_data/06/k_means_mapped_tbl.rds&quot;)
@@ -2649,12 +2650,12 @@ umap_kmeans_results_tbl %&gt;%
 </div>
 </div>
 </div>
-<div id="challenge-07_supervised-ml-regressioni" class="section level1">
-<h1><span class="header-section-number">7</span> Challenge 07_Supervised ML Regression(I)</h1>
+<div id="challenge-07_supervised-ml-regressioni" class="section level1" number="7">
+<h1 number="7"><span class="header-section-number">7</span> Challenge 07_Supervised ML Regression(I)</h1>
 <p>no challenge for this chapter</p>
 </div>
-<div id="challenge-08_supervised-ml-regressionii" class="section level1">
-<h1><span class="header-section-number">8</span> Challenge 08_Supervised ML Regression(II)</h1>
+<div id="challenge-08_supervised-ml-regressionii" class="section level1" number="8">
+<h1 number="8"><span class="header-section-number">8</span> Challenge 08_Supervised ML Regression(II)</h1>
 <p>In this session we did not use the recipes packages to prepare our data. This is going to be your challenge. For further information take a look at the last session or just use google. Prepare the data for the models with the steps provided below. Remember, you don’t need to set the flags by yourself (see all_nominal()).</p>
 <p>##I. Build a model</p>
 <p>##II. Create features with the recipes package</p>
@@ -2665,8 +2666,8 @@ umap_kmeans_results_tbl %&gt;%
 <p>##IV. Evaluate your model with the yardstick package</p>
 <p>Just use the function, that we have created in this session.</p>
 </div>
-<div id="challenge-09_automated-machine-learning-with-h20-i" class="section level1">
-<h1><span class="header-section-number">9</span> Challenge 09_Automated Machine Learning with H20 (I)</h1>
+<div id="challenge-09_automated-machine-learning-with-h20-i" class="section level1" number="9">
+<h1 number="9"><span class="header-section-number">9</span> Challenge 09_Automated Machine Learning with H20 (I)</h1>
 <p>Use your learning from descriptive features and plot_ggpairs() to further investigate the features. Run the functions above according to the features needed. Answer the following questions. Most of the time, you will only need the images from diagonal.</p>
 <pre class="r"><code>employee_attrition_tbl &lt;- read_csv(&quot;00_data/09/datasets-1067-1925-WA_Fn-UseC_-HR-Employee-Attrition.csv&quot;)
 
@@ -2857,10 +2858,10 @@ employee_attrition_tbl %&gt;%
     plot_ggpairs(Attrition)</code></pre>
 <p><img src="journal_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
 </div>
-<div id="challenge-10_automated-machine-learning-with-h20-ii" class="section level1">
-<h1><span class="header-section-number">10</span> Challenge 10_Automated Machine Learning with H20 (II)</h1>
-<div id="load-the-training-test-dataset" class="section level2">
-<h2><span class="header-section-number">10.1</span> 1. Load the training &amp; test dataset</h2>
+<div id="challenge-10_automated-machine-learning-with-h20-ii" class="section level1" number="10">
+<h1 number="10"><span class="header-section-number">10</span> Challenge 10_Automated Machine Learning with H20 (II)</h1>
+<div id="load-the-training-test-dataset" class="section level2" number="10.1">
+<h2 number="10.1"><span class="header-section-number">10.1</span> 1. Load the training &amp; test dataset</h2>
 <pre class="r"><code># H2O modeling
 library(tidyverse)
 library(readxl)
@@ -2883,8 +2884,8 @@ recipe_obj &lt;- recipe(went_on_backorder ~., data = train_readable_tbl) %&gt;%
 train_tbl &lt;- bake(recipe_obj, new_data = train_readable_tbl)
 test_tbl  &lt;- bake(recipe_obj, new_data = test_readable_tbl)</code></pre>
 </div>
-<div id="specifiy-the-response-and-predictor-variables" class="section level2">
-<h2><span class="header-section-number">10.2</span> 2. Specifiy the response and predictor variables</h2>
+<div id="specifiy-the-response-and-predictor-variables" class="section level2" number="10.2">
+<h2 number="10.2"><span class="header-section-number">10.2</span> 2. Specifiy the response and predictor variables</h2>
 <pre class="r"><code># Modeling
 h2o.init()</code></pre>
 <pre><code>##  Connection successful!
@@ -2927,8 +2928,8 @@ test_h2o  &lt;- as.h2o(test_tbl)</code></pre>
 y &lt;- &quot;went_on_backorder&quot;
 x &lt;- setdiff(names(train_h2o), y)</code></pre>
 </div>
-<div id="run-automl-specifying-the-stopping-criterion" class="section level2">
-<h2><span class="header-section-number">10.3</span> 3. run AutoML specifying the stopping criterion</h2>
+<div id="run-automl-specifying-the-stopping-criterion" class="section level2" number="10.3">
+<h2 number="10.3"><span class="header-section-number">10.3</span> 3. run AutoML specifying the stopping criterion</h2>
 <pre class="r"><code>?h2o.automl
 
 automl_models_h2o &lt;- h2o.automl(
@@ -2956,8 +2957,8 @@ automl_models_h2o &lt;- h2o.automl(
   |                                                                            
   |======================================================================| 100%</code></pre>
 </div>
-<div id="view-the-leaderboard" class="section level2">
-<h2><span class="header-section-number">10.4</span> 4. View the leaderboard</h2>
+<div id="view-the-leaderboard" class="section level2" number="10.4">
+<h2 number="10.4"><span class="header-section-number">10.4</span> 4. View the leaderboard</h2>
 <pre class="r"><code>typeof(automl_models_h2o)</code></pre>
 <pre><code>## [1] &quot;S4&quot;</code></pre>
 <pre class="r"><code>slotNames(automl_models_h2o)</code></pre>
@@ -3122,8 +3123,8 @@ automl_models_h2o &lt;- h2o.automl(
 ## 
 ## Gains/Lift Table: Extract with `h2o.gainsLift(&lt;model&gt;, &lt;data&gt;)` or `h2o.gainsLift(&lt;model&gt;, valid=&lt;T/F&gt;, xval=&lt;T/F&gt;)`</code></pre>
 </div>
-<div id="predicting-using-leader-model" class="section level2">
-<h2><span class="header-section-number">10.5</span> 5. Predicting using Leader Model</h2>
+<div id="predicting-using-leader-model" class="section level2" number="10.5">
+<h2 number="10.5"><span class="header-section-number">10.5</span> 5. Predicting using Leader Model</h2>
 <pre class="r"><code># Choose whatever model you want
 h2o.init()</code></pre>
 <pre><code>##  Connection successful!
@@ -3305,17 +3306,17 @@ stacked_ensemble_h2o</code></pre>
 
 predictions_tbl &lt;- predictions %&gt;% as_tibble()</code></pre>
 </div>
-<div id="save-the-leader-model" class="section level2">
-<h2><span class="header-section-number">10.6</span> 6. Save the leader model</h2>
+<div id="save-the-leader-model" class="section level2" number="10.6">
+<h2 number="10.6"><span class="header-section-number">10.6</span> 6. Save the leader model</h2>
 <pre class="r"><code>#h2o.getModel(&quot;StackedEnsemble_AllModels_AutoML_20210321_133123&quot;) %&gt;%
 #h2o.saveModel(path = &quot;04_Modeling/h2o_models/&quot;)</code></pre>
 </div>
 </div>
-<div id="challenge-11_performance-measures" class="section level1">
-<h1><span class="header-section-number">11</span> Challenge 11_Performance Measures</h1>
+<div id="challenge-11_performance-measures" class="section level1" number="11">
+<h1 number="11"><span class="header-section-number">11</span> Challenge 11_Performance Measures</h1>
 <p>Apply all the steps you have learned in this session on the dataset from challenge of the last session (Product Backorders):</p>
-<div id="leaderboard-visualization" class="section level2">
-<h2><span class="header-section-number">11.1</span> 1. Leaderboard visualization</h2>
+<div id="leaderboard-visualization" class="section level2" number="11.1">
+<h2 number="11.1"><span class="header-section-number">11.1</span> 1. Leaderboard visualization</h2>
 <pre class="r"><code>h2o.init()</code></pre>
 <pre><code>##  Connection successful!
 ## 
@@ -3494,8 +3495,8 @@ data_transformed_tbl %&gt;%
 
 }</code></pre>
 </div>
-<div id="tune-a-model-with-grid-search" class="section level2">
-<h2><span class="header-section-number">11.2</span> 2. Tune a model with grid search</h2>
+<div id="tune-a-model-with-grid-search" class="section level2" number="11.2">
+<h2 number="11.2"><span class="header-section-number">11.2</span> 2. Tune a model with grid search</h2>
 <pre class="r"><code>h2o.init()</code></pre>
 <pre><code>##  Connection successful!
 ## 
@@ -3973,8 +3974,8 @@ deeplearning_grid_01_model_1 %&gt;% h2o.auc(train = T, valid = T, xval = T)</cod
 ## 
 ## Gains/Lift Table: Extract with `h2o.gainsLift(&lt;model&gt;, &lt;data&gt;)` or `h2o.gainsLift(&lt;model&gt;, valid=&lt;T/F&gt;, xval=&lt;T/F&gt;)`</code></pre>
 </div>
-<div id="visualize-the-trade-of-between-the-precision-and-the-recall-and-the-optimal-threshold" class="section level2">
-<h2><span class="header-section-number">11.3</span> 3. Visualize the trade of between the precision and the recall and the optimal threshold</h2>
+<div id="visualize-the-trade-of-between-the-precision-and-the-recall-and-the-optimal-threshold" class="section level2" number="11.3">
+<h2 number="11.3"><span class="header-section-number">11.3</span> 3. Visualize the trade of between the precision and the recall and the optimal threshold</h2>
 <pre class="r"><code>h2o.init()</code></pre>
 <pre><code>##  Connection successful!
 ## 
@@ -4352,8 +4353,8 @@ performance_tbl %&gt;%
     theme_new</code></pre>
 <p><img src="journal_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
 </div>
-<div id="roc-plot" class="section level2">
-<h2><span class="header-section-number">11.4</span> 4. ROC Plot</h2>
+<div id="roc-plot" class="section level2" number="11.4">
+<h2 number="11.4"><span class="header-section-number">11.4</span> 4. ROC Plot</h2>
 <pre class="r"><code># ROC Plot
 h2o.init()</code></pre>
 <pre><code>##  Connection successful!
@@ -4432,8 +4433,8 @@ model_metrics_tbl &lt;- fs::dir_info(path = &quot;04_Modeling/h2o_models/&quot;)
     )</code></pre>
 <p><img src="journal_files/figure-html/unnamed-chunk-66-1.png" width="672" /></p>
 </div>
-<div id="precision-vs-recall-plot" class="section level2">
-<h2><span class="header-section-number">11.5</span> 5. Precision vs Recall Plot</h2>
+<div id="precision-vs-recall-plot" class="section level2" number="11.5">
+<h2 number="11.5"><span class="header-section-number">11.5</span> 5. Precision vs Recall Plot</h2>
 <pre class="r"><code>h2o.init()</code></pre>
 <pre><code>##  Connection successful!
 ## 
@@ -4504,8 +4505,8 @@ model_metrics_tbl &lt;- fs::dir_info(path = &quot;04_Modeling/h2o_models/&quot;)
     )</code></pre>
 <p><img src="journal_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
 </div>
-<div id="gain-plot" class="section level2">
-<h2><span class="header-section-number">11.6</span> 6. Gain Plot</h2>
+<div id="gain-plot" class="section level2" number="11.6">
+<h2 number="11.6"><span class="header-section-number">11.6</span> 6. Gain Plot</h2>
 <pre class="r"><code># Gain &amp; Lift
 
 ranked_predictions_tbl &lt;- predictions_tbl %&gt;%
@@ -4618,8 +4619,8 @@ lift_transformed_tbl %&gt;%
     theme_new</code></pre>
 <p><img src="journal_files/figure-html/unnamed-chunk-73-1.png" width="672" /></p>
 </div>
-<div id="dashboard-with-cowplot" class="section level2">
-<h2><span class="header-section-number">11.7</span> 8. Dashboard with cowplot</h2>
+<div id="dashboard-with-cowplot" class="section level2" number="11.7">
+<h2 number="11.7"><span class="header-section-number">11.7</span> 8. Dashboard with cowplot</h2>
 <pre class="r"><code># 5. Performance Visualization ----  
 #install.packages(&quot;cowplot&quot;)
 
@@ -4629,14 +4630,14 @@ h2o.init()</code></pre>
 <pre><code>##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         2 hours 54 minutes 
+##     H2O cluster uptime:         15 minutes 10 seconds 
 ##     H2O cluster timezone:       Europe/Berlin 
 ##     H2O data parsing timezone:  UTC 
-##     H2O cluster version:        3.32.0.1 
-##     H2O cluster version age:    5 months and 12 days !!! 
-##     H2O cluster name:           H2O_started_from_R_jader_cgv301 
+##     H2O cluster version:        3.32.0.5 
+##     H2O cluster version age:    6 days  
+##     H2O cluster name:           H2O_started_from_R_jader_bsh019 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   0.93 GB 
+##     H2O cluster total memory:   1.30 GB 
 ##     H2O cluster total cores:    8 
 ##     H2O cluster allowed cores:  8 
 ##     H2O cluster healthy:        TRUE 
@@ -4645,7 +4646,7 @@ h2o.init()</code></pre>
 ##     H2O Connection proxy:       NA 
 ##     H2O Internal Security:      FALSE 
 ##     H2O API Extensions:         Amazon S3, Algos, AutoML, Core V3, TargetEncoder, Core V4 
-##     R Version:                  R version 4.0.3 (2020-10-10)</code></pre>
+##     R Version:                  R version 4.0.4 (2021-02-15)</code></pre>
 <pre class="r"><code># set values to test the function while building it
 h2o_leaderboard &lt;- automl_models_h2o@leaderboard
 newdata &lt;- test_tbl
@@ -4825,15 +4826,99 @@ plot_h2o_performance &lt;- function(h2o_leaderboard, newdata, order_by = c(&quot
     h2o.show_progress()
     
     return(ret)
-    
+
 }</code></pre>
+<pre class="r"><code>h2o.init()</code></pre>
+<pre><code>##  Connection successful!
+## 
+## R is connected to the H2O cluster: 
+##     H2O cluster uptime:         44 minutes 25 seconds 
+##     H2O cluster timezone:       Europe/Berlin 
+##     H2O data parsing timezone:  UTC 
+##     H2O cluster version:        3.32.0.5 
+##     H2O cluster version age:    6 days  
+##     H2O cluster name:           H2O_started_from_R_jader_bsh019 
+##     H2O cluster total nodes:    1 
+##     H2O cluster total memory:   1.00 GB 
+##     H2O cluster total cores:    8 
+##     H2O cluster allowed cores:  8 
+##     H2O cluster healthy:        TRUE 
+##     H2O Connection ip:          localhost 
+##     H2O Connection port:        54321 
+##     H2O Connection proxy:       NA 
+##     H2O Internal Security:      FALSE 
+##     H2O API Extensions:         Amazon S3, Algos, AutoML, Core V3, TargetEncoder, Core V4 
+##     R Version:                  R version 4.0.4 (2021-02-15)</code></pre>
+<pre class="r"><code>newdata</code></pre>
+<pre><code>## # A tibble: 2,857 x 23
+##        sku national_inv lead_time in_transit_qty forecast_3_month
+##      &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;          &lt;dbl&gt;            &lt;dbl&gt;
+##  1 1120868            7         8              0                0
+##  2 1124321            0        12              0              163
+##  3 1127720          150         8              0              325
+##  4 1128797            0         8              0                3
+##  5 1130488            3         3              0               16
+##  6 1130838          -62         8              0              120
+##  7 1131347            0         8              0                2
+##  8 1132099           11         2             10               27
+##  9 1134975            1         2              4                4
+## 10 1140247           -1         8              0                9
+## # ... with 2,847 more rows, and 18 more variables: forecast_6_month &lt;dbl&gt;,
+## #   forecast_9_month &lt;dbl&gt;, sales_1_month &lt;dbl&gt;, sales_3_month &lt;dbl&gt;,
+## #   sales_6_month &lt;dbl&gt;, sales_9_month &lt;dbl&gt;, min_bank &lt;dbl&gt;,
+## #   potential_issue &lt;fct&gt;, pieces_past_due &lt;dbl&gt;, perf_6_month_avg &lt;dbl&gt;,
+## #   perf_12_month_avg &lt;dbl&gt;, local_bo_qty &lt;dbl&gt;, deck_risk &lt;fct&gt;,
+## #   oe_constraint &lt;fct&gt;, ppap_risk &lt;fct&gt;, stop_auto_buy &lt;fct&gt;, rev_stop &lt;fct&gt;,
+## #   went_on_backorder &lt;fct&gt;</code></pre>
+<pre class="r"><code>test_tbl</code></pre>
+<pre><code>## # A tibble: 2,857 x 23
+##        sku national_inv lead_time in_transit_qty forecast_3_month
+##      &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;          &lt;dbl&gt;            &lt;dbl&gt;
+##  1 1120868            7         8              0                0
+##  2 1124321            0        12              0              163
+##  3 1127720          150         8              0              325
+##  4 1128797            0         8              0                3
+##  5 1130488            3         3              0               16
+##  6 1130838          -62         8              0              120
+##  7 1131347            0         8              0                2
+##  8 1132099           11         2             10               27
+##  9 1134975            1         2              4                4
+## 10 1140247           -1         8              0                9
+## # ... with 2,847 more rows, and 18 more variables: forecast_6_month &lt;dbl&gt;,
+## #   forecast_9_month &lt;dbl&gt;, sales_1_month &lt;dbl&gt;, sales_3_month &lt;dbl&gt;,
+## #   sales_6_month &lt;dbl&gt;, sales_9_month &lt;dbl&gt;, min_bank &lt;dbl&gt;,
+## #   potential_issue &lt;fct&gt;, pieces_past_due &lt;dbl&gt;, perf_6_month_avg &lt;dbl&gt;,
+## #   perf_12_month_avg &lt;dbl&gt;, local_bo_qty &lt;dbl&gt;, deck_risk &lt;fct&gt;,
+## #   oe_constraint &lt;fct&gt;, ppap_risk &lt;fct&gt;, stop_auto_buy &lt;fct&gt;, rev_stop &lt;fct&gt;,
+## #   went_on_backorder &lt;fct&gt;</code></pre>
+<pre class="r"><code>automl_models_h2o@leaderboard #%&gt;% plot_h2o_performance(newdata = test_tbl, order_by = &quot;logloss&quot;,size = 0.5, max_models = 4)</code></pre>
+<pre><code>##                                              model_id       auc   logloss
+## 1    StackedEnsemble_AllModels_AutoML_20210308_203220 0.9514473 0.1807339
+## 2 StackedEnsemble_BestOfFamily_AutoML_20210308_203220 0.9487197 0.1823229
+## 3          GBM_grid__1_AutoML_20210308_203220_model_1 0.9478599 0.1862965
+## 4                        GBM_4_AutoML_20210308_203220 0.9401720 0.2620108
+## 5                        GBM_1_AutoML_20210308_203220 0.9375571 0.2499964
+## 6                        GBM_3_AutoML_20210308_203220 0.9269748 0.2863429
+##       aucpr mean_per_class_error      rmse        mse
+## 1 0.7520215            0.1557373 0.2259491 0.05105298
+## 2 0.7519650            0.1727318 0.2264700 0.05128864
+## 3 0.7481581            0.1573227 0.2305322 0.05314508
+## 4 0.6823210            0.1868665 0.2741913 0.07518087
+## 5 0.7009986            0.1515572 0.2664291 0.07098446
+## 6 0.6299827            0.1627405 0.2870916 0.08242159
+## 
+## [13 rows x 7 columns]</code></pre>
 </div>
 </div>
-<div id="challenge-12_explaining-black-box-models-with-lime" class="section level1">
-<h1><span class="header-section-number">12</span> Challenge 12_Explaining Black-Box Models With LIME</h1>
-<p>##Part 1: Recreate plot_features().</p>
+<div id="challenge-12_explaining-black-box-models-with-lime" class="section level1" number="12">
+<h1 number="12"><span class="header-section-number">12</span> Challenge 12_Explaining Black-Box Models With LIME</h1>
+<div id="part-1-recreate-plot_features." class="section level2" number="12.1">
+<h2 number="12.1"><span class="header-section-number">12.1</span> Part 1: Recreate plot_features().</h2>
 <p>Take the explanation data and use the first case to create a plot similar to the output of plot_features().</p>
-<p>##Part 2: Recreate plot_explanations():</p>
+</div>
+<div id="part-2-recreate-plot_explanations" class="section level2" number="12.2">
+<h2 number="12.2"><span class="header-section-number">12.2</span> Part 2: Recreate plot_explanations():</h2>
+</div>
 </div>
 
 
