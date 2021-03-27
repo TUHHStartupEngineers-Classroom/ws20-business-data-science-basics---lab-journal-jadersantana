@@ -8,8 +8,8 @@ process_hr_data_readable <- function(data, definitions_tbl) {
     mutate(key = as.numeric(key)) %>%
     mutate(value = value %>% str_replace(pattern = "'", replacement = "")) %>%
     split(.$column_name) %>%
-    map(~ select(., -column_name)) %>%
-    map(~ mutate(., value = as_factor(value))) 
+    purrr::map(~ select(., -column_name)) %>%
+    purrr::map(~ mutate(., value = as_factor(value))) 
   
   for (i in seq_along(definitions_list)) {
     list_name <- names(definitions_list)[i]
@@ -36,5 +36,5 @@ process_hr_data_readable <- function(data, definitions_tbl) {
   return(data_merged_tbl)
   
 }
-process_hr_data_readable(employee_attrition_tbl, definitions_raw_tbl) %>% 
-  glimpse()
+#process_hr_data_readable(employee_attrition_tbl, definitions_raw_tbl) %>% 
+ # glimpse()

@@ -7,25 +7,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 ```{r eval=FALSE, include=FALSE}
 
 # LIME FEATURE EXPLANATION ----
@@ -40,6 +21,7 @@ library(readxl)
 library(tidyverse)
 library(tidyquant)
 library(lime)
+library(rsample)
 
 # Load Data
 employee_attrition_tbl <- read_csv("00_data/09/datasets-1067-1925-WA_Fn-UseC_-HR-Employee-Attrition.csv")
@@ -76,9 +58,9 @@ test_tbl  <- bake(recipe_obj, new_data = test_readable_tbl)
 h2o.init()
 
 #h2o.getModel("StackedEnsemble_BestOfFamily_AutoML_20210321_195224") %>% 
- # h2o.saveModel(path = "04_Modeling/h2o_models/attrition")
+ # h2o.saveModel(path = "04_Modeling/h2o_models_attrition")
 
-automl_leader <- h2o.loadModel("04_Modeling/h2o_models/attrition/StackedEnsemble_BestOfFamily_AutoML_20210321_195224")
+automl_leader <- h2o.loadModel("04_Modeling/h2o_models_attrition/StackedEnsemble_BestOfFamily_AutoML_20210322_194400")
 automl_leader
 
 
@@ -100,3 +82,393 @@ predictions_tbl <- automl_leader %>%
 predictions_tbl
 ```
 
+```{r eval=FALSE, include=FALSE}
+test_tbl %>%
+    slice(1) %>%
+    glimpse()
+```
+
+
+```{r eval=FALSE, include=FALSE}
+# 3.2 Single Explanation ----
+
+explainer <- train_tbl %>%
+    select(-Attrition) %>%
+    lime(
+        model           = automl_leader,
+        bin_continuous  = TRUE,
+        n_bins          = 4,
+        quantile_bins   = TRUE
+    )
+
+explainer
+```
+
+```{r eval=FALSE, include=FALSE}
+?lime::explain
+
+explanation <- test_tbl %>%
+    slice(1) %>%
+    select(-Attrition) %>%
+    lime::explain(
+    
+        # Pass our explainer object
+        explainer = explainer,
+        # Because it is a binary classification model: 1
+        n_labels   = 1,
+        # number of features to be returned
+        n_features = 8,
+        # number of localized linear models
+        n_permutations = 5000,
+        # Let's start with 1
+        kernel_width   = 1
+    )
+
+explanation
+```
+
+```{r eval=FALSE, include=FALSE}
+explanation %>%
+    as.tibble() %>%
+    select(feature:prediction)
+```
+
+```{r eval=FALSE, include=FALSE}
+g <- plot_features(explanation = explanation, ncol = 1)
+```
+
+```{r eval=FALSE, include=FALSE}
+# 3.3 Multiple Explanations ----
+
+explanation <- test_tbl %>%
+    slice(1:20) %>%
+    select(-Attrition) %>%
+    lime::explain(
+        explainer = explainer,
+        n_labels   = 1,
+        n_features = 8,
+        n_permutations = 5000,
+        kernel_width   = 0.5
+    )
+
+explanation %>%
+    as.tibble()
+
+plot_features(explanation, ncol = 4)
+```
+
+```{r eval=FALSE, include=FALSE}
+plot_explanations(explanation)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```

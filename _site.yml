@@ -19,6 +19,10 @@ navbar:
               href: ggplot_graphs.html
             - text: "machine learning"
               href: machine_learning.html
+            - text: "unit12"
+              href: unit12.html
+            - text: "unit10"
+              href: unit10.html
     - text: "Links"
       href: links.html
 output_dir: "docs"

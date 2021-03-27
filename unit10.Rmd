@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ##Data Processing
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # Load data
 library(tidyverse)
 library(readxl)
@@ -21,7 +21,7 @@ definitions_raw_tbl    <- read_excel("00_data/09/data_definitions.xlsx", sheet =
 View(definitions_raw_tbl)
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 employee_attrition_tbl %>% 
         ggplot(aes(Education)) +
         geom_bar()
@@ -688,7 +688,7 @@ automl_models_h2o@leader
 
 ```{r eval=FALSE, include=FALSE}
 # Depending on the algorithm, the output will be different
-h2o.getModel("DeepLearning_grid__1_AutoML_20200820_190823_model_1")
+h2o.getModel("DeepLearning_grid__1_AutoML_20210322_194400_model_1")
 
 # Extracts and H2O model name by a position so can more easily use h2o.getModel()
 extract_h2o_model_name_by_position <- function(h2o_leaderboard, n = 1, verbose = T) {
@@ -711,20 +711,20 @@ automl_models_h2o@leaderboard %>%
 
 
 ```{r eval=FALSE, include=FALSE}
-h2o.getModel("DeepLearning_grid__1_AutoML_20200820_190823_model_1") %>% 
-  h2o.saveModel(path = "04_Modeling/h20_models/")
+h2o.getModel("DeepLearning_grid__1_AutoML_20210322_194400_model_1") %>% 
+  h2o.saveModel(path = "04_Modeling/h2o_models_attrition/")
 
-h2o.loadModel("04_Modeling/h20_models/DeepLearning_grid__1_AutoML_20200820_190823_model_1")
+h2o.loadModel("04_Modeling/h2o_models_attrition/DeepLearning_grid__1_AutoML_20210322_194400_model_1")
 ```
 
 
 ```{r eval=FALSE, include=FALSE}
 # Choose whatever model you want
 
-h2o.getModel("StackedEnsemble_BestOfFamily_AutoML_20210321_195224") %>% 
-  h2o.saveModel(path = "04_Modeling/h2o_models/attrition")
+h2o.getModel("StackedEnsemble_BestOfFamily_AutoML_20210322_194400") %>% 
+  h2o.saveModel(path = "04_Modeling/h2o_models_attrition")
 
-stacked_ensemble_h2o <- h2o.loadModel("04_Modeling/h20_models/attrition/StackedEnsemble_BestOfFamily_AutoML_20210321_133123")
+stacked_ensemble_h2o <- h2o.loadModel("04_Modeling/h2o_models_attrition/StackedEnsemble_BestOfFamily_AutoML_20210322_194400")
 stacked_ensemble_h2o
 
 predictions <- h2o.predict(stacked_ensemble_h2o, newdata = as.h2o(test_tbl))
@@ -751,7 +751,7 @@ predictions_tbl <- predictions %>% as_tibble()
 
 
 ```{r eval=FALSE, include=FALSE}
-deep_learning_h2o <- h2o.loadModel("04_Modeling/h20_models/DeepLearning_grid__1_AutoML_20200820_190823_model_1")
+deep_learning_h2o <- h2o.loadModel("04_Modeling/h2o_models_attrition/DeepLearning_grid__1_AutoML_20210322_194400_model_1")
 
 # To see all possible parameters
 ?h2o.deeplearning

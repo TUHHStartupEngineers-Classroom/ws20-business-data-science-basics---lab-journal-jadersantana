@@ -1451,7 +1451,7 @@ automl_models_h2o@leader
 ```{r}
 # Choose whatever model you want
 h2o.init()
-stacked_ensemble_h2o <- h2o.getModel("StackedEnsemble_AllModels_AutoML_20210321_133123")
+stacked_ensemble_h2o <- h2o.getModel("StackedEnsemble_AllModels_AutoML_20210322_192104")
 stacked_ensemble_h2o
 
 predictions <- h2o.predict(stacked_ensemble_h2o, newdata = as.h2o(test_tbl))
@@ -1465,7 +1465,7 @@ predictions_tbl <- predictions %>% as_tibble()
 ## 6. Save the leader model
 
 ```{r}
-#h2o.getModel("StackedEnsemble_AllModels_AutoML_20210321_133123") %>%
+#h2o.getModel("StackedEnsemble_AllModels_AutoML_20210322_192104") %>%
 #h2o.saveModel(path = "04_Modeling/h2o_models/")
 ```
 
@@ -1593,10 +1593,10 @@ plot_h2o_leaderboard <- function(h2o_leaderboard, order_by = c("auc", "logloss")
 ```{r}
 
 h2o.init()
-#h2o.getModel("DeepLearning_1_AutoML_20210321_133123") %>% 
+#h2o.getModel("DeepLearning_1_AutoML_20210322_192104") %>% 
 #h2o.saveModel(path = "04_Modeling/h2o_models/")
 
-deeplearning_h2o <- h2o.loadModel("04_Modeling/h2o_models/DeepLearning_1_AutoML_20210321_133123")
+deeplearning_h2o <- h2o.loadModel("04_Modeling/h2o_models/DeepLearning_1_AutoML_20210322_192104")
 
 # Take a look for the metrics on the training data set
 # For my model the total error in the confusion matrix is ~15 %
@@ -1671,12 +1671,12 @@ h2o.init()
 #h2o.saveModel(path = "04_Modeling/h2o_models/")
 #h2o.getModel("DeepLearning_1_AutoML_20210321_133123") %>% 
 #h2o.saveModel(path = "04_Modeling/h2o_models/")
-#h2o.getModel("GLM_1_AutoML_20210321_133123") %>% 
+#h2o.getModel("GLM_1_AutoML_20210322_192104") %>% 
 #h2o.saveModel(path = "04_Modeling/h2o_models/")
 
-stacked_ensemble_h2o <- h2o.loadModel("04_Modeling/h2o_models/StackedEnsemble_AllModels_AutoML_20210321_133123")
-deeplearning_h2o     <- h2o.loadModel("04_Modeling/h2o_models/DeepLearning_1_AutoML_20210321_133123")
-glm_h2o              <- h2o.loadModel("04_Modeling/h2o_models/GLM_1_AutoML_20210321_133123")
+stacked_ensemble_h2o <- h2o.loadModel("04_Modeling/h2o_models/StackedEnsemble_AllModels_AutoML_20210322_192104")
+deeplearning_h2o     <- h2o.loadModel("04_Modeling/h2o_models/DeepLearning_1_AutoML_20210322_192104")
+glm_h2o              <- h2o.loadModel("04_Modeling/h2o_models/GLM_1_AutoML_20210322_192104")
 
 performance_h2o <- h2o.performance(stacked_ensemble_h2o, newdata = as.h2o(test_tbl))
 
@@ -1764,7 +1764,7 @@ performance_tbl %>%
 # ROC Plot
 h2o.init()
 
-path <- "04_Modeling/h2o_models/StackedEnsemble_AllModels_AutoML_20210321_133123"
+path <- "04_Modeling/h2o_models/StackedEnsemble_AllModels_AutoML_20210322_192104"
 
 load_model_performance_metrics <- function(path, test_tbl) {
     
@@ -2146,13 +2146,10 @@ plot_h2o_performance <- function(h2o_leaderboard, newdata, order_by = c("auc", "
 
 h2o.init()
 
-newdata
+#automl_models_h2o@leaderboard #%>%
+    #plot_h2o_performance(newdata = test_tbl, order_by = "logloss", 
+                         #size = 0.5, max_models = 4)
 
-test_tbl
-
-automl_models_h2o@leaderboard %>%
-    plot_h2o_performance(newdata = test_tbl, order_by = "logloss", 
-                         size = 0.5, max_models = 4)
 
 ```
 
@@ -2165,13 +2162,155 @@ automl_models_h2o@leaderboard %>%
 Take the explanation data and use the first case to create a plot similar to the output of plot_features().
 
 
+```{r}
+# LIME FEATURE EXPLANATION ----
+
+# 1. Setup ----
+
+# Load Libraries 
+
+library(h2o)
+library(recipes)
+library(readxl)
+library(tidyverse)
+library(tidyquant)
+library(lime)
+library(rsample)
+library(purrr)
+
+# Load Data
+employee_attrition_tbl <- read_csv("00_data/09/datasets-1067-1925-WA_Fn-UseC_-HR-Employee-Attrition.csv")
+definitions_raw_tbl    <- read_excel("00_data/09/data_definitions.xlsx", sheet = 1, col_names = FALSE)
+
+# Processing Pipeline
+source("00_Scripts/data_processing_pipeline.R")
+
+employee_attrition_readable_tbl <- process_hr_data_readable(employee_attrition_tbl, definitions_raw_tbl)
+
+# Split into test and train
+set.seed(seed = 1113)
+split_obj <- rsample::initial_split(employee_attrition_readable_tbl, prop = 0.85)
+
+# Assign training and test data
+train_readable_tbl <- training(split_obj)
+test_readable_tbl  <- testing(split_obj)
+
+
+
+
+# ML Preprocessing Recipe 
+recipe_obj <- recipe(Attrition ~ ., data = train_readable_tbl) %>%
+                step_zv(all_predictors()) %>%
+                step_mutate_at(c("JobLevel", "StockOptionLevel"), fn = as.factor) %>% 
+                prep()
+
+recipe_obj
+
+train_tbl <- bake(recipe_obj, new_data = train_readable_tbl)
+test_tbl  <- bake(recipe_obj, new_data = test_readable_tbl)
+
+# 2. Models ----
+
+h2o.init()
+
+#h2o.getModel("StackedEnsemble_BestOfFamily_AutoML_20210321_195224") %>% 
+ # h2o.saveModel(path = "04_Modeling/h2o_models_attrition")
+
+automl_leader <- h2o.loadModel("04_Modeling/h2o_models_attrition/StackedEnsemble_BestOfFamily_AutoML_20210322_194400")
+automl_leader
+
+predictions_tbl <- automl_leader %>% 
+    h2o.predict(newdata = as.h2o(test_tbl)) %>%
+    as.tibble() %>%
+    bind_cols(
+        test_tbl %>%
+            select(Attrition, EmployeeNumber)
+    )
+
+predictions_tbl
+
+test_tbl %>%
+    slice(1) %>%
+    glimpse()
+
+explainer <- train_tbl %>%
+    select(-Attrition) %>%
+    lime(
+        model           = automl_leader,
+        bin_continuous  = TRUE,
+        n_bins          = 4,
+        quantile_bins   = TRUE
+    )
+
+explainer
+
+?lime::explain
+
+explanation <- test_tbl %>%
+    #slice(1) %>%
+    select(-Attrition) %>%
+    lime::explain(
+    
+        # Pass our explainer object
+        explainer = explainer,
+        # Because it is a binary classification model: 1
+        n_labels   = 1,
+        # number of features to be returned
+        n_features = 8,
+        # number of localized linear models
+        n_permutations = 5000,
+        # Let's start with 1
+        kernel_width   = 1
+    )
+
+explanation %>% 
+  as.tibble()
+  
+case_1 <- explanation %>%
+    filter(case == 1)
+
+case_1 %>% 
+  as.tibble()
+
+case_1 %>%plot_features()
+
+case_1 %>%
+    ggplot(aes(x=reorder(feature_desc, feature_weight^2), feature_weight))+coord_flip() + geom_col(fill = ifelse(case_1$feature_weight >0, "#3333FF", "#FF0000" )) + labs(
+      title = "Case: 1
+Label: Yes
+      ",
+      subtitle = "",
+      y = "Weight",
+      x = "Feature"
+      )
+
+
+```
+
+```{r}
+
+h2o.init()
+
+explanation <- test_tbl %>%
+    #slice(1:20) %>%
+    select(-Attrition) %>%
+    lime::explain(
+        explainer = explainer,
+        n_labels   = 1,
+        n_features = 8,
+        n_permutations = 5000,
+        kernel_width   = 0.5
+    )
+
+plot_explanations(explanation)
+
+```
+
+
 ```{r }
 
 ```
 
-```{r }
-
-```
 
 ## Part 2: Recreate plot_explanations():
 
