@@ -423,7 +423,7 @@ div.tocify {
 </div>
 <div id="challenge-02_intro_tv-intro-to-tidyverse" class="section level1" number="2">
 <h1 number="2"><span class="header-section-number">2</span> Challenge 02_intro_tv Intro to tidyverse</h1>
-<p>Last compiled: 2021-03-27 15:31:30</p>
+<p>Last compiled: 2021-03-27 17:23:46</p>
 <div id="load-libraries--" class="section level2" number="2.1">
 <h2 number="2.1"><span class="header-section-number">2.1</span> 1.0 Load libraries —-</h2>
 <pre class="r"><code>library(tidyverse)
@@ -686,7 +686,7 @@ sales_by_loc_year_tbl %&gt;%
 </div>
 <div id="challenge-03_data-aquisition" class="section level1" number="3">
 <h1 number="3"><span class="header-section-number">3</span> Challenge 03_Data Aquisition</h1>
-<p>Last compiled: 2021-03-27 15:31:30</p>
+<p>Last compiled: 2021-03-27 17:23:46</p>
 <div id="load-libraries---1" class="section level2" number="3.1">
 <h2 number="3.1"><span class="header-section-number">3.1</span> 1.0 Load libraries —-</h2>
 <p>test 2</p>
@@ -4927,25 +4927,17 @@ test_tbl  &lt;- bake(recipe_obj, new_data = test_readable_tbl)
 # 2. Models ----
 
 h2o.init()</code></pre>
-<pre><code>## 
-## H2O is not running yet, starting it now...
-## 
-## Note:  In case of errors look at the following log files:
-##     C:\Users\jader\AppData\Local\Temp\Rtmpm0M3cZ\file26c46c5f1974/h2o_jader_started_from_r.out
-##     C:\Users\jader\AppData\Local\Temp\Rtmpm0M3cZ\file26c4469a1cb6/h2o_jader_started_from_r.err
-## 
-## 
-## Starting H2O JVM and connecting:  Connection successful!
+<pre><code>##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         3 seconds 126 milliseconds 
+##     H2O cluster uptime:         1 hours 16 minutes 
 ##     H2O cluster timezone:       Europe/Berlin 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.32.0.5 
-##     H2O cluster version age:    10 days  
+##     H2O cluster version age:    11 days  
 ##     H2O cluster name:           H2O_started_from_R_jader_wny421 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   1.31 GB 
+##     H2O cluster total memory:   0.72 GB 
 ##     H2O cluster total cores:    8 
 ##     H2O cluster allowed cores:  8 
 ##     H2O cluster healthy:        TRUE 
@@ -5324,8 +5316,8 @@ explainer</code></pre>
 ## $preprocess
 ## function (x) 
 ## x
-## &lt;bytecode: 0x0000000046e7aa18&gt;
-## &lt;environment: 0x0000000046e5cc50&gt;
+## &lt;bytecode: 0x0000000046cf8530&gt;
+## &lt;environment: 0x0000000046ca9c10&gt;
 ## 
 ## $bin_continuous
 ## [1] TRUE
@@ -5665,22 +5657,20 @@ explanation &lt;- test_tbl %&gt;%
   |                                                                            
   |                                                                      |   0%
   |                                                                            
-  |==================                                                    |  25%
-  |                                                                            
   |======================================================================| 100%</code></pre>
 <pre class="r"><code>explanation %&gt;% 
   as.tibble()</code></pre>
 <pre><code>## # A tibble: 1,760 x 13
 ##    model_type   case  label label_prob model_r2 model_intercept model_prediction
 ##    &lt;chr&gt;        &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;    &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-##  1 classificat~ 1     Yes        0.621    0.324           0.106            0.532
-##  2 classificat~ 1     Yes        0.621    0.324           0.106            0.532
-##  3 classificat~ 1     Yes        0.621    0.324           0.106            0.532
-##  4 classificat~ 1     Yes        0.621    0.324           0.106            0.532
-##  5 classificat~ 1     Yes        0.621    0.324           0.106            0.532
-##  6 classificat~ 1     Yes        0.621    0.324           0.106            0.532
-##  7 classificat~ 1     Yes        0.621    0.324           0.106            0.532
-##  8 classificat~ 1     Yes        0.621    0.324           0.106            0.532
+##  1 classificat~ 1     Yes        0.621    0.324           0.106            0.533
+##  2 classificat~ 1     Yes        0.621    0.324           0.106            0.533
+##  3 classificat~ 1     Yes        0.621    0.324           0.106            0.533
+##  4 classificat~ 1     Yes        0.621    0.324           0.106            0.533
+##  5 classificat~ 1     Yes        0.621    0.324           0.106            0.533
+##  6 classificat~ 1     Yes        0.621    0.324           0.106            0.533
+##  7 classificat~ 1     Yes        0.621    0.324           0.106            0.533
+##  8 classificat~ 1     Yes        0.621    0.324           0.106            0.533
 ##  9 classificat~ 2     No         0.902    0.297           0.775            0.771
 ## 10 classificat~ 2     No         0.902    0.297           0.775            0.771
 ## # ... with 1,750 more rows, and 6 more variables: feature &lt;chr&gt;,
@@ -5694,40 +5684,43 @@ case_1 %&gt;%
 <pre><code>## # A tibble: 8 x 13
 ##   model_type    case  label label_prob model_r2 model_intercept model_prediction
 ##   &lt;chr&gt;         &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;    &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
-## 1 classificati~ 1     Yes        0.621    0.324           0.106            0.532
-## 2 classificati~ 1     Yes        0.621    0.324           0.106            0.532
-## 3 classificati~ 1     Yes        0.621    0.324           0.106            0.532
-## 4 classificati~ 1     Yes        0.621    0.324           0.106            0.532
-## 5 classificati~ 1     Yes        0.621    0.324           0.106            0.532
-## 6 classificati~ 1     Yes        0.621    0.324           0.106            0.532
-## 7 classificati~ 1     Yes        0.621    0.324           0.106            0.532
-## 8 classificati~ 1     Yes        0.621    0.324           0.106            0.532
+## 1 classificati~ 1     Yes        0.621    0.324           0.106            0.533
+## 2 classificati~ 1     Yes        0.621    0.324           0.106            0.533
+## 3 classificati~ 1     Yes        0.621    0.324           0.106            0.533
+## 4 classificati~ 1     Yes        0.621    0.324           0.106            0.533
+## 5 classificati~ 1     Yes        0.621    0.324           0.106            0.533
+## 6 classificati~ 1     Yes        0.621    0.324           0.106            0.533
+## 7 classificati~ 1     Yes        0.621    0.324           0.106            0.533
+## 8 classificati~ 1     Yes        0.621    0.324           0.106            0.533
 ## # ... with 6 more variables: feature &lt;chr&gt;, feature_value &lt;dbl&gt;,
 ## #   feature_weight &lt;dbl&gt;, feature_desc &lt;chr&gt;, data &lt;list&gt;, prediction &lt;list&gt;</code></pre>
 <pre class="r"><code>case_1 %&gt;%plot_features()</code></pre>
 <p><img src="journal_files/figure-html/unnamed-chunk-76-1.png" width="672" /></p>
 <pre class="r"><code>case_1 %&gt;%
     ggplot(aes(x=reorder(feature_desc, feature_weight^2), feature_weight))+coord_flip() + geom_col(fill = ifelse(case_1$feature_weight &gt;0, &quot;#3333FF&quot;, &quot;#FF0000&quot; )) + labs(
-      title = &quot;Case: 1
-Label: Yes
-      &quot;,
+      title = &quot;Reproduction of plot_features() for case 1&quot;,
       subtitle = &quot;&quot;,
       y = &quot;Weight&quot;,
       x = &quot;Feature&quot;
       )</code></pre>
 <p><img src="journal_files/figure-html/unnamed-chunk-76-2.png" width="672" /></p>
+</div>
+<div id="part-2-recreate-plot_explanations" class="section level2" number="12.2">
+<h2 number="12.2"><span class="header-section-number">12.2</span> Part 2: Recreate plot_explanations():</h2>
+<p>Take the full explanation data and recreate the second plot.</p>
+<p>You will need at least the layers geom_tile() and facet_wrap().</p>
 <pre class="r"><code>h2o.init()</code></pre>
 <pre><code>##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         1 minutes 33 seconds 
+##     H2O cluster uptime:         1 hours 11 minutes 
 ##     H2O cluster timezone:       Europe/Berlin 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.32.0.5 
-##     H2O cluster version age:    10 days  
+##     H2O cluster version age:    11 days  
 ##     H2O cluster name:           H2O_started_from_R_jader_wny421 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   1.03 GB 
+##     H2O cluster total memory:   0.74 GB 
 ##     H2O cluster total cores:    8 
 ##     H2O cluster allowed cores:  8 
 ##     H2O cluster healthy:        TRUE 
@@ -5738,7 +5731,7 @@ Label: Yes
 ##     H2O API Extensions:         Amazon S3, Algos, AutoML, Core V3, TargetEncoder, Core V4 
 ##     R Version:                  R version 4.0.4 (2021-02-15)</code></pre>
 <pre class="r"><code>explanation &lt;- test_tbl %&gt;%
-    #slice(1:20) %&gt;%
+    slice(1:20) %&gt;%
     select(-Attrition) %&gt;%
     lime::explain(
         explainer = explainer,
@@ -5756,14 +5749,39 @@ Label: Yes
   |                                                                            
   |                                                                      |   0%
   |                                                                            
-  |===========================                                           |  39%
-  |                                                                            
   |======================================================================| 100%</code></pre>
+<pre class="r"><code>explanation %&gt;% as_tibble()</code></pre>
+<pre><code>## # A tibble: 160 x 13
+##    model_type   case  label label_prob model_r2 model_intercept model_prediction
+##    &lt;chr&gt;        &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;    &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
+##  1 classificat~ 1     Yes        0.621    0.313           0.108            0.520
+##  2 classificat~ 1     Yes        0.621    0.313           0.108            0.520
+##  3 classificat~ 1     Yes        0.621    0.313           0.108            0.520
+##  4 classificat~ 1     Yes        0.621    0.313           0.108            0.520
+##  5 classificat~ 1     Yes        0.621    0.313           0.108            0.520
+##  6 classificat~ 1     Yes        0.621    0.313           0.108            0.520
+##  7 classificat~ 1     Yes        0.621    0.313           0.108            0.520
+##  8 classificat~ 1     Yes        0.621    0.313           0.108            0.520
+##  9 classificat~ 2     No         0.902    0.299           0.791            0.687
+## 10 classificat~ 2     No         0.902    0.299           0.791            0.687
+## # ... with 150 more rows, and 6 more variables: feature &lt;chr&gt;,
+## #   feature_value &lt;dbl&gt;, feature_weight &lt;dbl&gt;, feature_desc &lt;chr&gt;, data &lt;list&gt;,
+## #   prediction &lt;list&gt;</code></pre>
 <pre class="r"><code>plot_explanations(explanation)</code></pre>
-<p><img src="journal_files/figure-html/unnamed-chunk-77-1.png" width="672" /></p>
-</div>
-<div id="part-2-recreate-plot_explanations" class="section level2" number="12.2">
-<h2 number="12.2"><span class="header-section-number">12.2</span> Part 2: Recreate plot_explanations():</h2>
+<p><img src="journal_files/figure-html/unnamed-chunk-78-1.png" width="672" /></p>
+<pre class="r"><code>explanation %&gt;%
+  ggplot(aes(x=feature_desc,y=factor(case, level=c(1:20)), color = feature_weight)) + 
+  coord_flip()+
+  theme(axis.text.x = element_text(angle = 60, hjust = 0.5))+
+  geom_point()+
+  scale_colour_gradient2(low=&quot;red&quot;, high=&quot;blue&quot;)+
+        #geom_point(size = size) +
+        facet_wrap(~ label, scales = &quot;fixed&quot;) +
+        labs(title = &quot;Reproduction of plot_explanations(explanation)&quot;,
+             subtitle = &quot;&quot;,
+             x = &quot;Feature&quot;,
+             y = &quot;Case&quot;)</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-78-2.png" width="672" /></p>
 </div>
 </div>
 

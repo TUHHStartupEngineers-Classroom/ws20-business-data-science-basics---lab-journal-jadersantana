@@ -2276,9 +2276,7 @@ case_1 %>%plot_features()
 
 case_1 %>%
     ggplot(aes(x=reorder(feature_desc, feature_weight^2), feature_weight))+coord_flip() + geom_col(fill = ifelse(case_1$feature_weight >0, "#3333FF", "#FF0000" )) + labs(
-      title = "Case: 1
-Label: Yes
-      ",
+      title = "Reproduction of plot_features() for case 1",
       subtitle = "",
       y = "Weight",
       x = "Feature"
@@ -2287,12 +2285,18 @@ Label: Yes
 
 ```
 
+## Part 2: Recreate plot_explanations():
+
+Take the full explanation data and recreate the second plot.
+
+You will need at least the layers geom_tile() and facet_wrap().
+
 ```{r}
 
 h2o.init()
 
 explanation <- test_tbl %>%
-    #slice(1:20) %>%
+    slice(1:20) %>%
     select(-Attrition) %>%
     lime::explain(
         explainer = explainer,
@@ -2302,23 +2306,28 @@ explanation <- test_tbl %>%
         kernel_width   = 0.5
     )
 
+
+
+```
+
+
+```{r }
+explanation %>% as_tibble()
+
 plot_explanations(explanation)
 
-```
-
-
-```{r }
-
-```
-
-
-## Part 2: Recreate plot_explanations():
-
-```{r }
-
-```
-
-```{r }
+explanation %>%
+  ggplot(aes(x=feature_desc,y=factor(case, level=c(1:20)), color = feature_weight)) + 
+  coord_flip()+
+  theme(axis.text.x = element_text(angle = 60, hjust = 0.5))+
+  geom_point()+
+  scale_colour_gradient2(low="red", high="blue")+
+        #geom_point(size = size) +
+        facet_wrap(~ label, scales = "fixed") +
+        labs(title = "Reproduction of plot_explanations(explanation)",
+             subtitle = "",
+             x = "Feature",
+             y = "Case")
 
 ```
 
