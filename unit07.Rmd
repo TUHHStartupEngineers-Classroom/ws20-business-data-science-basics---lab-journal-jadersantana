@@ -1,0 +1,575 @@
+---
+title: "Unit 7"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Theory Input
+
+## 1. Modeling
+
+```{r I. Resources, eval=FALSE, include=FALSE}
+#install.packages("tidymodels")
+#install.packages("broom.mixed")
+
+library(tidyverse)
+library(tidyquant)
+library(broom)
+library(umap)
+library(dplyr)
+
+library(tidymodels)  # for the parsnip package, along with the rest of tidymodels
+
+# Helper packages
+library(broom.mixed) # for converting bayesian models to tidy tibbles
+
+# Data set
+bike_data_tbl_import <- readRDS("00_data/01_bike_sales/02_wrangled_data/bike_orderlines.rds") 
+
+bike_data_tbl <- bike_data_tbl_import %>% select(everything()) %>% filter(category_1 != "Gravel")
+
+ggplot(bike_data_tbl,
+       aes(x = price, 
+           y = weight, 
+           group = category_1, 
+           col = category_1)) +
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE) +
+  scale_color_manual(values=c("#2dc6d6", "#d65a2d", "#d6af2d", "#8a2dd6","#641E16"))
+
+```
+
+```{r II. Build and fit a model,eval=FALSE, include=FALSE}
+
+#install.packages("parnsnip")
+
+library(tidymodels)
+
+weight ~ price * category_1
+
+linear_reg()
+
+lm_mod <- linear_reg() %>% 
+              set_engine("lm")
+              
+lm_mod
+
+lm_fit <- lm_mod %>% 
+            fit(weight ~ price * category_1, 
+                data = bike_data_tbl)
+tidy(lm_fit)
+
+new_points <- expand.grid(price = 20000, 
+                          category_1 = c("E-Bikes", "Hybrid / City", "Mountain", "Road"))
+new_points
+
+mean_pred <- predict(lm_fit, new_data = new_points)
+mean_pred
+
+conf_int_pred <- predict(lm_fit, 
+                         new_data = new_points, 
+                         type = "conf_int")
+conf_int_pred
+
+plot_data <- new_points %>% 
+              bind_cols(mean_pred) %>% 
+              bind_cols(conf_int_pred)
+ggplot(plot_data, aes(x = category_1)) + 
+  geom_point(aes(y = .pred)) + 
+  geom_errorbar(aes(ymin = .pred_lower, 
+                    ymax = .pred_upper),
+                width = .2) + 
+  labs(y = "Bike weight", x = "Category") 
+
+#install.packages("rstanarm")
+
+library(rstanarm)
+# set the prior distribution
+prior_dist <- rstanarm::student_t(df = 1)
+
+set.seed(123)
+
+# make the parsnip model
+bayes_mod <- linear_reg() %>% 
+              set_engine("stan",
+              prior_intercept = prior_dist, 
+              prior = prior_dist) 
+
+# train the model
+
+bayes_fit <-  bayes_mod %>% 
+                fit(weight ~ price * category_1, 
+                data = bike_data_tbl)
+
+print(bayes_fit, digits = 5)
+
+tidy(bayes_fit, conf.int = TRUE)
+
+bayes_plot_data <- 
+  new_points %>%
+  bind_cols(predict(bayes_fit, new_data = new_points)) %>% 
+  bind_cols(predict(bayes_fit, new_data = new_points, type = "conf_int"))
+
+ggplot(bayes_plot_data, aes(x = category_1)) + 
+  geom_point(aes(y = .pred)) + 
+  geom_errorbar(aes(ymin = .pred_lower, ymax = .pred_upper), width = .2) + 
+  labs(y = "Bike weight") + 
+  ggtitle("Bayesian model with t(1) prior distribution")
+
+## parsnip model object
+## 
+## Fit time:  1m 39.2s 
+## stan_glm
+##  family:       gaussian [identity]
+##  formula:      weight ~ price * category_1
+##  observations: 218
+##  predictors:   8
+## ------
+##                                    Median   MAD_SD  
+## (Intercept)                        15.24134  1.25450
+## price                          0.00158  0.00032
+## category_1Hybrid / City            -2.34716  1.53781
+## category_1Mountain                 -1.52799  1.31226
+## category_1Road                     -6.47532  1.31294
+## price:category_1Hybrid / City -0.00310  0.00066
+## price:category_1Mountain      -0.00180  0.00035
+## price:category_1Road          -0.00180  0.00033
+## 
+## Auxiliary parameter(s):
+##       Median  MAD_SD 
+## sigma 1.63413 0.07824
+## 
+## ------
+## * For help interpreting the printed output see ?print.stanreg
+## * For info on the priors used see ?prior_summary.stanreg
+
+```
+
+## 2. Preprocessing
+
+### I. The data
+
+```{r I. The data, eval=FALSE, include=FALSE}
+
+#install.packages("nycflights13")
+#install.packages("skimr")
+
+library(nycflights13)
+library(skimr)
+
+set.seed(123)
+
+flight_data <- 
+  flights %>% 
+  mutate(
+    # Convert the arrival delay to a factor
+    arr_delay = ifelse(arr_delay >= 30, "late", "on_time"),
+    arr_delay = factor(arr_delay),
+    # We will use the date (not date-time) in the recipe below
+    date = as.Date(time_hour)
+  ) %>% 
+  # Include the weather data
+  inner_join(weather, by = c("origin", "time_hour")) %>% 
+  # Only retain the specific columns we will use
+  select(dep_time, flight, origin, dest, air_time, distance, 
+         carrier, date, arr_delay, time_hour) %>% 
+  # Exclude missing data
+  na.omit() %>% 
+  # For creating models, it is better to have qualitative columns
+  # encoded as factors (instead of character strings)
+  mutate_if(is.character, as.factor)
+
+flight_data %>% 
+  count(arr_delay) %>% 
+  mutate(prop = n/sum(n))
+
+glimpse(flight_data)
+
+flight_data %>% 
+  skimr::skim(dest, carrier)
+
+
+
+
+
+```
+
+### II. Data Splitting   
+```{r eval=FALSE, include=FALSE}
+## Data Splitting
+
+#install.packages("rsample")
+library(rsample)
+
+# Fix the random numbers by setting the seed 
+# This enables the analysis to be reproducible when random numbers are used 
+set.seed(555)
+# Put 3/4 of the data into the training set 
+data_split <- initial_split(flight_data, prop = 3/4)
+
+# Create data frames for the two sets:
+train_data <- training(data_split)
+test_data  <- testing(data_split)
+```
+
+### III. Create recipe and roles
+
+```{r III. Create recipe and roles, eval=FALSE, include=FALSE}
+
+library(recipes)
+
+flights_rec <- 
+  recipe(arr_delay ~ ., data = train_data) 
+
+flights_rec <- 
+  recipe(arr_delay ~ ., data = train_data) %>% 
+  update_role(flight, time_hour, new_role = "ID") 
+
+summary(flights_rec)
+
+```
+
+### IV. Create features
+
+```{r IV. Create features, eval=FALSE, include=FALSE}
+
+
+flight_data %>% 
+  distinct(date) %>% 
+  mutate(numeric_date = as.numeric(date)) 
+
+flights_rec <- 
+ recipe(arr_delay ~ ., data = train_data) %>% 
+ update_role(flight, time_hour, new_role = "ID") %>% 
+ step_date(date, features = c("dow", "month")) %>%               
+ step_holiday(date, holidays = timeDate::listHolidays("US")) %>% 
+ step_rm(date)
+
+test_data %>% 
+  distinct(dest) %>% 
+  anti_join(train_data)
+
+flights_rec <- 
+  recipe(arr_delay ~ ., data = train_data) %>% 
+  update_role(flight, time_hour, new_role = "ID") %>% 
+  step_date(date, features = c("dow", "month")) %>% 
+  step_holiday(date, holidays = timeDate::listHolidays("US")) %>% 
+  step_rm(date) %>% 
+  step_dummy(all_nominal(), -all_outcomes()) %>% 
+  step_zv(all_predictors())
+
+```
+
+### V. Fit a model with a recipe
+
+```{r V. Fit a model with a recipe, eval=FALSE, include=FALSE}
+
+lr_mod <- 
+  logistic_reg() %>% 
+  set_engine("glm")
+
+library(workflows)
+library(parsnip)
+
+flights_wflow <- 
+  workflow() %>% 
+  add_model(lr_mod) %>% 
+  add_recipe(flights_rec)
+flights_wflow
+
+flights_fit <- 
+  flights_wflow %>% 
+  fit(data = train_data)
+
+flights_fit %>% 
+  pull_workflow_fit() %>% 
+  tidy()
+
+predict(flights_fit, test_data)
+
+flights_pred <- 
+  predict(flights_fit, test_data, type = "prob") %>% 
+  bind_cols(test_data %>% select(arr_delay, time_hour, flight)) 
+
+# The data look like: 
+flights_pred
+
+flights_pred %>% 
+  roc_curve(truth = arr_delay, .pred_late) %>% 
+  autoplot()
+
+flights_pred %>% 
+  roc_auc(truth = arr_delay, .pred_late)
+
+
+```
+
+## 3. Evaluating
+
+```{r eval=FALSE, include=FALSE}
+library(tidymodels)
+
+library(modeldata)
+
+```
+### I. The Data
+
+```{r 3. I. The Data, eval=FALSE, include=FALSE}
+data(cells, package = "modeldata")
+cells
+
+cells %>% 
+  count(class) %>% 
+  mutate(prop = n/sum(n))
+```
+### II. Data splitting
+```{r II. Data splitting, eval=FALSE, include=FALSE}
+set.seed(123)
+cell_split <- initial_split(cells %>% select(-case), 
+                            strata = class)
+cell_train <- training(cell_split)
+cell_test  <- testing(cell_split)
+
+nrow(cell_train)
+## 1515
+nrow(cell_train)/nrow(cells)
+## 0.7503715
+
+# training set proportions by class
+cell_train %>% 
+  count(class) %>% 
+  mutate(prop = n/sum(n))
+## # A tibble: 2 x 3
+##   class     n  prop
+##   <fct> <int> <dbl>
+## 1 PS      975 0.644
+## 2 WS      540 0.356  
+
+# test set proportions by class
+cell_test %>% 
+  count(class) %>% 
+  mutate(prop = n/sum(n))
+## # A tibble: 2 x 3
+##   class     n  prop
+##   <fct> <int> <dbl>
+## 1 PS      325 0.645
+## 2 WS      179 0.355
+```
+### III. Modeling
+
+```{r III. Modeling, eval=FALSE, include=FALSE}
+
+#install.packages("ranger")
+library(ranger)
+
+rf_mod <- 
+  rand_forest(trees = 1000) %>%
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+set.seed(234)
+rf_fit <- 
+  rf_mod %>% 
+  fit(class ~ ., data = cell_train)
+rf_fit
+
+rf_training_pred <- 
+  predict(rf_fit, cell_train) %>% 
+  bind_cols(predict(rf_fit, cell_train, type = "prob")) %>% 
+  # Add the true outcome data back in
+  bind_cols(cell_train %>% 
+              select(class))
+
+rf_training_pred %>%                # training set predictions
+  roc_auc(truth = class, .pred_PS)
+## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   <chr>   <chr>          <dbl>
+## 1 roc_auc binary          1.00
+rf_training_pred %>%                # training set predictions
+  accuracy(truth = class, .pred_class)
+## # A tibble: 1 x 3
+##   .metric  .estimator .estimate
+##   <chr>    <chr>          <dbl>
+## 1 accuracy binary         0.993  
+
+rf_testing_pred <- 
+  predict(rf_fit, cell_test) %>% 
+  bind_cols(predict(rf_fit, cell_test, type = "prob")) %>% 
+  bind_cols(cell_test %>% select(class))
+
+rf_testing_pred %>%                   # test set predictions
+  roc_auc(truth = class, .pred_PS)
+## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   <chr>   <chr>          <dbl>
+## 1 roc_auc binary         0.909
+
+rf_testing_pred %>%                   # test set predictions
+  accuracy(truth = class, .pred_class)
+## # A tibble: 1 x 3
+##   .metric  .estimator .estimate
+##   <chr>    <chr>          <dbl>
+## 1 accuracy binary         0.837
+```
+### IV. Estimating performance
+```{r IV. Estimating performance}
+
+
+
+```
+### V. Resampling to the rescue
+```{V. Resampling to the rescue}
+
+```
+### VI. Fit a model with resampling
+```{r VI. Fit a model with resampling}
+
+```
+
+## 4. Tuning
+```{r 4. Tuning}
+
+```
+### I. The cell image data, revisited
+```{r I. The cell image data, revisited}
+
+```
+### II. Predicting image segmentation, but better
+```{r II. Predicting image segmentation, but better}
+
+```
+### III. Tuning hyperparameters
+```{r III. Tuning hyperparameters}
+
+```
+### IV. Model tuning with a grid
+```{r IV. Model tuning with a grid}
+
+```
+### V. Finalizing our model
+```{r V. Finalizing our model}
+
+```
+### VI. Exploring results
+```{r VI. Exploring results}
+
+```
+### VII. The last fit
+```{r VII. The last fit}
+
+```
+
+
+# Chapter 8 - Business Case
+
+```{r eval=FALSE, include=FALSE}
+# Standard
+library(tidyverse)
+
+# Modeling
+library(parsnip)
+
+# Preprocessing & Sampling
+library(recipes)
+library(rsample)
+
+# Modeling Error Metrics
+library(yardstick)
+
+#install.packages("rpart.plot")
+
+# Plotting Decision Trees
+library(rpart.plot)
+
+
+```
+### 
+```{r eval=FALSE, include=FALSE}
+# Modeling ----------------------------------------------------------------
+bike_orderlines_tbl <- readRDS("00_data/01_bike_sales/01_raw_data/bike_orderlines.rds")
+glimpse(bike_orderlines_tbl)
+
+model_sales_tbl <- bike_orderlines_tbl %>%
+    select(total_price, model, category_2, frame_material) %>%
+    
+    group_by(model, category_2, frame_material) %>%
+    summarise(total_sales = sum(total_price)) %>%
+    filter(!(category_2 %in% c("Downhill", "Adventure", "E-Road", "Fat Bikes"))) %>%
+    ungroup() %>%
+    
+    arrange(desc(total_sales))
+
+model_sales_tbl %>%
+    mutate(category_2 = as_factor(category_2) %>% 
+               fct_reorder(total_sales, .fun = max) %>% 
+               fct_rev()) %>%
+    
+    ggplot(aes(frame_material, total_sales)) +
+    geom_violin() +
+    geom_jitter(width = 0.1, alpha = 0.5, color = "#2c3e50") +
+    #coord_flip() +
+    facet_wrap(~ category_2) +
+    scale_y_continuous(labels = scales::dollar_format(scale = 1e-6, suffix = "M", accuracy = 0.1)) +
+    tidyquant::theme_tq() +
+    labs(
+        title = "Total Sales for Each Model",
+        x = "Frame Material", y = "Revenue"
+    )
+```
+### 
+```{r eval=FALSE, include=FALSE}
+bike_features_tbl <- readRDS("00_data/01_bike_sales/01_raw_data/bike_features_tbl.rds")
+glimpse(bike_features_tbl)
+
+bike_features_tbl <- bike_features_tbl %>% 
+    select(model:url, `Rear Derailleur`, `Shift Lever`) %>% 
+    mutate(
+      `shimano dura-ace`        = `Rear Derailleur` %>% str_to_lower() %>% str_detect("shimano dura-ace ") %>% as.numeric(),
+      `shimano ultegra`         = `Rear Derailleur` %>% str_to_lower() %>% str_detect("shimano ultegra ") %>% as.numeric(),
+      `shimano 105`             = `Rear Derailleur` %>% str_to_lower() %>% str_detect("shimano 105 ") %>% as.numeric(),
+      `shimano tiagra`          = `Rear Derailleur` %>% str_to_lower() %>% str_detect("shimano tiagra ") %>% as.numeric(),
+      `Shimano sora`            = `Rear Derailleur` %>% str_to_lower() %>% str_detect("shimano sora") %>% as.numeric(),
+      `shimano deore`           = `Rear Derailleur` %>% str_to_lower() %>% str_detect("shimano deore(?! xt)") %>% as.numeric(),
+      `shimano slx`             = `Rear Derailleur` %>% str_to_lower() %>% str_detect("shimano slx") %>% as.numeric(),
+      `shimano grx`             = `Rear Derailleur` %>% str_to_lower() %>% str_detect("shimano grx") %>% as.numeric(),
+      `Shimano xt`              = `Rear Derailleur` %>% str_to_lower() %>% str_detect("shimano deore xt |shimano xt ") %>% as.numeric(),
+      `Shimano xtr`             = `Rear Derailleur` %>% str_to_lower() %>% str_detect("shimano xtr") %>% as.numeric(),
+      `Shimano saint`           = `Rear Derailleur` %>% str_to_lower() %>% str_detect("shimano saint") %>% as.numeric(),
+      `SRAM red`                = `Rear Derailleur` %>% str_to_lower() %>% str_detect("sram red") %>% as.numeric(),
+      `SRAM force`              = `Rear Derailleur` %>% str_to_lower() %>% str_detect("sram force") %>% as.numeric(),
+      `SRAM rival`              = `Rear Derailleur` %>% str_to_lower() %>% str_detect("sram rival") %>% as.numeric(),
+      `SRAM apex`               = `Rear Derailleur` %>% str_to_lower() %>% str_detect("sram apex") %>% as.numeric(),
+      `SRAM xx1`                = `Rear Derailleur` %>% str_to_lower() %>% str_detect("sram xx1") %>% as.numeric(),
+      `SRAM x01`                = `Rear Derailleur` %>% str_to_lower() %>% str_detect("sram x01|sram xo1") %>% as.numeric(),
+      `SRAM gx`                 = `Rear Derailleur` %>% str_to_lower() %>% str_detect("sram gx") %>% as.numeric(),
+      `SRAM nx`                 = `Rear Derailleur` %>% str_to_lower() %>% str_detect("sram nx") %>% as.numeric(),
+      `SRAM sx`                 = `Rear Derailleur` %>% str_to_lower() %>% str_detect("sram sx") %>% as.numeric(),
+      `SRAM sx`                 = `Rear Derailleur` %>% str_to_lower() %>% str_detect("sram sx") %>% as.numeric(),
+      `Campagnolo potenza`      = `Rear Derailleur` %>% str_to_lower() %>% str_detect("campagnolo potenza") %>% as.numeric(),
+      `Campagnolo super record` = `Rear Derailleur` %>% str_to_lower() %>% str_detect("campagnolo super record") %>% as.numeric(),
+      `shimano nexus`           = `Shift Lever`     %>% str_to_lower() %>% str_detect("shimano nexus") %>% as.numeric(),
+      `shimano alfine`          = `Shift Lever`     %>% str_to_lower() %>% str_detect("shimano alfine") %>% as.numeric()
+    ) %>% 
+  # Remove original columns  
+  select(-c(`Rear Derailleur`, `Shift Lever`)) %>% 
+  # Set all NAs to 0
+  mutate_if(is.numeric, ~replace(., is.na(.), 0))
+
+# 2.0 TRAINING & TEST SETS ----
+bike_features_tbl <- bike_features_tbl %>% 
+  
+  mutate(id = row_number()) %>% 
+  
+  select(id, everything(), -url)
+
+```
+### 
+```{r eval=FALSE, include=FALSE}
+
+```
+
+

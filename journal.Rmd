@@ -1,7 +1,7 @@
 ---
 title: "Journal (reproducible report)"
-author: "Joschka Schwarz"
-date: "2020-11-05"
+author: "Jader Santana"
+date: "2020-11-23"
 output:
   html_document:
     toc: true
@@ -13,42 +13,2339 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE)
+knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE, cache.lazy = FALSE)
+```
+# Challenge 01_intro_r Introduction to R, RStudio IDE & Github
+no specific challenge for this unit
+
+# Challenge 02_intro_tv Intro to tidyverse
+
+Last compiled: `r Sys.time()`
+
+## 1.0 Load libraries ----
+```{r}
+library(tidyverse)
+#  library(tibble)    --> is a modern re-imagining of the data frame
+#  library(readr)     --> provides a fast and friendly way to read rectangular data like csv
+#  library(dplyr)     --> provides a grammar of data manipulation
+#  library(magrittr)  --> offers a set of operators which make your code more readable (pipe operator)
+#  library(tidyr)     --> provides a set of functions that help you get to tidy data
+#  library(stringr)   --> provides a cohesive set of functions designed to make working with strings as easy as possible
+#  library(ggplot2)   --> graphics
+
+
+# Excel Files
+library(readxl)
 ```
 
-**IMPORTANT:** You can delete everything in here and start fresh. You might want to start by not deleting anything above this line until you know what that stuff is doing.
+## 2.0 Importing Files ----
+```{r}
+# A good convention is to use the file name and suffix it with tbl for the data structure tibble
+bikes_tbl      <- read_excel(path = "00_data/01_bike_sales/01_raw_data/bikes.xlsx")
+orderlines_tbl <- read_excel("00_data/01_bike_sales/01_raw_data/orderlines.xlsx")
 
-This is an `.Rmd` file. It is plain text with special features. Any time you write just like this, it will be compiled to normal text in the website. If you put a \# in front of your text, it will create a top level-header.
+# Not necessary for this analysis, but for the sake of completeness
+bikeshops_tbl  <- read_excel("00_data/01_bike_sales/01_raw_data/bikeshops.xlsx")
+```
+## 3.0 Examining Data ----
+```{r}
+bikeshops_tbl
+glimpse(bikeshops_tbl)
+```
+## 4.0 Joining Data ----
+```{r}
+left_join(orderlines_tbl, bikes_tbl, by = c("product.id" = "bike.id"))
+bike_orderlines_joined_tbl <- orderlines_tbl %>%
+  left_join(bikes_tbl, by = c("product.id" = "bike.id")) %>%
+  left_join(bikeshops_tbl, by = c("customer.id" = "bikeshop.id"))
+bike_orderlines_joined_tbl %>% glimpse()
+```
+## 5.0 Wrangling Data ----
+```{r}
+# All actions are chained with the pipe already. You can perform each step separately and use glimpse() or View() to validate your code. Store the result in a variable at the end of the steps.
+bike_orderlines_wrangled_tbl <- bike_orderlines_joined_tbl %>%
+  # 5.1 Separate category name
+  separate(col    = location,
+           into   = c("city", "state"),
+           sep    = ", ") %>%
+  
+  # 5.2 Add the total price (price * quantity) 
+  # Add a column to a tibble that uses a formula-style calculation of other columns
+  mutate(total.price = price * quantity) %>%
+  
+  # 5.3 Optional: Reorganize. Using select to grab or remove unnecessary columns
+  # 5.3.1 by exact column name
+  select(-...1, -gender) %>%
+  
+  # 5.3.2 by a pattern
+  # You can use the select_helpers to define patterns. 
+  # Type ?ends_with and click on Select helpers in the documentation
+  select(-ends_with(".id")) %>%
+  
+  # 5.3.3 Actually we need the column "order.id". Let's bind it back to the data
+  bind_cols(bike_orderlines_joined_tbl %>% select(order.id)) %>% 
+  
+  # 5.3.4 You can reorder the data by selecting the columns in your desired order.
+  # You can use select_helpers like contains() or everything()
+  select(order.id, contains("order"), contains("model"), contains("category"),
+         price, quantity, total.price,
+         everything()) %>%
+  
+  # 5.4 Rename columns because we actually wanted underscores instead of the dots
+  # (one at the time vs. multiple at once)
+  rename(bikeshop = name) %>%
+  set_names(names(.) %>% str_replace_all("\\.", "_"))
+```
+## 6.0 Business Insights ----
 
-# My first post
+### 6.1 Sales by Location ----
+```{r}
+library(lubridate)
+# Step 1 - Manipulate
+sales_by_location_tbl <- bike_orderlines_wrangled_tbl %>%
+  
+  # Select columns
+  select(state, total_price) %>%
+  
+  # Add year column
+  #no need mutate(year = year(order_date)) %>%
+  
+  # Grouping by state and summarizing sales
+  group_by(state) %>% 
+  summarize(sales = sum(total_price)) %>%
+  
+  # Optional: Add a column that turns the numbers into a currency format 
+  # (makes it in the plot optically more appealing)
+  # mutate(sales_text = scales::dollar(sales)) <- Works for dollar values
+  mutate(sales_text = scales::dollar(sales, big.mark = ".", 
+                                     decimal.mark = ",", 
+                                     prefix = "", 
+                                     suffix = " €"))
 
-Last compiled: `r Sys.Date()`
+sales_by_location_tbl
 
-Notice that whatever you define as a top level header, automatically gets put into the table of contents bar on the left. 
+# Step 2 - Visualize
+sales_by_location_tbl %>%
+  
+  # Setup canvas with the columns location (x-axis) and sales (y-axis)
+  ggplot(aes(x = state, y = sales)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  # Geometries
+  geom_col(fill = "#2DC6D6") + # Use geom_col for a bar plot
+  geom_label(aes(label = sales_text)) + # Adding labels to the bars
+  geom_smooth(method = "lm", se = FALSE) + # Adding a trendline
+  
+  # Formatting
+  # scale_y_continuous(labels = scales::dollar) + # Change the y-axis. 
+  # Again, we have to adjust it for euro values
+  scale_y_continuous(labels = scales::dollar_format(big.mark = ".", 
+                                                    decimal.mark = ",", 
+                                                    prefix = "", 
+                                                    suffix = " €")) +
+  labs(
+    title    = "Revenue by Location(state)",
+    subtitle = "Not an upward Trend",
+    x = "", # Override defaults for x and y
+    y = "Revenue"
+  )
 
-## Second level header
+```
 
-You can add more headers by adding more hashtags. These won't be put into the table of contents
-
-### third level header
-
-Here's an even lower level header
-
-# My second post (note the order)
-
-Last compiled: `r Sys.Date()`
-
-I'm writing this tutorial going from the top down. And, this is how it will be printed. So, notice the second post is second in the list. If you want your most recent post to be at the top, then make a new post starting at the top. If you want the oldest first, do, then keep adding to the bottom
-
-# Adding R stuff
-
-So far this is just a blog where you can write in plain text and serve your writing to a webpage. One of the main purposes of this lab journal is to record your progress learning R. The reason I am asking you to use this process is because you can both make a website, and a lab journal, and learn R all in R-studio. This makes everything really convenient and in the same place. 
-
-So, let's say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this:
+### 6.2 Sales by Year and Location ----
 
 ```{r}
-samples <- rnorm(100, mean=0, sd=1)
-hist(samples)
+# Step 1 - Manipulate
+sales_by_loc_year_tbl <- bike_orderlines_wrangled_tbl %>%
+  
+  # Select columns and add a year
+  select(order_date, total_price, state) %>%
+  mutate(year = year(order_date)) %>%
+  
+  # Group by and summarize year and main catgegory
+  group_by(year, state) %>%
+  summarise(sales = sum(total_price)) %>%
+  ungroup() %>%
+  
+  # Format $ Text
+  mutate(sales_text = scales::dollar(sales, big.mark = ".", 
+                                     decimal.mark = ",", 
+                                     prefix = "", 
+                                     suffix = " €"))
+
+sales_by_loc_year_tbl
+```
+```{r plot, fig.width=13, fig.height=7}
+# Step 2 - Visualize
+sales_by_loc_year_tbl %>%
+  
+  # Set up x, y, fill
+  ggplot(aes(x = year, y = sales, fill = state)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  # Geometries
+  geom_col() + # Run up to here to get a stacked bar plot
+  
+  # Facet
+  facet_wrap(~ state) +
+  
+  # Formatting
+  scale_y_continuous(labels = scales::dollar_format(big.mark = ".", 
+                                                    decimal.mark = ",", 
+                                                    prefix = "", 
+                                                    suffix = " €")) +
+  labs(
+    title = "Revenue by year and location",
+    subtitle = "Each location has an upward trend",
+    fill = "Main Location" # Changes the legend name
+  )
 ```
 
-When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You'll learn that all of these things and more can be customized in each R code block.
+# Challenge 03_Data Aquisition
+
+Last compiled: `r Sys.time()`
+
+## 1.0 Load libraries ----
+test 2
+
+# Challenge 04_Data Wrangling
+Answer the following questions with that data:
+
+## 1.0 Patent Dominance ----
+1. Patent Dominance: What US company / corporation has the most patents? List the 10 US companies with the most assigned/granted patents.
+```{r 1.0 Patent Dominance}
+#install.packages("vroom")
+#install.packages("tictoc")
+
+# Tidyverse
+library(tidyverse)
+library(vroom)
+
+# Data Table
+library(data.table)
+
+# Counter
+library(tictoc)
+
+
+
+col_types_assignee_tbl <- list(
+  id = col_character(),
+  type = col_double(),
+  name_first = col_character(),
+  name_last = col_character(),
+  organization = col_character()
+)
+
+assignee_tbl <- vroom(
+            file       = "00_data/04_challenge/assignee.tsv", 
+            delim      = "\t", 
+            col_types  = col_types_assignee_tbl,
+            na         = c("", "NA", "NULL")
+        )
+
+#col_types_patent_tbl <- list(
+ # id = col_character(),
+  #type = col_character(),
+  #number = col_character(),
+  #country = col_character(),
+ # date = col_date("%Y-%m-%d"),
+#  abstract = col_character(),
+  #title = col_character(),
+ # kind = col_character(),
+#  num_claims = col_double(),
+  #filename = col_character(),
+ # withdrawn = col_double()
+#)
+
+#patent_tbl <- vroom(
+#            file       = "00_data/04_challenge/patent.tsv", 
+#            delim      = "\t", 
+#            col_types  = col_types_patent_tbl,
+#            na         = c("", "NA", "NULL")
+#        )
+
+col_types_patent_assignee_tbl <- list(
+  patent_id = col_character(),
+  assignee_id = col_character(),
+  location_id = col_character()
+)
+
+patent_assignee_tbl <- vroom(
+            file       = "00_data/04_challenge/patent_assignee.tsv", 
+            delim      = "\t", 
+            col_types  = col_types_patent_assignee_tbl,
+            na         = c("", "NA", "NULL")
+        )
+
+#col_types_uspc_tbl <- list(
+ # uuid = col_character(),
+  #patent_id = col_character(),
+  #mainclass_id = col_character(),
+  #subclass_id = col_character(),
+  #sequence = col_double()
+#)
+
+#uspc_tbl <- vroom(
+ #           file       = "00_data/04_challenge/uspc.tsv", 
+  #          delim      = "\t", 
+   #         col_types  = col_types_uspc_tbl,
+    #        na         = c("", "NA", "NULL")
+     #   )
+
+assignee_tbl %>% glimpse()
+#patent_tbl %>% glimpse()
+patent_assignee_tbl %>% glimpse()
+#uspc_tbl %>% glimpse()
+
+class(assignee_tbl)
+#class(patent_tbl)
+class(patent_assignee_tbl)
+#class(uspc_tbl)
+
+setDT(assignee_tbl)
+#setDT(patent_tbl)
+setDT(patent_assignee_tbl)
+#setDT(uspc_tbl)
+
+class(assignee_tbl)
+#class(patent_tbl)
+class(patent_assignee_tbl)
+#class(uspc_tbl)
+
+assignee_tbl %>% glimpse()
+#patent_tbl %>% glimpse()
+patent_assignee_tbl %>% glimpse()
+#uspc_tbl %>% glimpse()
+
+# 4.0 DATA WRANGLING ----
+# 4.1 Joining / Merging Data ----
+
+tic()
+combined_assignee_patent_assignee_tbl <- merge(x = assignee_tbl, y = patent_assignee_tbl, 
+                       by.x = "id", by.y = "assignee_id",
+                       all.x = TRUE, 
+                       all.y = TRUE)%>%
+mutate(patents_unit=1)%>%
+ group_by(organization) %>%
+  summarize(number_of_patents = sum(patents_unit)) %>%
+  ungroup()%>%
+  arrange(number_of_patents)
+toc()
+
+combined_assignee_patent_assignee_tbl %>%
+    select(organization, number_of_patents) %>%
+    arrange(desc(number_of_patents)) %>%
+    slice(1:11) %>%
+    filter(organization!="")
+
+```
+
+
+## 2.0 Recent Patent Acitivity ----
+2. Recent patent activity: What US company had the most patents granted in 2019? List the top 10 companies with the most new granted patents for 2019.
+
+```{r}
+#install.packages("vroom")
+#install.packages("tictoc")
+
+# Tidyverse
+library(tidyverse)
+library(vroom)
+
+# Data Table
+library(data.table)
+
+# Counter
+library(tictoc)
+
+col_types_assignee_tbl <- list(
+  id = col_character(),
+  type = col_double(),
+  name_first = col_character(),
+  name_last = col_character(),
+  organization = col_character()
+)
+
+#assignee_tbl <- vroom(
+            #file       = "00_data/04_challenge/assignee.tsv", 
+            #delim      = "\t", 
+            #col_types  = col_types_assignee_tbl,
+            #na         = c("", "NA", "NULL")
+        #)
+
+col_types_patent_tbl <- list(
+  id = col_character(),
+  type = col_character(),
+  number = col_character(),
+  country = col_character(),
+  date = col_date("%Y-%m-%d"),
+  abstract = col_character(),
+  title = col_character(),
+  kind = col_character(),
+  num_claims = col_double(),
+  filename = col_character(),
+  withdrawn = col_double()
+)
+
+#patent_tbl <- vroom(
+ #           file       = "00_data/04_challenge/patent.tsv", 
+  #          delim      = "\t", 
+   #         col_types  = col_types_patent_tbl,
+    #        na         = c("", "NA", "NULL")
+     #   )
+
+col_types_patent_assignee_tbl <- list(
+  patent_id = col_character(),
+  assignee_id = col_character(),
+  location_id = col_character()
+)
+
+#patent_assignee_tbl <- vroom(
+ #           file       = "00_data/04_challenge/patent_assignee.tsv", 
+  #          delim      = "\t", 
+   #         col_types  = col_types_patent_assignee_tbl,
+    #        na         = c("", "NA", "NULL")
+     #   )
+
+#col_types_uspc_tbl <- list(
+ # uuid = col_character(),
+  #patent_id = col_character(),
+  #mainclass_id = col_character(),
+  #subclass_id = col_character(),
+  #sequence = col_double()
+#)
+
+#uspc_tbl <- vroom(
+ #           file       = "00_data/04_challenge/uspc.tsv", 
+  #          delim      = "\t", 
+   #         col_types  = col_types_uspc_tbl,
+    #        na         = c("", "NA", "NULL")
+     #   )
+
+#assignee_tbl %>% glimpse()
+#patent_tbl %>% glimpse()
+#patent_assignee_tbl %>% glimpse()
+#uspc_tbl %>% glimpse()
+
+#class(assignee_tbl)
+#class(patent_tbl)
+#class(patent_assignee_tbl)
+#class(uspc_tbl)
+
+#setDT(assignee_tbl)
+#setDT(patent_tbl)
+#setDT(patent_assignee_tbl)
+#setDT(uspc_tbl)
+
+#class(assignee_tbl)
+#class(patent_tbl)
+#class(patent_assignee_tbl)
+#class(uspc_tbl)
+
+#assignee_tbl %>% glimpse()
+#patent_tbl %>% glimpse()
+#patent_assignee_tbl %>% glimpse()
+#uspc_tbl %>% glimpse()
+
+# 4.0 DATA WRANGLING ----
+# 4.1 Joining / Merging Data ----
+
+#tic()
+#combined_assignee_patent_assignee_tbl <- merge(x = assignee_tbl, y = patent_assignee_tbl, 
+                       #by.x = "id", by.y = "assignee_id",
+                       #all.x = TRUE, 
+                       #all.y = TRUE)%>%
+#mutate(patents_unit=1)%>%
+ #group_by(organization) %>%
+  #summarize(number_of_patents = sum(patents_unit)) %>%
+  #ungroup()%>%
+  #arrange(number_of_patents)
+#toc()
+
+#combined_assignee_patent_assignee_tbl %>%
+    #select(organization, number_of_patents) %>%
+    #arrange(desc(number_of_patents)) %>%
+    #slice(1:11) %>%
+    #filter(organization!="")
+
+```
+
+
+## 3.0 Innovation in Tech ----
+3. Innovation in Tech: What is the most innovative tech sector? For the top 10 companies (worldwide) with the most patents, what are the top 5 USPTO tech main classes?
+
+```{r}
+library(tidyverse)
+```
+
+# Challenge 05_Data Visualisation
+Answer the following questions with that data:
+
+## Challenge 05.1 ----
+
+Goal: Map the time course of the cumulative Covid-19 cases! Your plot should look like this:
+Adding the cases for Europe is optional. You can choose your own color theme, but don’t use the default one. Don’t forget to scale the axis properly. The labels can be added with geom_label() or with geom_label_repel() (from the package ggrepel).
+
+```{r}
+library(vroom)
+library(tidyverse)
+library(data.table)
+library(dplyr)
+library(base)
+
+
+#covid_data_tbl <- read_csv("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
+    
+    col_types_covid_data_tbl <- list(
+    dateRep = col_date("%d/%m/%Y"),
+    year_week = col_character(),
+    cases_weekly = col_double(),
+    deaths_weekly = col_double(),
+    countriesAndTerritories = col_character(),
+    geoId = col_character(),
+    countryterritoryCode = col_character(),
+    popData2019 = col_double(),
+    continentExp = col_character(),
+    `notification_rate_per_100000_population_14-days` = col_double()
+    )
+   
+covid_data_tbl <- vroom(
+            file       = "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", 
+            delim      = ",", 
+            col_types  = col_types_covid_data_tbl,
+            na         = c("", "NA", "NULL")
+        )
+
+covid_data_cumulative_by_month_tbl <- covid_data_tbl %>%
+    
+    # Select relevant columns
+    select(dateRep, cases_weekly, countriesAndTerritories) %>%
+    mutate(month = month(dateRep)) %>%
+    mutate(month_name = months(dateRep)) %>%
+    mutate(year = year(dateRep)) %>%
+    filter(year=="2020")%>%
+    group_by(month, month_name, countriesAndTerritories) %>%  
+    summarize(cases_month = sum(cases_weekly)) %>%
+    arrange(countriesAndTerritories)%>%
+    group_by(countriesAndTerritories) %>%
+    mutate(cases_month_aux = ifelse( is.na(cases_month), 0, cases_month ), #remove NA
+          cum_cases_month = cumsum(cases_month_aux) )%>%
+    mutate(cum_cases_month_abbr = scales::dollar(cum_cases_month, 
+                                                      scale = 1e-6, 
+                                                      prefix       = "", 
+                                                      suffix       = " M")) %>%
+    mutate(cum_cases_month_in_millions = cum_cases_month/1e6) %>%
+    select(month,countriesAndTerritories, cases_month, cum_cases_month, month_name, cum_cases_month_abbr, cum_cases_month_in_millions )
+    
+covid_data_cumulative_by_month_tbl %>%
+filter(countriesAndTerritories %in% c("United_Kingdom","United_States_of_America", "Germany", "Spain", "France", "Brazil"))%>%
+
+  # Set up x, y, fill
+  ggplot(aes(x = factor(month_name, 
+                        level=c("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September","Oktober", "November", "Dezember")), 
+                        y = cum_cases_month_in_millions, group=countriesAndTerritories, color=countriesAndTerritories)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  # Geometries
+  geom_point() +
+  geom_line(aes(label=countriesAndTerritories)) +
+  #geom_smooth(method = "lm", se = FALSE)+
+  
+  #scale_x_continuous(breaks = seq(1, 12, by=1)) +
+  #scale_y_discrete() +
+  #xlim(1,12)+
+  ylim(0, 20)+
+  
+  #verify with Prof geom_label
+  #geom_label(label = covid_data_cumulative_by_month_tbl %>%
+   #                   filter(cum_cases_month_in_millions > 1000000),
+    #           vjust = -0.5, 
+     #          size  = 3,
+      #         fill  = "#1f78b4",
+       #        color = "white",
+        #       fontface = "italic",
+         #      data = covid_data_cumulative_by_month_tbl %>%
+          #            filter(cum_cases_month_in_millions > 1000000)) +
+    
+labs(
+      title = "COVID-19 Confirmed Cases Worldwide",
+      subtitle = "-",
+      x = "YEAR 2020",
+      y = "Cumulative Cases (in millions)"
+      )
+```
+
+## Challenge 05.2 ----
+
+Goal: Visualize the distribution of the mortality rate (deaths / population) with geom_map(). The necessary longitudinal and lateral data can be accessed with this function:
+
+world <- map_data("world")
+
+This data has also to be put in the map argument of geom_map():
+
+plot_data %>% ggplot( ... ) +
+  geom_map(aes(map_id = ..., ... ), map = world, ... ) +
+  ...
+
+```{r}
+library(tidyverse)
+#install.packages("maps")
+library(maps)
+library(vroom)
+library(data.table)
+library(dplyr)
+library(base)
+library(tictoc)
+
+world <- map_data("world")
+col_types_covid_data_tbl <- list(
+    dateRep = col_date("%d/%m/%Y"),
+    year_week = col_character(),
+    cases_weekly = col_double(),
+    deaths_weekly = col_double(),
+    countriesAndTerritories = col_character(),
+    geoId = col_character(),
+    countryterritoryCode = col_character(),
+    popData2019 = col_double(),
+    continentExp = col_character(),
+    `notification_rate_per_100000_population_14-days` = col_double()
+    )
+   
+covid_data_tbl <- vroom(
+            file       = "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", 
+            delim      = ",", 
+            col_types  = col_types_covid_data_tbl,
+            na         = c("", "NA", "NULL")
+        )
+covid_data_cumulative_death_by_country_tbl <- covid_data_tbl %>%
+    
+    # Select relevant columns
+    select(dateRep,countriesAndTerritories,deaths_weekly, popData2019) %>%
+    mutate(year = year(dateRep)) %>%
+    filter(year=="2020")%>%
+    group_by(countriesAndTerritories, popData2019) %>%  
+    summarize(deaths_sum = sum(deaths_weekly)) %>%
+    arrange(countriesAndTerritories)%>%
+    mutate(mortality_per_million= deaths_sum/popData2019*100*1000)
+  
+#tic()
+#combined_covid_death_world_tbl <- merge(x = covid_data_cumulative_death_by_country_tbl, y = world, 
+#                       by.x = "countriesAndTerritories", by.y = "region",
+#                       all.x = TRUE, 
+#                       all.y = TRUE)%>%
+#mutate(patents_unit=1)%>%
+# group_by(organization) %>%
+ # summarize(number_of_patents = sum(patents_unit)) %>%
+# # ungroup()%>%
+#arrange(number_of_patents)
+#toc()
+
+#combined_assignee_patent_assignee_tbl %>%
+   # select(organization, number_of_patents) %>%
+  #  arrange(desc(number_of_patents)) %>%
+  #  slice(1:11) %>%
+  #  filter(organization!="")
+
+
+
+#cas <- covid_data_cumulative_death_by_country_tbl %>%
+  #  select(countriesAndTerritories,deaths_sum, popData2019, mortality_per_million)%>%
+  #  mutate(across(countriesAndTerritories, str_replace_all, "_", " ")) %>%
+  #  mutate(countriesAndTerritories = case_when(countriesAndTerritories == "United Kingdom" ~ "UK",
+    #      countriesAndTerritories == "United States of America" ~ "USA",
+      #    countriesAndTerritories == "Czechia" ~ "Czech Republic",
+      #    TRUE ~ countriesAndTerritories
+       #   ))
+#
+```
+
+# Challenge 06_Machine Learning Fundamentals
+
+## Summary
+
+__Your organization wants to know which companies are similar to each other to help in identifying potential customers of a SAAS software solution (e.g. Salesforce CRM or equivalent) in various segments of the market. The Sales Department is very interested in this analysis, which will help them more easily penetrate various market segments.__
+
+You will be using stock prices in this analysis. You come up with a method to classify companies based on how their stocks trade using their daily stock returns (percentage movement from one day to the next). This analysis will help your organization determine which companies are related to each other (competitors and have similar attributes). 
+
+You can analyze the stock prices using what you've learned in the unsupervised learning tools including K-Means and UMAP. You will use a combination of `kmeans()` to find groups and `umap()` to visualize similarity of daily stock returns.
+
+## Objectives
+
+Apply your knowledge on K-Means and UMAP along with `dplyr`, `ggplot2`, and `purrr` to create a visualization that identifies subgroups in the S&P 500 Index. You will specifically apply:
+
+- Modeling: `kmeans()` and `umap()`
+- Iteration: `purrr`
+- Data Manipulation: `dplyr`, `tidyr`, and `tibble`
+- Visualization: `ggplot2` (bonus `plotly`)
+
+
+## Libraries
+
+Load the following libraries. 
+
+
+```{r}
+#install.packages("plotly")
+#install.packages("tidyquant")
+#install.packages("umap")
+
+library(tidyverse)
+library(tidyquant)
+library(broom)
+library(umap)
+```
+
+
+## Data
+
+We will be using stock prices in this analysis. Although some of you know already how to use an API to retrieve stock prices I obtained the stock prices for every stock in the S&P 500 index for you already. The files are saved in the `session_6_data` directory. 
+
+We can read in the stock prices. The data is 1.2M observations. The most important columns for our analysis are:
+
+- `symbol`: The stock ticker symbol that corresponds to a company's stock price
+- `date`: The timestamp relating the symbol to the share price at that point in time
+- `adjusted`: The stock price, adjusted for any splits and dividends (we use this when analyzing stock data over long periods of time) 
+
+
+```{r}
+# STOCK PRICES
+sp_500_prices_tbl <- read_rds("00_data/06/sp_500_prices_tbl.rds")
+sp_500_prices_tbl
+```
+
+The second data frame contains information about the stocks the most important of which are:
+
+- `company`: The company name
+- `sector`: The sector that the company belongs to
+
+```{r}
+# SECTOR INFORMATION
+sp_500_index_tbl <- read_rds("00_data/06/sp_500_index_tbl.rds")
+sp_500_index_tbl
+```
+
+
+## Question
+
+<mark>Which stock prices behave similarly?</mark>
+
+Answering this question helps us __understand which companies are related__, and we can use clustering to help us answer it!
+
+Even if you're not interested in finance, this is still a great analysis because it will tell you which companies are competitors and which are likely in the same space (often called sectors) and can be categorized together. Bottom line - This analysis can help you better understand the dynamics of the market and competition, which is useful for all types of analyses from finance to sales to marketing.  
+
+Let's get started. 
+
+### Step 1 - Convert stock prices to a standardized format (daily returns)
+
+What you first need to do is get the data in a format that can be converted to a "user-item" style matrix. The challenge here is to connect the dots between what we have and what we need to do to format it properly.
+
+We know that in order to compare the data, it needs to be standardized or normalized. Why? Because we cannot compare values (stock prices) that are of completely different magnitudes. In order to standardize, we will convert from adjusted stock price (dollar value) to daily returns (percent change from previous day). Here is the formula. 
+
+$$ 
+return_{daily} = \frac{price_{i}-price_{i-1}}{price_{i-1}}
+$$
+
+First, what do we have? We have stock prices for every stock in the [SP 500 Index](https://finance.yahoo.com/quote/%5EGSPC?p=%5EGSPC), which is the daily stock prices for over 500 stocks. The data set is over 1.2M observations. 
+
+```{r}
+sp_500_prices_tbl %>% glimpse()
+```
+
+Your first task is to convert to a tibble named `sp_500_daily_returns_tbl` by performing the following operations:
+
+- Select the `symbol`, `date` and `adjusted` columns
+- Filter to dates beginning in the year 2018 and beyond. 
+- Compute a Lag of 1 day on the adjusted stock price. Be sure to group by symbol first, otherwise we will have lags computed using values from the previous stock in the data frame. 
+- Remove a `NA` values from the lagging operation
+- Compute the difference between adjusted and the lag
+- Compute the percentage difference by dividing the difference by that lag. Name this column `pct_return`.
+- Return only the `symbol`, `date`, and `pct_return` columns
+- Save as a variable named `sp_500_daily_returns_tbl`
+
+```{r}
+# Apply your data transformation skills!
+
+sp_500_daily_returns_tbl <- sp_500_prices_tbl %>%
+    
+    # Select relevant columns
+    select(symbol, date, adjusted) %>%
+    filter(year(date)>="2018")%>%
+    group_by(symbol) %>%  
+    mutate(adjusted_lag = lag(adjusted,1))%>%  
+    filter(adjusted_lag!="NA")%>%
+    mutate(pct_return = (adjusted -adjusted_lag)/adjusted_lag)%>% 
+    select(symbol, date, pct_return)
+
+sp_500_daily_returns_tbl
+# Output: sp_500_daily_returns_tbl
+```
+
+
+### Step 2 - Convert to User-Item Format
+
+The next step is to convert to a user-item format with the `symbol` in the first column and every other column the value of the _daily returns_ (`pct_return`) for every stock at each `date`.
+
+We're going to import the correct results first (just in case you were not able to complete the last step).
+
+```{r}
+
+sp_500_daily_returns_tbl <- read_rds("00_data/06/sp_500_daily_returns_tbl.rds")
+sp_500_daily_returns_tbl
+
+```
+
+
+Now that we have the daily returns (percentage change from one day to the next), we can convert to a user-item format. The user in this case is the `symbol` (company), and the item in this case is the `pct_return` at each `date`. 
+
+- Spread the `date` column to get the values as percentage returns. Make sure to fill an `NA` values with zeros. 
+- Save the result as `stock_date_matrix_tbl`
+
+```{r}
+# Convert to User-Item Format
+stock_date_matrix_tbl <- sp_500_daily_returns_tbl %>%
+
+    select(symbol, date, pct_return) %>%
+    pivot_wider(names_from = date, values_from = pct_return, values_fill = 0) %>%
+    ungroup()
+
+stock_date_matrix_tbl
+
+# Output: stock_date_matrix_tbl
+```
+
+
+
+### Step 3 - Perform K-Means Clustering
+
+Next, we'll perform __K-Means clustering__. 
+
+We're going to import the correct results first (just in case you were not able to complete the last step).
+```{r}
+#if I load this data bas I get an error: for 
+#stock_date_matrix_tbl <- read_rds("00_data/06/stock_date_matrix_tbl.rds")
+```
+
+Beginning with the `stock_date_matrix_tbl`, perform the following operations:
+
+- Drop the non-numeric column, `symbol`
+- Perform `kmeans()` with `centers = 4` and `nstart = 20`
+- Save the result as `kmeans_obj`
+
+```{r}
+#Create kmeans_obj for 4 centers
+
+kmeans_obj <- stock_date_matrix_tbl %>%
+    select(-symbol) %>%
+    kmeans(centers = 4, nstart = 20)
+
+```
+
+Use `glance()` to get the `tot.withinss`. 
+
+```{r}
+# Apply glance() to get the tot.withinss
+broom::glance(kmeans_obj)
+```
+
+### Step 4 - Find the optimal value of K
+
+Now that we are familiar with the process for calculating `kmeans()`, let's use `purrr` to iterate over many values of "k" using the `centers` argument. 
+
+We'll use this __custom function__ called `kmeans_mapper()`:
+
+```{r}
+kmeans_mapper <- function(center = 3) {
+    stock_date_matrix_tbl %>%
+        select(-symbol) %>%
+        kmeans(centers = center, nstart = 20)
+
+}
+```
+
+Apply the `kmeans_mapper()` and `glance()` functions iteratively using `purrr`.
+
+- Create a tibble containing column called `centers` that go from 1 to 30
+- Add a column named `k_means` with the `kmeans_mapper()` output. Use `mutate()` to add the column and `map()` to map centers to the `kmeans_mapper()` function.
+- Add a column named `glance` with the `glance()` output. Use `mutate()` and `map()` again to iterate over the column of `k_means`.
+- Save the output as `k_means_mapped_tbl` 
+
+
+```{r K Means Error}
+
+library(purrr)
+
+#k_means_mapped_tbl <- tibble(centers = 1:30) %>%
+  #  mutate(k_means = centers %>% purrr:map(kmeans_mapper)) %>%
+ #   mutate(glance = k_means %>% purrr:map(glance))
+#k_means_mapper_tbl
+
+#Error generated only when building site:
+
+#Error: Problem with `mutate()` input `k_means`.
+#x cannot coerce type 'closure' to vector of type 'character'
+#i Input `k_means` is `centers %>% map(kmeans_mapper)`.
+#Backtrace:
+ #    x
+ # 1. +-rmarkdown::render_site(encoding = "UTF-8")
+#  2. | \-generator$render(...)
+ # 3. |   \-base::sapply(...)
+  #4. |     \-base::lapply(X = X, FUN = FUN, ...)
+#  5. |       \-rmarkdown:::FUN(X[[i]], ...)
+ # 6. |         \-rmarkdown:::render_one(...)
+  #7. |           +-base::suppressMessages(rmarkdown::render(...))
+#  8. |           | \-base::withCallingHandlers(...)
+ # 9. |           \-rmarkdown::render(...)
+ #10. |             \-knitr::knit(knit_input, knit_output, envir = envir, quiet = quiet)
+ #11. |               \-knitr:::process_file(text, output)
+ #12. |                 +-base::withCallingHandlers(...)
+ #13. |                 +-knitr:::process_group(group)
+ #14. |                 \-knitr:::process_group.block(group)
+ #15. |                   \-knitr:::call_block(x)
+ #16. |                     \-knitr:::block_exec(params)
+ #17. |                       +-knitr:::in_dir(...)
+ #18. |                       \-knitr:::evaluate(...)
+ #19. |                         \-evaluate::evaluate(...)
+ #20. |                           \-evaluate:::evaluate_call(...)
+ #21. |                             +-evaluate:::timing_fn(...)
+ #22. |                             +-base:::handle(...)
+ #23. |                             +-base::withCallingHandlers(...)
+ #24. |                             +-base::withVisible(eval(expr, envir, enclos))
+ #25. |                             \-base::eval(expr, envir, enclos)
+ #26. |                               \-base::eval(expr, envir, enclos)
+ #27. +-`%>%`(...)
+ #28. +-dplyr::mutate(., glance = k_means %>% map(glance))
+ #29. +-dplyr::mutate(., k_means = centers %>% map(kmeans_mapper))
+ #30. +-dplyr:::mutate.data.frame(., k_means = centers %>% map(kmeans_mapper))
+ #31. | \-dplyr:::mutate_cols(.data, ...)
+ #32. |   +-base::withCallingHandlers(...)
+ #33. |   \-mask$eval_all_mutate(dots[[i]])
+ #34. +-centers %>% map(kmeans_mapper)
+ #35. +-maps::map(., kmeans_mapper)
+ #36. | \-maps:::map.poly(...)
+ #37. |   \-base::paste("(^", regions, ")", sep = "", collapse = "|")
+ #38. \-base::.handleSimpleError(...)
+ #39.   \-dplyr:::h(simpleError(msg, call))
+
+#Ausf�hrung angehalten
+
+#Exited with status 1.
+
+# Output: k_means_mapped_tbl 
+```
+
+Next, let's visualize the "tot.withinss" from the glance output as a ___Scree Plot___. 
+
+- Begin with the `k_means_mapped_tbl`
+- Unnest the `glance` column
+- Plot the `centers` column (x-axis) versus the `tot.withinss` column (y-axis) using `geom_point()` and `geom_line()`
+- Add a title "Scree Plot" and feel free to style it with your favorite theme
+
+```{r}
+
+# Visualize Scree Plot
+#k_means_mapped_tbl %>%
+ #   unnest(glance) %>%
+  #  select(centers, tot.withinss)%>%
+    
+    # Visualization
+   # ggplot(aes(centers, tot.withinss)) +
+    #geom_point(color = "#2DC6D6", size = 4) +
+    #geom_line(color = "#2DC6D6", size = 1) +
+    # Add labels (which are repelled a little)
+    #ggrepel::geom_label_repel(aes(label = centers), color = "#2DC6D6") +
+    # Formatting
+    #labs(title = "Scree Plot",
+    #subtitle = "",
+    #caption = "")  
+```
+
+We can see that the Scree Plot becomes linear (constant rate of change) between 5 and 10 centers for K.
+
+
+### Step 5 - Apply UMAP
+
+Next, let's plot the `UMAP` 2D visualization to help us investigate cluster assignments. 
+
+
+We're going to import the correct results first (just in case you were not able to complete the last step).
+```{r}
+
+k_means_mapped_tbl <- read_rds("00_data/06/k_means_mapped_tbl.rds")
+```
+
+First, let's apply the `umap()` function to the `stock_date_matrix_tbl`, which contains our user-item matrix in tibble format.
+
+- Start with `stock_date_matrix_tbl`
+- De-select the `symbol` column
+- Use the `umap()` function storing the output as `umap_results`
+```{r}
+# Apply UMAP
+
+umap_results <- stock_date_matrix_tbl %>%
+    select(-symbol) %>%
+    umap()
+# Store results as: umap_results 
+```
+
+Next, we want to combine the `layout` from the `umap_results` with the `symbol` column from the `stock_date_matrix_tbl`.
+
+- Start with `umap_results$layout`
+- Convert from a `matrix` data type to a `tibble` with `as_tibble()`
+- Bind the columns of the umap tibble with the `symbol` column from the `stock_date_matrix_tbl`.
+- Save the results as `umap_results_tbl`.
+
+```{r}
+# Convert umap results to tibble with symbols
+umap_results_tbl <- umap_results$layout %>%
+    as_tibble(.name_repair = "unique") %>% # argument is required to set names in the next step
+    set_names(c("x", "y")) %>%
+    bind_cols(
+        stock_date_matrix_tbl %>% select(symbol)
+    )
+umap_results_tbl
+# Output: umap_results_tbl
+```
+
+Finally, let's make a quick visualization of the `umap_results_tbl`.
+
+- Pipe the `umap_results_tbl` into `ggplot()` mapping the columns to x-axis and y-axis
+- Add a `geom_point()` geometry with an `alpha = 0.5`
+- Apply `theme_tq()` and add a title "UMAP Projection"
+
+```{r}
+# Visualize UMAP results
+umap_results_tbl %>%
+  ggplot(aes(x,y))+
+  geom_point(size=0.5)+
+  theme_tq(base_size=11)+
+  labs(title = "UMAP Projection",
+    subtitle = "",
+    caption = "")  
+```
+
+We can now see that we have some clusters. However, we still need to combine the K-Means clusters and the UMAP 2D representation. 
+
+
+
+### Step 6 - Combine K-Means and UMAP
+
+Next, we combine the K-Means clusters and the UMAP 2D representation
+
+We're going to import the correct results first (just in case you were not able to complete the last step).
+```{r}
+
+k_means_mapped_tbl <- read_rds("00_data/06/k_means_mapped_tbl.rds")
+umap_results_tbl   <- read_rds("00_data/06/umap_results_tbl.rds")
+```
+
+
+First, pull out the K-Means for 10 Centers. Use this since beyond this value the Scree Plot flattens. 
+Have a look at the business case to recall how that works.
+
+```{r}
+# Get the k_means_obj from the 10th center
+
+# Get the data for the third element (which we have chosen in the skree plot)
+k_means_obj <- k_means_mapped_tbl %>%
+    pull(k_means) %>%
+    pluck(10)
+
+# Store as k_means_obj
+```
+
+Next, we'll combine the clusters from the `k_means_obj` with the `umap_results_tbl`.
+
+- Begin with the `k_means_obj`
+- Augment the `k_means_obj` with the `stock_date_matrix_tbl` to get the clusters added to the end of the tibble
+- Select just the `symbol` and `.cluster` columns
+- Left join the result with the `umap_results_tbl` by the `symbol` column
+- Left join the result with the result of `sp_500_index_tbl %>% select(symbol, company, sector)` by the `symbol` column. 
+- Store the output as `umap_kmeans_results_tbl`
+
+```{r}
+# Use your dplyr & broom skills to combine the k_means_obj with the umap_results_tbl
+
+# Convert it to a tibble with broom
+kmeans_clusters_tbl <- k_means_obj %>% 
+    augment(stock_date_matrix_tbl) %>%
+    # Select the data we need
+    select(symbol, .cluster)
+
+# Bind data together
+umap_kmeans_results_tbl <- umap_results_tbl %>%
+    left_join(kmeans_clusters_tbl)
+
+# Output: umap_kmeans_results_tbl 
+```
+
+Plot the K-Means and UMAP results.
+
+- Begin with the `umap_kmeans_results_tbl`
+- Use `ggplot()` mapping `V1`, `V2` and `color = .cluster`
+- Add the `geom_point()` geometry with `alpha = 0.5`
+- Apply colors as you desire (e.g. `scale_color_manual(values = palette_light() %>% rep(3))`)
+
+```{r}
+# Visualize the combined K-Means and UMAP results
+
+umap_kmeans_results_tbl %>%
+    mutate(label_text = str_glue("Customer: {symbol}
+                                 Cluster: {.cluster}")) %>%
+                                 
+    ggplot(aes(V1,V2,color = .cluster)) +
+    # Geometries
+    
+    geom_point(size=0.5) +
+    
+    # Formatting
+    scale_color_manual(values=c("#2d72d6", "#2dc6d6", "#2dd692","#641E16","#1ABC9C","#F9E79F", "#E5E7E9", "#E6B0AA", "#2874A6", "#17202A")) +
+    labs(title = "K-Means and UMAP results",
+    subtitle = "",
+    caption = "") +
+    theme(legend.position = "none")
+
+
+```
+
+Congratulations! You are done with the 1st challenge!
+
+# Challenge 07_Supervised ML Regression(I)
+
+no challenge for this chapter
+
+# Challenge 08_Supervised ML Regression(II)
+
+In this session we did not use the recipes packages to prepare our data. This is going to be your challenge. For further information take a look at the last session or just use google. Prepare the data for the models with the steps provided below. Remember, you don’t need to set the flags by yourself (see all_nominal()).
+
+##I. Build a model
+
+```{r }
+
+```
+
+##II. Create features with the recipes package
+
+This is just a template. Check the documentation for further information.
+
+?recipe
+?step_dummy
+?prep
+?bake
+
+recipe_obj <- recipe(...) %>% 
+                step_rm(...) %>% 
+                step_dummy(... ) %>% # Check out the argument one_hot = T
+                prep()
+
+train_transformed_tbl <- bake(..., ...)
+test_transformed_tbl  <- bake(..., ...)
+III. Bundle the model and recipe with the workflow package
+
+##IV. Evaluate your model with the yardstick package
+
+Just use the function, that we have created in this session.
+
+# Challenge 09_Automated Machine Learning with H20 (I)
+
+Use your learning from descriptive features and plot_ggpairs() to further investigate the features. Run the functions above according to the features needed. Answer the following questions. Most of the time, you will only need the images from diagonal.
+
+```{r }
+
+employee_attrition_tbl <- read_csv("00_data/09/datasets-1067-1925-WA_Fn-UseC_-HR-Employee-Attrition.csv")
+
+# Libraries 
+library(tidyverse)
+library(readxl)
+library(skimr)
+library(GGally)
+
+# Load Data data definitions
+
+path_data_definitions <- "00_data/09/data_definitions.xlsx"
+definitions_raw_tbl   <- read_excel(path_data_definitions, sheet = 1, col_names = FALSE)
+
+employee_attrition_tbl
+
+```
+
+```{r }
+# Create data tibble, to potentially debug the plot_ggpairs function (because it has a data argument)
+data <- employee_attrition_tbl %>%
+    select(Attrition, Age, Gender, MaritalStatus, NumCompaniesWorked, Over18, DistanceFromHome)
+
+plot_ggpairs <- function(data, color = NULL, density_alpha = 0.5) {
+    
+    color_expr <- enquo(color)
+    
+    if (rlang::quo_is_null(color_expr)) {
+        
+        g <- data %>%
+            ggpairs(lower = "blank") 
+        
+    } else {
+        
+        color_name <- quo_name(color_expr)
+        
+        g <- data %>%
+            ggpairs(mapping = aes_string(color = color_name), 
+                    lower = "blank", legend = 1,
+                    diag = list(continuous = wrap("densityDiag", 
+                                                  alpha = density_alpha))) +
+            theme(legend.position = "bottom")
+    }
+    
+    return(g)
+    
+}
+
+
+```
+
+##1. Compensation Features
+
+What can you deduce about the interaction between Monthly Income and Attrition?
+
+a. Those that are leaving the company have a higher Monthly Income
+b. That those are staying have a lower Monthly Income
+c. Those that are leaving have a lower Monthly Income
+d. It's difficult to deduce anything based on the visualization
+
+Answer: alternative C - the density of YES-Attrition is higher of a lower income, only in the first part of the chart collum 2 row 2. WIth a small exception of a peak around 10k of Monthly income, that can be taken out of account.
+```{r }
+#   3. Compensation features: MonthlyIncome 
+employee_attrition_tbl %>%
+    select(Attrition, contains("income")) %>%
+    plot_ggpairs(Attrition)
+```
+##2. Compensation Features
+
+What can you deduce about the interaction between Percent Salary Hike and Attrition?
+
+a.Those that are leaving the company have a higher Percent Salary Hike
+b.Those that are staying have a lower Percent Salary Hike
+c.Those that are leaving have lower Percent Salary Hike
+d.It's difficult to deduce anything based on the visualization
+
+Answer: alternative D - the percent of salary against the Attrition does not show anything that could be interpreted as a role player or as a predictor.
+
+```{r }
+#   3. Compensation features: PercentSalaryHike 
+employee_attrition_tbl %>%
+    select(Attrition, contains("salaryhike")) %>%
+    plot_ggpairs(Attrition)
+```
+##3. Compensation Features
+
+What can you deduce about the interaction between Stock Option Level and Attrition?
+
+a.Those that are leaving the company have a higher stock option level
+b.Those that are staying have a higher stock option level
+c.It's difficult to deduce anything based on the visualization
+
+Answer: alternative B - the density chart show us that the ones leaving the company tend to have a lower Stock Option Level than the ones staying.Or that the ones staying tend to have a higher stock option level than the ones leaving.
+
+from the box plot, we can deduce that at least 50% of the ones who left the company had stock level in 0. We can also deduce that at least 50% of the ones staying have Stock Option level 1 or more. 
+
+```{r }
+#   3. Compensation features: Stock 
+employee_attrition_tbl %>%
+    select(Attrition, contains("stock")) %>%
+    plot_ggpairs(Attrition)
+```
+##4. Survey Results
+
+What can you deduce about the interaction between Environment Satisfaction and Attrition?
+
+a. A higher proportion of those leaving have a low environment satisfaction level
+b. A higher proportion of those leaving have a high environment satisfaction level
+c. It's difficult to deduce anything based on the visualization
+
+Answer: alternative B - at least 50% of the ones leaving the company have high environmental satisfactions, based on the box plot.
+```{r }
+#   4. Survey Results: Environment
+employee_attrition_tbl %>%
+    select(Attrition, contains("Environment")) %>%
+    plot_ggpairs(Attrition)
+```
+##5. Survey Results
+
+What can you deduce about the interaction between Work Life Balance and Attrition
+
+a. Those that are leaving have higher density of 2's and 3's
+b. Those that are staying have a higher density of 2's and 3's
+c. Those that are staying have a lower density of 2's and 3's
+d. It's difficult to deduce anything based on the visualization
+
+Answer: alternative B as shown in the density chart in red
+
+```{r }
+#   4. Survey Results: WorkLifeBalance 
+employee_attrition_tbl %>%
+    select(Attrition, contains("life")) %>%
+    plot_ggpairs(Attrition)
+```
+
+##6. Performance Data
+
+What Can you deduce about the interaction between Job Involvement and Attrition?
+
+a. Those that are leaving have a lower density of 3's and 4's
+b. Those that are leaving have a lower density of 1's and 2's
+c. Those that are staying have a lower density of 2's and 3's
+d. It's difficult to deduce anything based on the visualization
+
+Answer: alternative B as shown in the density chart in red
+
+```{r }
+#   5. Performance Data: Job Involvement
+employee_attrition_tbl %>%
+    select(Attrition, contains("involvement")) %>%
+    plot_ggpairs(Attrition)
+```
+
+##7. Work-Life Features
+
+What can you deduce about the interaction between Over Time and Attrition?
+
+a. The proportion of those leaving that are working Over Time are high compared to those that are not leaving
+b. The proportion of those staying that are working Over Time are high compared to those that are not staying
+
+Answer: alternative A - the employees staying have a much smaller proportion of overtime x no overtime than the ones leaving.
+
+```{r }
+#   6. Work-Life Features 
+employee_attrition_tbl %>%
+    select(Attrition, contains("overtime")) %>%
+    plot_ggpairs(Attrition)
+```
+
+##8. Training and Education
+
+What can you deduce about the interaction between Training Times Last Year and Attrition
+
+a. People that leave tend to have more annual trainings
+b. People that leave tend to have less annual trainings
+c. It's difficult to deduce anything based on the visualization
+
+Answer: alternative B
+
+```{r }
+#   7. Training and Education 
+employee_attrition_tbl %>%
+    select(Attrition, contains("training")) %>%
+    plot_ggpairs(Attrition)
+
+```
+
+##9. Time-Based Features
+
+What can you deduce about the interaction between Years At Company and Attrition
+
+a. People that leave tend to have more working years at the company
+b. People that leave tend to have less working years at the company
+c. It's difficult to deduce anything based on the visualization
+
+Answer: alternative B
+```{r }
+#   8. Time-Based Features: Years at company
+employee_attrition_tbl %>%
+    select(Attrition, contains("yearsatcompany")) %>%
+    plot_ggpairs(Attrition)
+```
+
+##10. Time-Based Features
+
+What can you deduce about the interaction between Years Since Last Promotion and Attrition?
+
+a. Those that are leaving have more years since last promotion than those that are staying
+b. Those that are leaving have fewer years since last promotion than those that are staying
+c. It's difficult to deduce anything based on the visualization
+
+answer: alternative C
+```{r }
+#   8. Time-Based Features: Promotion
+employee_attrition_tbl %>%
+    select(Attrition, contains("promotion")) %>%
+    plot_ggpairs(Attrition)
+```
+
+
+```{r }
+
+```
+
+# Challenge 10_Automated Machine Learning with H20 (II)
+
+## 1. Load the training & test dataset
+
+```{r}
+# H2O modeling
+library(tidyverse)
+library(readxl)
+library(rsample)
+library(recipes)
+library(PerformanceAnalytics)
+library(h2o)
+
+product_backorders_tbl          <- read_csv("https://github.com/TUHHStartupEngineers/dat_sci_ss20/raw/master/10/product_backorders.csv")
+
+set.seed(seed = 1113)
+split_obj                       <- rsample::initial_split(product_backorders_tbl, prop = 0.85)
+train_readable_tbl              <- training(split_obj)
+test_readable_tbl               <- testing(split_obj)
+
+recipe_obj <- recipe(went_on_backorder ~., data = train_readable_tbl) %>% 
+    step_zv(all_predictors()) %>% 
+    prep()
+
+train_tbl <- bake(recipe_obj, new_data = train_readable_tbl)
+test_tbl  <- bake(recipe_obj, new_data = test_readable_tbl)
+```
+
+## 2. Specifiy the response and predictor variables
+
+```{r}
+# Modeling
+h2o.init()
+
+# Split data into a training and a validation data frame
+# Setting the seed is just for reproducability
+split_h2o <- h2o.splitFrame(as.h2o(train_tbl), ratios = c(0.85), seed = 1234)
+train_h2o <- split_h2o[[1]]
+valid_h2o <- split_h2o[[2]]
+test_h2o  <- as.h2o(test_tbl)
+
+# Set the target and predictors
+y <- "went_on_backorder"
+x <- setdiff(names(train_h2o), y)
+```
+
+## 3. run AutoML specifying the stopping criterion
+
+```{r}
+?h2o.automl
+
+automl_models_h2o <- h2o.automl(
+  x = x,
+  y = y,
+  training_frame    = train_h2o,
+  validation_frame  = valid_h2o,
+  leaderboard_frame = test_h2o,
+  max_runtime_secs  = 30,
+  nfolds            = 5 
+)
+```
+
+## 4. View the leaderboard
+
+```{r}
+typeof(automl_models_h2o)
+
+slotNames(automl_models_h2o)
+
+automl_models_h2o@leaderboard
+
+automl_models_h2o@leader
+```
+
+## 5. Predicting using Leader Model
+
+```{r}
+# Choose whatever model you want
+h2o.init()
+stacked_ensemble_h2o <- h2o.getModel("StackedEnsemble_AllModels_AutoML_20210322_192104")
+stacked_ensemble_h2o
+
+predictions <- h2o.predict(stacked_ensemble_h2o, newdata = as.h2o(test_tbl))
+
+typeof(predictions)
+## [1] "environment"
+
+predictions_tbl <- predictions %>% as_tibble()
+```
+
+## 6. Save the leader model
+
+```{r}
+#h2o.getModel("StackedEnsemble_AllModels_AutoML_20210322_192104") %>%
+#h2o.saveModel(path = "04_Modeling/h2o_models/")
+```
+
+# Challenge 11_Performance Measures
+
+Apply all the steps you have learned in this session on the dataset from challenge of the last session (Product Backorders):
+
+## 1. Leaderboard visualization
+
+```{r}
+
+h2o.init()
+automl_models_h2o@leaderboard %>% 
+              as_tibble() %>% 
+              select(-c(mean_per_class_error, rmse, mse))
+```
+
+```{r}
+
+h2o.init()
+# Visualize the H2O leaderboard to help with model selection
+data_transformed_tbl <- automl_models_h2o@leaderboard %>%
+        as_tibble() %>%
+        select(-c(aucpr, mean_per_class_error, rmse, mse)) %>% 
+        mutate(model_type = str_extract(model_id, "[^_]+")) %>%
+        slice(1:15) %>% 
+        rownames_to_column(var = "rowname") %>%
+        # Visually this step will not change anything
+        # It reorders the factors under the hood
+        mutate(
+          model_id   = as_factor(model_id) %>% reorder(auc),
+          model_type = as.factor(model_type)
+          ) %>% 
+          pivot_longer(cols = -c(model_id, model_type, rowname), 
+                       names_to = "key", 
+                       values_to = "value", 
+                       names_transform = list(key = forcats::fct_inorder)
+                       ) %>% 
+        mutate(model_id = paste0(rowname, ". ", model_id) %>% as_factor() %>% fct_rev())
+
+data_transformed_tbl %>%
+        ggplot(aes(value, model_id, color = model_type)) +
+        geom_point(size = 3) +
+        geom_label(aes(label = round(value, 2), hjust = "inward")) +
+        
+        # Facet to break out logloss and auc
+        facet_wrap(~ key, scales = "free_x") +
+        labs(title = "Leaderboard Metrics",
+             subtitle = paste0("Ordered by: ", "auc"),
+             y = "Model Postion, Model ID", x = "") + 
+        theme(legend.position = "bottom")
+
+```
+
+```{r}
+
+h2o.init()
+plot_h2o_leaderboard <- function(h2o_leaderboard, order_by = c("auc", "logloss"), 
+                                 n_max = 20, size = 4, include_lbl = TRUE) {
+
+    # Setup inputs
+    # adjust input so that all formats are working
+    order_by <- tolower(order_by[[1]])
+
+    leaderboard_tbl <- h2o_leaderboard %>%
+        as.tibble() %>%
+        select(-c(aucpr, mean_per_class_error, rmse, mse)) %>% 
+        mutate(model_type = str_extract(model_id, "[^_]+")) %>%
+        rownames_to_column(var = "rowname") %>%
+        mutate(model_id = paste0(rowname, ". ", model_id) %>% as.factor())
+
+    # Transformation
+    if (order_by == "auc") {
+
+        data_transformed_tbl <- leaderboard_tbl %>%
+            slice(1:n_max) %>%
+            mutate(
+                model_id   = as_factor(model_id) %>% reorder(auc),
+                model_type = as.factor(model_type)
+            ) %>%
+                pivot_longer(cols = -c(model_id, model_type, rowname), 
+                       names_to = "key", 
+                       values_to = "value", 
+                       names_transform = list(key = forcats::fct_inorder)
+                       )
+
+    } else if (order_by == "logloss") {
+
+        data_transformed_tbl <- leaderboard_tbl %>%
+            slice(1:n_max) %>%
+            mutate(
+                model_id   = as_factor(model_id) %>% reorder(logloss) %>% fct_rev(),
+                model_type = as.factor(model_type)
+            ) %>%
+            pivot_longer(cols = -c(model_id, model_type, rowname), 
+                       names_to = "key", 
+                       values_to = "value", 
+                       names_transform = list(key = forcats::fct_inorder)
+                       )
+
+    } else {
+        # If nothing is supplied
+        stop(paste0("order_by = '", order_by, "' is not a permitted option."))
+    }
+
+    # Visualization
+    g <- data_transformed_tbl %>%
+        ggplot(aes(value, model_id, color = model_type)) +
+        geom_point(size = size) +
+        facet_wrap(~ key, scales = "free_x") +
+        labs(title = "Leaderboard Metrics",
+             subtitle = paste0("Ordered by: ", toupper(order_by)),
+             y = "Model Postion, Model ID", x = "")
+
+    if (include_lbl) g <- g + geom_label(aes(label = round(value, 2), 
+                                             hjust = "inward"))
+
+    return(g)
+
+}
+```
+
+## 2. Tune a model with grid search
+
+```{r}
+
+h2o.init()
+#h2o.getModel("DeepLearning_1_AutoML_20210322_192104") %>% 
+#h2o.saveModel(path = "04_Modeling/h2o_models/")
+
+deeplearning_h2o <- h2o.loadModel("04_Modeling/h2o_models/DeepLearning_1_AutoML_20210322_192104")
+
+# Take a look for the metrics on the training data set
+# For my model the total error in the confusion matrix is ~15 %
+deeplearning_h2o
+
+# We want to see how it performs for the testing data frame
+test_tbl
+
+# Make sure to convert it to an h20 object
+# Accuracy of the confusion matrix shows ~85 % accuracy
+h2o.performance(deeplearning_h2o, newdata = as.h2o(test_tbl))
+```
+```{r}
+deeplearning_grid_01 <- h2o.grid(
+
+    # See help page for available algos
+    algorithm = "deeplearning",
+    
+    # I just use the same as the object
+    grid_id = "deeplearning_grid_01",
+    
+    # The following is for ?h2o.deeplearning()
+    # predictor and response variables
+    x = x,
+    y = y,
+    
+    # training and validation frame and crossfold validation
+    training_frame   = train_h2o,
+    validation_frame = valid_h2o,
+    nfolds = 5,
+    
+    # Hyperparamters: Use deeplearning_h2o@allparameters to see all
+    hyper_params = list(
+        # Use some combinations (the first one was the original)
+        hidden = list(c(10, 10, 10), c(50, 20, 10), c(20, 20, 20)),
+        epochs = c(10, 50, 100)
+    )
+)
+
+```
+
+```{r}
+deeplearning_grid_01
+```
+
+```{r}
+
+h2o.init()
+h2o.getGrid(grid_id = "deeplearning_grid_01", sort_by = "auc", decreasing = TRUE)
+```
+
+```{r}
+
+h2o.init()
+deeplearning_grid_01_model_1 <- h2o.getModel("deeplearning_grid_01_model_1")
+
+deeplearning_grid_01_model_1 %>% h2o.auc(train = T, valid = T, xval = T)
+
+deeplearning_grid_01_model_1 %>%
+    h2o.performance(newdata = as.h2o(test_tbl))
+
+
+```
+
+
+## 3. Visualize the trade of between the precision and the recall and the optimal threshold
+
+```{r}
+
+h2o.init()
+#h2o.getModel("StackedEnsemble_AllModels_AutoML_20210321_133123") %>% 
+#h2o.saveModel(path = "04_Modeling/h2o_models/")
+#h2o.getModel("DeepLearning_1_AutoML_20210321_133123") %>% 
+#h2o.saveModel(path = "04_Modeling/h2o_models/")
+#h2o.getModel("GLM_1_AutoML_20210322_192104") %>% 
+#h2o.saveModel(path = "04_Modeling/h2o_models/")
+
+stacked_ensemble_h2o <- h2o.loadModel("04_Modeling/h2o_models/StackedEnsemble_AllModels_AutoML_20210322_192104")
+deeplearning_h2o     <- h2o.loadModel("04_Modeling/h2o_models/DeepLearning_1_AutoML_20210322_192104")
+glm_h2o              <- h2o.loadModel("04_Modeling/h2o_models/GLM_1_AutoML_20210322_192104")
+
+performance_h2o <- h2o.performance(stacked_ensemble_h2o, newdata = as.h2o(test_tbl))
+
+typeof(performance_h2o)
+performance_h2o %>% slotNames()
+
+# We are focusing on the slot metrics. This slot contains all possible metrics
+performance_h2o@metrics
+
+```
+
+```{r}
+# Classifier Summary Metrics
+
+h2o.auc(performance_h2o, train = T, valid = T, xval = T)
+
+
+# Caution: "train, "val", and "xval" arugments only work for models (not performance objects)
+h2o.auc(stacked_ensemble_h2o, train = T, valid = T, xval = T)
+
+
+h2o.giniCoef(performance_h2o)
+
+h2o.logloss(performance_h2o)
+
+
+# result for the training data
+h2o.confusionMatrix(stacked_ensemble_h2o)
+
+
+# result for the hold out set
+h2o.confusionMatrix(performance_h2o)
+
+```
+
+```{r}
+# Precision vs Recall Plot
+
+# This is on the test set
+performance_tbl <- performance_h2o %>%
+    h2o.metric() %>%
+    as.tibble() 
+
+performance_tbl %>% 
+  glimpse()
+```
+
+```{r}
+
+theme_new <- theme(
+      legend.position  = "bottom",
+      legend.key       = element_blank(),
+      panel.background = element_rect(fill   = "transparent"),
+      panel.border     = element_rect(color = "black", fill = NA, size = 0.5),
+      panel.grid.major = element_line(color = "grey", size = 0.333)
+      )
+
+
+```
+
+```{r}
+performance_tbl %>%
+    filter(f1 == max(f1))
+
+performance_tbl %>%
+    ggplot(aes(x = threshold)) +
+    geom_line(aes(y = precision), color = "blue", size = 1) +
+    geom_line(aes(y = recall), color = "red", size = 1) +
+    
+    # Insert line where precision and recall are harmonically optimized
+    geom_vline(xintercept = h2o.find_threshold_by_max_metric(performance_h2o, "f1")) +
+    labs(title = "Precision vs Recall", y = "value") +
+    theme_new
+
+```
+
+```{r }
+
+```
+
+
+## 4. ROC Plot
+
+```{r}
+# ROC Plot
+h2o.init()
+
+path <- "04_Modeling/h2o_models/StackedEnsemble_AllModels_AutoML_20210322_192104"
+
+load_model_performance_metrics <- function(path, test_tbl) {
+    
+    model_h2o <- h2o.loadModel(path)
+    perf_h2o  <- h2o.performance(model_h2o, newdata = as.h2o(test_tbl)) 
+    
+    perf_h2o %>%
+        h2o.metric() %>%
+        as_tibble() %>%
+        mutate(auc = h2o.auc(perf_h2o)) %>%
+        select(tpr, fpr, auc)
+    
+}
+
+model_metrics_tbl <- fs::dir_info(path = "04_Modeling/h2o_models/") %>%
+    select(path) %>%
+    mutate(metrics = purrr::map(path, load_model_performance_metrics, test_tbl)) %>%
+    unnest(cols = metrics)
+
+model_metrics_tbl %>%
+    mutate(
+        # Extract the model names
+        path = str_split(path, pattern = "/", simplify = T)[,3] %>% as_factor(),
+        auc  = auc %>% round(3) %>% as.character() %>% as_factor()
+        ) %>%
+    ggplot(aes(fpr, tpr, color = path, linetype = auc)) +
+    geom_line(size = 1) +
+    
+    # just for demonstration purposes
+    geom_abline(color = "red", linetype = "dotted") +
+    
+    theme_new +
+    theme(
+      legend.direction = "vertical",
+      ) +
+    labs(
+        title = "ROC Plot",
+        subtitle = "Performance of 3 Top Performing Models"
+    )
+```
+
+```{r}
+
+```
+
+## 5. Precision vs Recall Plot
+
+```{r }
+h2o.init()
+load_model_performance_metrics <- function(path, test_tbl) {
+    
+    model_h2o <- h2o.loadModel(path)
+    perf_h2o  <- h2o.performance(model_h2o, newdata = as.h2o(test_tbl)) 
+    
+    perf_h2o %>%
+        h2o.metric() %>%
+        as_tibble() %>%
+        mutate(auc = h2o.auc(perf_h2o)) %>%
+        select(tpr, fpr, auc, precision, recall)
+    
+}
+
+model_metrics_tbl <- fs::dir_info(path = "04_Modeling/h2o_models/") %>%
+    select(path) %>%
+    mutate(metrics = purrr::map(path, load_model_performance_metrics, test_tbl)) %>%
+    unnest(cols = metrics)
+
+model_metrics_tbl %>%
+    mutate(
+        path = str_split(path, pattern = "/", simplify = T)[,3] %>% as_factor(),
+        auc  = auc %>% round(3) %>% as.character() %>% as_factor()
+    ) %>%
+    ggplot(aes(recall, precision, color = path, linetype = auc)) +
+    geom_line(size = 1) +
+    theme_new + 
+    theme(
+      legend.direction = "vertical",
+      ) +
+    labs(
+        title = "Precision vs Recall Plot",
+        subtitle = "Performance of 3 Top Performing Models"
+    )
+```
+
+## 6. Gain Plot
+
+```{r }
+# Gain & Lift
+
+ranked_predictions_tbl <- predictions_tbl %>%
+    bind_cols(test_tbl) %>%
+    select(predict:Yes, went_on_backorder) %>%
+    # Sorting from highest to lowest class probability
+    arrange(desc(Yes))
+```
+
+```{r }
+ranked_predictions_tbl %>%
+    mutate(ntile = ntile(Yes, n = 10)) %>%
+    group_by(ntile) %>%
+    summarise(
+        cases = n(),
+        responses = sum(went_on_backorder == "Yes")
+    ) %>%
+    arrange(desc(ntile))
+```
+
+```{r }
+calculated_gain_lift_tbl <- ranked_predictions_tbl %>%
+    mutate(ntile = ntile(Yes, n = 10)) %>%
+    group_by(ntile) %>%
+    summarise(
+        cases = n(),
+        responses = sum(went_on_backorder == "Yes")
+    ) %>%
+    arrange(desc(ntile)) %>%
+    
+    # Add group numbers (opposite of ntile)
+    mutate(group = row_number()) %>%
+    select(group, cases, responses) %>%
+    
+    # Calculations
+    mutate(
+        cumulative_responses = cumsum(responses),
+        pct_responses        = responses / sum(responses),
+        gain                 = cumsum(pct_responses),
+        cumulative_pct_cases = cumsum(cases) / sum(cases),
+        lift                 = gain / cumulative_pct_cases,
+        gain_baseline        = cumulative_pct_cases,
+        lift_baseline        = gain_baseline / cumulative_pct_cases
+    )
+
+calculated_gain_lift_tbl 
+```
+
+```{r }
+gain_lift_tbl <- performance_h2o %>%
+    h2o.gainsLift() %>%
+    as.tibble()
+
+## Gain Chart
+
+gain_transformed_tbl <- gain_lift_tbl %>% 
+    select(group, cumulative_data_fraction, cumulative_capture_rate, cumulative_lift) %>%
+    select(-contains("lift")) %>%
+    mutate(baseline = cumulative_data_fraction) %>%
+    rename(gain     = cumulative_capture_rate) %>%
+    # prepare the data for the plotting (for the color and group aesthetics)
+    pivot_longer(cols = c(gain, baseline), values_to = "value", names_to = "key")
+
+gain_transformed_tbl %>%
+    ggplot(aes(x = cumulative_data_fraction, y = value, color = key)) +
+    geom_line(size = 1.5) +
+    labs(
+        title = "Gain Chart",
+        x = "Cumulative Data Fraction",
+        y = "Gain"
+    ) +
+    theme_new
+```
+## 7. Lift Plot
+
+```{r }
+## Lift Plot
+
+lift_transformed_tbl <- gain_lift_tbl %>% 
+    select(group, cumulative_data_fraction, cumulative_capture_rate, cumulative_lift) %>%
+    select(-contains("capture")) %>%
+    mutate(baseline = 1) %>%
+    rename(lift = cumulative_lift) %>%
+    pivot_longer(cols = c(lift, baseline), values_to = "value", names_to = "key")
+
+lift_transformed_tbl %>%
+    ggplot(aes(x = cumulative_data_fraction, y = value, color = key)) +
+    geom_line(size = 1.5) +
+    labs(
+        title = "Lift Chart",
+        x = "Cumulative Data Fraction",
+        y = "Lift"
+    ) +
+    theme_new
+```
+
+
+## 8. Dashboard with cowplot
+
+```{r}
+# 5. Performance Visualization ----  
+#install.packages("cowplot")
+
+library(cowplot)
+library(glue)
+h2o.init()
+
+# set values to test the function while building it
+h2o_leaderboard <- automl_models_h2o@leaderboard
+newdata <- test_tbl
+order_by <- "auc"
+max_models <- 4
+size <- 1
+
+plot_h2o_performance <- function(h2o_leaderboard, newdata, order_by = c("auc", "logloss"),
+                                 max_models = 3, size = 1.5) {
+    
+    # Inputs
+    
+    leaderboard_tbl <- h2o_leaderboard %>%
+        as_tibble() %>%
+        slice(1:max_models)
+    
+    newdata_tbl <- newdata %>%
+        as_tibble()
+    
+    # Selecting the first, if nothing is provided
+    order_by      <- tolower(order_by[[1]]) 
+    
+    # Convert string stored in a variable to column name (symbol)
+    order_by_expr <- rlang::sym(order_by)
+
+    # Turn of the progress bars ( opposite h2o.show_progress())
+    h2o.no_progress()
+    
+    # 1. Model metrics
+    
+    get_model_performance_metrics <- function(model_id, test_tbl) {
+        
+        model_h2o <- h2o.getModel(model_id)
+        perf_h2o  <- h2o.performance(model_h2o, newdata = as.h2o(test_tbl))
+        
+        perf_h2o %>%
+            h2o.metric() %>%
+            as.tibble() %>%
+            select(threshold, tpr, fpr, precision, recall)
+        
+    }
+    
+    model_metrics_tbl <- leaderboard_tbl %>%
+        mutate(metrics = purrr::map(model_id, get_model_performance_metrics, newdata_tbl)) %>%
+        unnest(cols = metrics) %>%
+        mutate(
+          model_id = as_factor(model_id) %>% 
+                      # programmatically reorder factors depending on order_by
+                      fct_reorder(!! order_by_expr, 
+                                  .desc = ifelse(order_by == "auc", TRUE, FALSE)),
+          auc      = auc %>% 
+                      round(3) %>% 
+                      as.character() %>% 
+                      as_factor() %>% 
+                      fct_reorder(as.numeric(model_id)),
+          logloss  = logloss %>% 
+                      round(4) %>% 
+                      as.character() %>% 
+                      as_factor() %>% 
+                      fct_reorder(as.numeric(model_id))
+        )
+    
+    
+    # 1A. ROC Plot
+    
+    p1 <- model_metrics_tbl %>%
+        ggplot(aes(fpr, tpr, color = model_id, linetype = !! order_by_expr)) +
+        geom_line(size = size) +
+        theme_new +
+        labs(title = "ROC", x = "FPR", y = "TPR") +
+        theme(legend.direction = "vertical") 
+        
+    
+    # 1B. Precision vs Recall
+    
+    p2 <- model_metrics_tbl %>%
+        ggplot(aes(recall, precision, color = model_id, linetype = !! order_by_expr)) +
+        geom_line(size = size) +
+        theme_new +
+        labs(title = "Precision Vs Recall", x = "Recall", y = "Precision") +
+        theme(legend.position = "none") 
+    
+    
+    # 2. Gain / Lift
+    
+    get_gain_lift <- function(model_id, test_tbl) {
+        
+        model_h2o <- h2o.getModel(model_id)
+        perf_h2o  <- h2o.performance(model_h2o, newdata = as.h2o(test_tbl)) 
+        
+        perf_h2o %>%
+            h2o.gainsLift() %>%
+            as.tibble() %>%
+            select(group, cumulative_data_fraction, cumulative_capture_rate, cumulative_lift)
+        
+    }
+    
+    gain_lift_tbl <- leaderboard_tbl %>%
+        mutate(metrics = purrr::map(model_id, get_gain_lift, newdata_tbl)) %>%
+        unnest(cols = metrics) %>%
+        mutate(
+            model_id = as_factor(model_id) %>% 
+                fct_reorder(!! order_by_expr, 
+                            .desc = ifelse(order_by == "auc", TRUE, FALSE)),
+            auc  = auc %>% 
+                round(3) %>% 
+                as.character() %>% 
+                as_factor() %>% 
+                fct_reorder(as.numeric(model_id)),
+            logloss = logloss %>% 
+                round(4) %>% 
+                as.character() %>% 
+                as_factor() %>% 
+                fct_reorder(as.numeric(model_id))
+        ) %>%
+        rename(
+            gain = cumulative_capture_rate,
+            lift = cumulative_lift
+        ) 
+    
+    # 2A. Gain Plot
+    
+    p3 <- gain_lift_tbl %>%
+        ggplot(aes(cumulative_data_fraction, gain, 
+                          color = model_id, linetype = !! order_by_expr)) +
+        geom_line(size = size,) +
+        geom_segment(x = 0, y = 0, xend = 1, yend = 1, 
+                     color = "red", size = size, linetype = "dotted") +
+        theme_new +
+        expand_limits(x = c(0, 1), y = c(0, 1)) +
+        labs(title = "Gain",
+             x = "Cumulative Data Fraction", y = "Gain") +
+        theme(legend.position = "none")
+    
+    # 2B. Lift Plot
+    
+    p4 <- gain_lift_tbl %>%
+        ggplot(aes(cumulative_data_fraction, lift, 
+                          color = model_id, linetype = !! order_by_expr)) +
+        geom_line(size = size) +
+        geom_segment(x = 0, y = 1, xend = 1, yend = 1, 
+                     color = "red", size = size, linetype = "dotted") +
+        theme_new +
+        expand_limits(x = c(0, 1), y = c(0, 1)) +
+        labs(title = "Lift",
+             x = "Cumulative Data Fraction", y = "Lift") +
+        theme(legend.position = "none") 
+    
+    
+    # Combine using cowplot
+    
+    # cowplot::get_legend extracts a legend from a ggplot object
+    p_legend <- get_legend(p1)
+    # Remove legend from p1
+    p1 <- p1 + theme(legend.position = "none")
+    
+    # cowplot::plt_grid() combines multiple ggplots into a single cowplot object
+    p <- cowplot::plot_grid(p1, p2, p3, p4, ncol = 2)
+    
+    # cowplot::ggdraw() sets up a drawing layer
+    p_title <- ggdraw() + 
+    
+        # cowplot::draw_label() draws text on a ggdraw layer / ggplot object
+        draw_label("H2O Model Metrics", size = 18, fontface = "bold", 
+                   color = "#2C3E50")
+    
+    p_subtitle <- ggdraw() + 
+        draw_label(glue("Ordered by {toupper(order_by)}"), size = 10,  
+                   color = "#2C3E50")
+    
+    # Combine everything
+    ret <- plot_grid(p_title, p_subtitle, p, p_legend, 
+    
+                     # Adjust the relative spacing, so that the legends always fits
+                     ncol = 1, rel_heights = c(0.05, 0.05, 1, 0.05 * max_models))
+    
+    h2o.show_progress()
+    
+    return(ret)
+
+}
+```
+
+```{r}
+
+h2o.init()
+
+#automl_models_h2o@leaderboard #%>%
+    #plot_h2o_performance(newdata = test_tbl, order_by = "logloss", 
+                         #size = 0.5, max_models = 4)
+
+
+```
+
+
+
+# Challenge 12_Explaining Black-Box Models With LIME
+
+## Part 1: Recreate plot_features(). 
+
+Take the explanation data and use the first case to create a plot similar to the output of plot_features().
+
+
+```{r}
+# LIME FEATURE EXPLANATION ----
+
+# 1. Setup ----
+
+# Load Libraries 
+
+library(h2o)
+library(recipes)
+library(readxl)
+library(tidyverse)
+library(tidyquant)
+library(lime)
+library(rsample)
+library(purrr)
+
+# Load Data
+employee_attrition_tbl <- read_csv("00_data/09/datasets-1067-1925-WA_Fn-UseC_-HR-Employee-Attrition.csv")
+definitions_raw_tbl    <- read_excel("00_data/09/data_definitions.xlsx", sheet = 1, col_names = FALSE)
+
+# Processing Pipeline
+source("00_Scripts/data_processing_pipeline.R")
+
+employee_attrition_readable_tbl <- process_hr_data_readable(employee_attrition_tbl, definitions_raw_tbl)
+
+# Split into test and train
+set.seed(seed = 1113)
+split_obj <- rsample::initial_split(employee_attrition_readable_tbl, prop = 0.85)
+
+# Assign training and test data
+train_readable_tbl <- training(split_obj)
+test_readable_tbl  <- testing(split_obj)
+
+
+
+
+# ML Preprocessing Recipe 
+recipe_obj <- recipe(Attrition ~ ., data = train_readable_tbl) %>%
+                step_zv(all_predictors()) %>%
+                step_mutate_at(c("JobLevel", "StockOptionLevel"), fn = as.factor) %>% 
+                prep()
+
+recipe_obj
+
+train_tbl <- bake(recipe_obj, new_data = train_readable_tbl)
+test_tbl  <- bake(recipe_obj, new_data = test_readable_tbl)
+
+# 2. Models ----
+
+h2o.init()
+
+#h2o.getModel("StackedEnsemble_BestOfFamily_AutoML_20210321_195224") %>% 
+ # h2o.saveModel(path = "04_Modeling/h2o_models_attrition")
+
+automl_leader <- h2o.loadModel("04_Modeling/h2o_models_attrition/StackedEnsemble_BestOfFamily_AutoML_20210322_194400")
+automl_leader
+
+predictions_tbl <- automl_leader %>% 
+    h2o.predict(newdata = as.h2o(test_tbl)) %>%
+    as.tibble() %>%
+    bind_cols(
+        test_tbl %>%
+            select(Attrition, EmployeeNumber)
+    )
+
+predictions_tbl
+
+test_tbl %>%
+    slice(1) %>%
+    glimpse()
+
+explainer <- train_tbl %>%
+    select(-Attrition) %>%
+    lime(
+        model           = automl_leader,
+        bin_continuous  = TRUE,
+        n_bins          = 4,
+        quantile_bins   = TRUE
+    )
+
+explainer
+
+?lime::explain
+
+explanation <- test_tbl %>%
+    #slice(1) %>%
+    select(-Attrition) %>%
+    lime::explain(
+    
+        # Pass our explainer object
+        explainer = explainer,
+        # Because it is a binary classification model: 1
+        n_labels   = 1,
+        # number of features to be returned
+        n_features = 8,
+        # number of localized linear models
+        n_permutations = 5000,
+        # Let's start with 1
+        kernel_width   = 1
+    )
+
+explanation %>% 
+  as.tibble()
+  
+case_1 <- explanation %>%
+    filter(case == 1)
+
+case_1 %>% 
+  as.tibble()
+
+case_1 %>%plot_features()
+
+case_1 %>%
+    ggplot(aes(x=reorder(feature_desc, feature_weight^2), feature_weight))+coord_flip() + geom_col(fill = ifelse(case_1$feature_weight >0, "#3333FF", "#FF0000" )) + labs(
+      title = "Reproduction of plot_features() for case 1",
+      subtitle = "",
+      y = "Weight",
+      x = "Feature"
+      )
+
+
+```
+
+## Part 2: Recreate plot_explanations():
+
+Take the full explanation data and recreate the second plot.
+
+You will need at least the layers geom_tile() and facet_wrap().
+
+```{r}
+
+h2o.init()
+
+explanation <- test_tbl %>%
+    slice(1:20) %>%
+    select(-Attrition) %>%
+    lime::explain(
+        explainer = explainer,
+        n_labels   = 1,
+        n_features = 8,
+        n_permutations = 5000,
+        kernel_width   = 0.5
+    )
+
+
+
+```
+
+
+```{r }
+explanation %>% as_tibble()
+
+plot_explanations(explanation)
+
+explanation %>%
+  ggplot(aes(x=feature_desc,y=factor(case, level=c(1:20)), color = feature_weight)) + 
+  coord_flip()+
+  theme(axis.text.x = element_text(angle = 60, hjust = 0.5))+
+  geom_point()+
+  scale_colour_gradient2(low="red", high="blue")+
+        #geom_point(size = size) +
+        facet_wrap(~ label, scales = "fixed") +
+        labs(title = "Reproduction of plot_explanations(explanation)",
+             subtitle = "",
+             x = "Feature",
+             y = "Case")
+
+```
+
+```{r }
+
+```
+
+```{r }
+
+```
+
+```{r }
+
+```
+
+```{r }
+
+```
+
+
+
